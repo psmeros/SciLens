@@ -16,18 +16,25 @@ sql = '	select body, retweet_count, publishing_date \
 
 
 
-#def hasResolvableURL(tweets):
-
 def extractURLs(tweets):
-	import re	
+	import re
+	import requests
+	import math
+
 	urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
 	urls = pd.Series(tweets['body'].apply(lambda x: re.findall(urlRegex, x)), name="urls")
-	print(urls)
 
-	tweets = pd.concat([tweets, urls], axis=1)
+	#a = urls.apply(lambda listUrl: for url in listUrl if url=='')
+	resolvableURLs = urls.apply(pd.Series).applymap(lambda x: None if pd.isnull(x) else True if requests.get(x).status_code else False)
+	resolvableURLs = pd.Series(np.logical_or.reduce(resolvableURLs, axis=1), name="hasResolvableURLs")
+	print (resolvableURLs.shape)
+
+	tweets = pd.concat([tweets, urls, resolvableURLs], axis=1)
 
 	return tweets
+
+#def hasResolvableURLs(tweets):
 
 
 
@@ -38,7 +45,7 @@ tweets = extractURLs(tweets)
 
 #tweets['hasURL'] = np.where(hasResolvableURL(tweets['body']), True, False)
 
-print (tweets[0:100])
+print (tweets[0:5])
 
 
 
