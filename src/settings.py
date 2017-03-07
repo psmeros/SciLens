@@ -23,3 +23,5 @@ def connectToDB(user, password, db, host='localhost', port=5432):
 
     return con, meta
 
+#Removes duplicate links from a document
+removeDuplicateLinks = True
