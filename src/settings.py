@@ -3,6 +3,7 @@ import pandas as pd
 #SETTINGS
 #Removes duplicate links from a document
 removeDuplicateLinks = True
+linkLimit = 10
 
 # Pandas Settings
 pd.set_option('display.width', 1024)
