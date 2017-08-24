@@ -12,23 +12,33 @@ urlLimit = 10
 urlTimout = 5
 
 # Pandas Settings
-pd.set_option('display.width', 1024)
+pd.set_option('display.max_colwidth', 2048)
+
 cachedDataFrame = 'cachedDataFrame.pkl'
 
-#Creates the query for the DB
-def createQuery(limitDocuments):
+gloveFile = '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt'
+
+#Creates a query for the DB
+def createQuery(limitDocuments, doc_type=''):
     limitline= 'limit '+str(limitDocuments) if(limitDocuments!=-1) else ''
     
-    query = """
-    (select id, body, doc_type
-    from document
-    where doc_type = 'web'
-    """+limitline+"""
-    )
-    UNION
-    (select id, body, doc_type
-    from document
-    where doc_type = 'twitter'
-    """+limitline+"""
-    ) """
+    if (doc_type=='web'):
+        query = """
+        select title, body 
+        from document
+        where doc_type = 'web'
+        """+limitline
+    else:
+        query = """
+        (select id, body, doc_type
+        from document
+        where doc_type = 'web'
+        """+limitline+"""
+        )
+        UNION
+        (select id, body, doc_type
+        from document
+        where doc_type = 'twitter'
+        """+limitline+"""
+        ) """
     return query

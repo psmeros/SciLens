@@ -5,16 +5,28 @@ from ssl import CertificateError
 from socket import timeout as SocketTimeoutError
 import re
 import sys
+import os
+import numpy as np
+
 
 from settings import *
 
+#Loads the Glove Embeddings file
+def loadGloveEmbeddings(filename):
+    print('Loading', filename,'embeddings file')
+    if not os.path.exists(filename):
+        print(filename,'embeddings not found')
+        return None
+    words = {} #key= word, value=embeddings
+    with open(filename, "r") as f:
+        for line in f:
+            tokens = line.strip().split()
+            words[tokens[0]] = np.array([float(x) for x in tokens[1:]])
+    return words
+
 
 #Resolves all the URLs of the documents.
-def resolveURLs(limitDocuments):
-
-    documents = readFromDB(limitDocuments)
-    documents = extractLinks(documents)
-    documents = flattenLinks(documents)
+def resolveURLs(documents):
 
     #Resolves a URL.
     def resolve(url):
@@ -79,16 +91,8 @@ def extractLinks(documents):
     return documents
 
 
-#Reads data from DB.
-def readFromDB(limitDocuments=10):
-    query = createQuery(limitDocuments)
-    documents = queryDB(query, 'smeros', '', 'sciArticles')
-    documents = documents.set_index('id')
-    return documents
-
-
 #Poses query to DB.
-def queryDB(query, user, password, db, host='localhost', port=5432):
+def queryDB(query, user='smeros', password='', db='sciArticles', host='localhost', port=5432):
     import sqlalchemy
     import warnings
 
