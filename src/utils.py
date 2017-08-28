@@ -22,7 +22,7 @@ def loadGloveEmbeddings(filename):
         for line in f:
             tokens = line.strip().split()
             words[tokens[0]] = np.array([float(x) for x in tokens[1:]])
-    return words
+    return words, len(next(iter(words.values())))    
 
 
 #Resolves all the URLs of the documents.
