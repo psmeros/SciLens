@@ -5,24 +5,44 @@ from ssl import CertificateError
 from socket import timeout as SocketTimeoutError
 import re
 import sys
-import os
 import numpy as np
 
 
 from settings import *
 
-#Loads the Glove Embeddings file
-def loadGloveEmbeddings(filename):
-    print('Loading', filename,'embeddings file')
-    if not os.path.exists(filename):
-        print(filename,'embeddings not found')
-        return None
-    words = {} #key= word, value=embeddings
-    with open(filename, "r") as f:
-        for line in f:
-            tokens = line.strip().split()
-            words[tokens[0]] = np.array([float(x) for x in tokens[1:]])
-    return words, len(next(iter(words.values())))    
+
+
+##DB##
+        
+#Poses query to DB.
+def queryDB(query, user='smeros', password='vasoula', db='sciArticles', host='localhost', port=5432):
+    import sqlalchemy
+    import warnings
+
+    with warnings.catch_warnings():
+        '''Returns a connection and a metadata object'''
+        
+        #ignore warning
+        warnings.simplefilter("ignore", category=sqlalchemy.exc.SAWarning)
+        
+        # We connect with the help of the PostgreSQL URL
+        url = 'postgresql://{}:{}@{}:{}/{}'
+        url = url.format(user, password, host, port, db)
+
+        # The return value of create_engine() is our connection object
+        con = sqlalchemy.create_engine(url, client_encoding='utf8')
+
+        # We then bind the connection to MetaData()
+        #meta = sqlalchemy.MetaData(bind=con, reflect=True)
+
+        #results as pandas dataframe
+        results = pd.read_sql_query(query, con, index_col=None, coerce_float=True, params=None, parse_dates=None, chunksize=None)
+        
+        return results
+
+
+    
+##URL Handling##
 
 
 #Resolves all the URLs of the documents.
@@ -67,7 +87,7 @@ def resolveURLs(documents):
 
 #Flattens documents with multiple URLs.
 def flattenLinks(documents):
-    
+
     #Filters out documents that have more than @urlLimit.
     if (applyUrlLimit):
         documents = documents[documents['urls'].apply(lambda x: len(x)) <urlLimit]
@@ -91,36 +111,11 @@ def extractLinks(documents):
     return documents
 
 
-#Poses query to DB.
-def queryDB(query, user='smeros', password='', db='sciArticles', host='localhost', port=5432):
-    import sqlalchemy
-    import warnings
 
-    with warnings.catch_warnings():
-        '''Returns a connection and a metadata object'''
-        
-        #ignore warning
-        warnings.simplefilter("ignore", category=sqlalchemy.exc.SAWarning)
-        
-        # We connect with the help of the PostgreSQL URL
-        url = 'postgresql://{}:{}@{}:{}/{}'
-        url = url.format(user, password, host, port, db)
+##Text Summarization
 
-        # The return value of create_engine() is our connection object
-        con = sqlalchemy.create_engine(url, client_encoding='utf8')
 
-        # We then bind the connection to MetaData()
-        #meta = sqlalchemy.MetaData(bind=con, reflect=True)
-
-        #results as pandas dataframe
-        results = pd.read_sql_query(query, con, index_col=None, coerce_float=True, params=None, parse_dates=None, chunksize=None)
-        
-        return results
-
-# Show progress bar.
-# from ipywidgets import FloatProgress
-# from IPython.display import display
-# f = FloatProgress(min=0, max=documents.shape[0])
-# display(f)
-# f.value += 1
-    
+def summarizeDocument(document):
+    from gensim.summarization.summarizer import summarize       
+    summary = summarize(document)
+    print (document, "-----", summary)
