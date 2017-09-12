@@ -6,9 +6,11 @@ from socket import timeout as SocketTimeoutError
 import re
 import sys
 import numpy as np
+from sklearn.neighbors import NearestNeighbors
 
 
 from settings import *
+from gloveEmbeddings import *
 
 
 
@@ -112,9 +114,35 @@ def extractLinks(documents):
 
 
 
-##Text Summarization
+##Text Summarization##
 
+#Converts the title and each sentence of the body of a document
+#to vectors and then runs a NN algorithm.
+def titleAndBodyNeighbors(limitDocuments=10):
+    numOfNeighbors = 3
+    
+    query = createQuery(limitDocuments, 'web')
+    documents = queryDB(query)    
+     
+    documents['bodyVecs'] = documents['body'].apply(lambda b: body2Vec(b))
+    documents['titleVec'] = documents['title'].apply(lambda t: title2Vec(t))
+    
+    def nn(titleVec, bodyVecs, body):    
+        nbrs = NearestNeighbors(n_neighbors=numOfNeighbors, algorithm='ball_tree').fit(np.array(bodyVecs))
+        distances, indices = nbrs.kneighbors(titleVec.reshape(1, -1))
+        
+        allSentences = sent_tokenize(body)
+        sentences = []
+        for i in indices.tolist()[0]:
+            sentences.append(allSentences[int(i)])
+        return sentences
+    
+    documents['nn'] = documents.apply(lambda d: nn(d['titleVec'],d['bodyVecs'], d['body']), axis=1)
 
+    documents = documents.drop(['bodyVecs', 'titleVec'], axis=1)
+    return documents
+
+#Creates a summary of a document based on gensim model (textRank).
 def summarizeDocument(document):
     from gensim.summarization.summarizer import summarize       
     summary = summarize(document)
