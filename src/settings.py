@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+import sys
 
 #Removes duplicate links from a document
 removeDuplicateLinks = True
@@ -16,7 +17,8 @@ pd.set_option('display.max_colwidth', 2048)
 
 cachedDataFrame = 'cachedDataFrame.pkl'
 
-gloveFile = '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt'
+gloveFile = '/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.50d.txt' if sys.platform == 'linux' else \
+            '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt'
 
 #Creates a query for the DB
 def createQuery(limitDocuments, doc_type=''):
@@ -30,13 +32,13 @@ def createQuery(limitDocuments, doc_type=''):
         """+limitline
     else:
         query = """
-        (select id, body, doc_type
+        (select body, doc_type
         from document
         where doc_type = 'web'
         """+limitline+"""
         )
         UNION
-        (select id, body, doc_type
+        (select body, doc_type
         from document
         where doc_type = 'twitter'
         """+limitline+"""
