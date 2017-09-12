@@ -27,9 +27,9 @@ def word2vec(word):
     global gloveEmbeddings, gloveEmbeddingsSize
     word = word.lower().strip()
     try:
-        return(gloveEmbeddings[word].reshape(1, -1))
+        return(gloveEmbeddings[word])
     except:
-        return np.zeros(gloveEmbeddingsSize).reshape(1, -1)
+        return np.zeros(gloveEmbeddingsSize)
 
     
 #Returns the vectors of each sentence of the body of an article.
