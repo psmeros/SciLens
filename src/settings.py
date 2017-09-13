@@ -13,7 +13,8 @@ urlLimit = 10
 urlTimout = 5
 
 # Pandas Settings
-pd.set_option('display.max_colwidth', 2048)
+pd.set_option('display.max_colwidth', 1024)
+
 
 cachedDataFrame = 'cachedDataFrame.pkl'
 
