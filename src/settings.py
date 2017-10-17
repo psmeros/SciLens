@@ -27,9 +27,9 @@ def createQuery(limitDocuments, doc_type=''):
     
     if (doc_type=='web'):
         query = """
-        select title, body 
-        from document
-        where doc_type = 'web'
+        select title, body, topic_label
+        from document, document_topic
+        where doc_type = 'web' and id = document_id
         """+limitline
     else:
         query = """
