@@ -8,3 +8,5 @@ stopwords
 
 conda install spacy
 python -m spacy download en
+
+conda install pyspark
