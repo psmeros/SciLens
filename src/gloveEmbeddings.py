@@ -3,7 +3,7 @@ import numpy as np
 from nltk import sent_tokenize, wordpunct_tokenize
 from nltk.corpus import stopwords
 stopWords = stopwords.words("english")
-
+from sklearn.metrics.pairwise import cosine_similarity
 
 gloveEmbeddings = gloveEmbeddingsSize = None
 
@@ -31,6 +31,9 @@ def word2vec(word):
     except:
         return np.zeros(gloveEmbeddingsSize)
 
+#Computes the cosine similarity between two vectors.
+def sim(vec1, vec2):
+    return abs(cosine_similarity(vec1.reshape(1, -1), vec2.reshape(1, -1)))
     
 #Returns the vectors of each sentence of the body of an article.
 def body2Vec(body):
