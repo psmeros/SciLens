@@ -17,7 +17,7 @@ from gloveEmbeddings import *
 ##DB##
         
 #Poses query to DB.
-def queryDB(query, user='smeros', password='vasoula', db='sciArticles', host='localhost', port=5432):
+def queryDB(query, user='smeros', password='vasoula', db='sciArticlesExtended', host='localhost', port=5432):
     import sqlalchemy
     import warnings
 
@@ -49,8 +49,9 @@ def queryDB(query, user='smeros', password='vasoula', db='sciArticles', host='lo
 
 #Resolves all the URLs of the documents.
 def resolveURLs(documents):
+    #Timeout for URL resolving
+    urlTimout = 5
 
-    #Resolves a URL.
     def resolve(url):
         
         resolved = {'resolvedURL':'', 'error':'', 'errorDesc':''}
@@ -86,11 +87,13 @@ def resolveURLs(documents):
     documents = pd.concat((documents, documents['url'].apply(lambda x: resolve(x))), axis=1)
     return documents
 
-
 #Flattens documents with multiple URLs.
 def flattenLinks(documents):
+    applyUrlLimit = False
+    urlLimit = 10
+    removeDuplicateLinks = True
 
-    #Filters out documents that have more than @urlLimit.
+    #Ignores Tweets with #URLs greater than @urlLimit.
     if (applyUrlLimit):
         documents = documents[documents['urls'].apply(lambda x: len(x)) <urlLimit]
     

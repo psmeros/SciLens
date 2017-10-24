@@ -1,25 +1,16 @@
 import pandas as pd
 import logging
 import sys
-
-#Removes duplicate links from a document
-removeDuplicateLinks = True
-
-#Ignores Tweets with  # of URLs greater than @urlLimit
-applyUrlLimit = False
-urlLimit = 10
-
-#Timeout for URL resolving
-urlTimout = 5
+import os
 
 # Pandas Settings
 pd.set_option('display.max_colwidth', 1024)
 
-
+#pickled dataframe
 cachedDataFrame = 'cachedDataFrame.pkl'
 
-gloveFile = '/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.50d.txt' if sys.platform == 'linux' else \
-            '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt'
+try: gloveFile = os.environ['gloveFile']
+except: gloveFile = ('/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.50d.txt' if sys.platform == 'linux' else '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt')
 
 #Creates a query for the DB
 def createQuery(limitDocuments, doc_type=''):
