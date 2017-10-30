@@ -3,11 +3,16 @@ import logging
 import sys
 import os
 
-# Pandas Settings
+#Pandas Settings
 pd.set_option('display.max_colwidth', 1024)
 
-#pickled dataframe
+#Pickled dataframe
 cachedDataFrame = 'cachedDataFrame.pkl'
+useCache = False
+
+#Use Spark for parallel processing
+useSpark = True
+
 
 try: gloveFile = os.environ['gloveFile']
 except: gloveFile = ('/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.50d.txt' if sys.platform == 'linux' else '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt')
