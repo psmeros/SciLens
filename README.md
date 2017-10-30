@@ -10,3 +10,7 @@ conda install spacy
 python -m spacy download en
 
 conda install pyspark
+
+
+# notebook to .py file
+ipython nbconvert --to=python notebook.ipynb
