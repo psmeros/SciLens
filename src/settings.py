@@ -8,7 +8,7 @@ pd.set_option('display.max_colwidth', 1024)
 
 #Pickled dataframe
 cachedDataFrame = 'cachedDataFrame.pkl'
-useCache = False
+useCache = True
 
 #Use Spark for parallel processing
 useSpark = True
