@@ -11,8 +11,10 @@ cachedDataFrame = 'cachedDataFrame.pkl'
 useCache = True
 
 #Use Spark for parallel processing
-useSpark = True
+useSpark = False
 
+#Plots directory
+os.makedirs('plots', exist_ok=True)
 
 try: gloveFile = os.environ['gloveFile']
 except: gloveFile = ('/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.50d.txt' if sys.platform == 'linux' else '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt')
