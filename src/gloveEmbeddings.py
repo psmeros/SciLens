@@ -12,7 +12,7 @@ def loadGloveEmbeddings():
     try: 
         gloveFile = os.environ['gloveFile']
     except: 
-        gloveFile = ('/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.50d.txt' if sys.platform == 'linux' else '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt')
+        gloveFile = ('/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.300d.txt' if sys.platform == 'linux' else '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.300d.txt')
 
     if not os.path.exists(gloveFile):
         print(gloveFile,'embeddings not found')
