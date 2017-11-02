@@ -3,21 +3,16 @@ import logging
 import sys
 import os
 
-#Pandas Settings
-pd.set_option('display.max_colwidth', 1024)
 
 #Pickled dataframe
-cachedDataFrame = 'cachedDataFrame.pkl'
 useCache = True
+cachedDataFrame = 'cachedDataFrame.pkl'
 
 #Use Spark for parallel processing
 useSpark = False
 
-#Plots directory
-os.makedirs('plots', exist_ok=True)
-
-try: gloveFile = os.environ['gloveFile']
-except: gloveFile = ('/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.50d.txt' if sys.platform == 'linux' else '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.50d.txt')
+#Use GloVe Embeddings
+#useGloVeEmbeddings=False
 
 #Creates a query for the DB
 def createQuery(limitDocuments, doc_type=''):
@@ -43,3 +38,10 @@ def createQuery(limitDocuments, doc_type=''):
         """+limitline+"""
         ) """
     return query
+
+
+#Plots directory
+os.makedirs('plots', exist_ok=True)
+
+#Pandas Settings
+pd.set_option('display.max_colwidth', 1024)

@@ -2,21 +2,22 @@ from spacy.en import English
 from spacy.symbols import nsubj, dobj, VERB
 from settings import *
 from utils import *
+from gloveEmbeddings import *
 
-loadGloVeEmbeddings=False
-
-# Create Keyword Lists
-english = English()
-sourcesKeywords = [english(x)[0].lemma_ for x in ['paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
-peopleKeywords = [english(x)[0].lemma_ for x in ['expert', 'scientist']]
-actionsKeywords = [english(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
 
 # Search for quote patterns
 def dependencyGraphSearch(title, body):
     
-    global nlp
-    try: nlp('')
-    except: nlp = English()
+    # Create Keyword Lists
+    global nlp, sourcesKeywords, peopleKeywords, actionsKeywords
+    try: 
+        nlp('')
+    except:
+        nlp = English()
+        sourcesKeywords = [nlp(x)[0].lemma_ for x in ['paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
+        peopleKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist']]
+        actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
+
     
     allEntities = nlp(body).ents + nlp(title).ents
     quotes = []
@@ -65,40 +66,36 @@ def dependencyGraphSearch(title, body):
                 quotee, quoteeType = improveQuotee(quotee, quoteeType, allEntities)                    
 
                 quotes.append({'quote': quote, 'quotee':quotee, 'quoteeType':quoteeType})
-                #print('quote: ', quote)
-                #print('by: ', quotee, '(', quoteeType, ')')
-                #print()
                 continue
 
     return quotes
 
 #Improves quotee's name
 def improveQuotee(quotee, quoteeType, allEntities):
-
     if len(quotee.split()) == 1:
-        #case where quotee is referred to with his/her first or last name.    
-        for e in allEntities:
-            if quotee in e.text.split() and quoteeType in ['PERSON']:
-                return e.text, e.label_
+        
+        #case where quotee is referred to with his/her first or last name.
+        if quoteeType == 'PERSON':
+            for e in allEntities:
+                if quotee in e.text.split():
+                    return e.text, quoteeType
 
         #case where quotee is referred to with an acronym.
-        def createAcronym(phrase):
-            fullAcronym = compactAcronym = upperAccronym = ''
+        if quoteeType == 'ORG':
+            for e in allEntities:
+                fullAcronym = compactAcronym = upperAccronym = ''
 
-            if len(phrase.split()) > 1:
-                for w in phrase.split():
-                    for l in w:
-                        if (l.isupper()):
-                            upperAccronym += l
-                    if w not in stopWords:
-                        compactAcronym += w[0]
-                    fullAcronym += w[0]
-
-            return fullAcronym.lower(), compactAcronym.lower(), upperAccronym.lower()
-
-        for e in allEntities:
-            if quotee.lower() in createAcronym(e.text)  and quoteeType in ['ORG']:
-                return e.text, e.label_
+                if len(e.text.split()) > 1:
+                    for w in e.text.split():
+                        for l in w:
+                            if (l.isupper()):
+                                upperAccronym += l
+                        if w.lower() not in stopWords:
+                            compactAcronym += w[0]
+                        fullAcronym += w[0]
+                
+                if quotee.lower() in [fullAcronym.lower(), compactAcronym.lower(), upperAccronym.lower()]:
+                    return e.text, quoteeType
 
     return quotee, quoteeType
 
@@ -129,44 +126,3 @@ def resolveQuotee(quotee, sentenceEntities, allEntities):
         return firstEntity or('expert', 'unknown')
     else:
         return (c.text, 'unknown')
-
-
-#Load gloVe Embeddings
-if loadGloVeEmbeddings:
-    from gloveEmbeddings import loadGloveEmbeddings, word2vec
-    loadGloveEmbeddings(gloveFile)
-
-    sourcesKeywordsVec = [word2vec(x) for x in sourcesKeywords]
-    peopleKeywordsVec = [word2vec(x) for x in peopleKeywords]
-    actionsKeywordsVec = [word2vec(x) for x in actionsKeywords]
-
-#Search (on the vector space) for sentences containing the given keywords.
-def keywordSearch(title, body):
-    subjectThreshold = 0.9
-    predicateThreshold = 0.9
-    
-    claims = []
-    for s in sent_tokenize(body):
-        subjectFound = predicateFound = False
-        claim = ""
-        for w in wordpunct_tokenize(s):
-
-            if predicateFound == True:
-                claim = s
-                claims.append(claim)
-                break
-
-            wVec = word2vec(w)
-
-            if subjectFound == False:
-                for sVec in sourcesKeywordsVec+peopleKeywordsVec:
-                    if sim(sVec, wVec) > subjectThreshold:
-                        subjectFound = True
-                        break
-
-            if subjectFound == True:
-                for pVec in actionsKeywordsVec:
-                    if sim(pVec, wVec) > predicateThreshold:
-                        predicateFound = True
-                        break
-    return claims
