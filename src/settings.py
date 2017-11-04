@@ -17,6 +17,15 @@ limitDocuments = 10
 #Settings for database connection
 dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}
 
+#GloVe Embeddings file
+gloveFile = '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.300d.txt'
+#gloveFile = '/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.300d.txt'
+#gloveFile = '/home/smeros/glove_data/glove.6B.300d.txt'
+
+if not os.path.exists(gloveFile):
+    print(gloveFile,'embeddings not found')
+    sys.exit(0)
+
 #Creates a query for the DB
 def createQuery(limitDocuments, doc_type=''):
     limitline= 'limit '+str(limitDocuments) if(limitDocuments!=-1) else ''

@@ -8,15 +8,7 @@ gloveEmbeddings = gloveEmbeddingsSize = None
 
 #Loads GloVe file.
 def loadGloveEmbeddings():    
-    try: 
-        gloveFile = os.environ['gloveFile']
-    except: 
-        gloveFile = ('/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.300d.txt' if sys.platform == 'linux' else '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.300d.txt')
-
-    if not os.path.exists(gloveFile):
-        print(gloveFile,'embeddings not found')
-        return None
-    words = {} #key= word, value=embeddings
+    words = {}
     with open(gloveFile, "r") as f:
         for line in f:
             tokens = line.strip().split()
