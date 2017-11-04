@@ -1,10 +1,9 @@
 # dependencies
 
-glove.6B.50d.txt
+gloVe 6B (Wikipedia)
 
-python > import nltk > nltk.download
-punkt
-stopwords
+
+[DEPRECATED] python > import nltk > nltk.download [punkt stopwords]
 
 conda install spacy
 python -m spacy download en
