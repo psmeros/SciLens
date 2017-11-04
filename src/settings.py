@@ -5,14 +5,11 @@ import os
 
 
 #Pickled dataframe
-useCache = True
+useCache = False
 cachedDataFrame = 'cachedDataFrame.pkl'
 
 #Use Spark for parallel processing
-useSpark = False
-
-#Use GloVe Embeddings
-#useGloVeEmbeddings=False
+useSpark = True
 
 #Creates a query for the DB
 def createQuery(limitDocuments, doc_type=''):
