@@ -17,7 +17,7 @@ from gloveEmbeddings import *
 ##DB##
         
 #Poses query to DB.
-def queryDB(query, user='smeros', password='vasoula', db='sciArticlesExtended', host='localhost', port=5432):
+def queryDB(query, user='smeros', password='vasoula', db='sciArticles', host='localhost', port=5432):
     import sqlalchemy
     import warnings
 

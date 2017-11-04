@@ -7,7 +7,7 @@ from gloveEmbeddings import *
 
 
 # Search for quote patterns
-def dependencyGraphSearch(title, body):
+def dependencyGraphSearch(article):
     
     # Create Keyword Lists
     global nlp, sourcesKeywords, peopleKeywords, actionsKeywords
@@ -19,10 +19,10 @@ def dependencyGraphSearch(title, body):
         peopleKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist']]
         actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
     
-    allEntities = nlp(body).ents + nlp(title).ents
+    allEntities = nlp(article).ents
     quotes = []
 
-    for s in nlp(body).sents:
+    for s in nlp(article).sents:
         quoteFound = quoteeFound = False
         quote = quotee = quoteeType = ""
         s = s.text.strip()
@@ -68,8 +68,35 @@ def dependencyGraphSearch(title, body):
 
                 quotes.append({'quote': quote, 'quotee':quotee, 'quoteeType':quoteeType})
                 continue
-
     return quotes
+
+#Resolves the quotee of a quote.
+def resolveQuotee(quotee, sentenceEntities, allEntities):
+
+    #heuristic: if there is no named entity as quotee, assume it's the first entity of the sentence.
+    useHeuristic = False
+    firstEntity = None
+    if useHeuristic:
+        for e in sentenceEntities + allEntities:
+            if e.label_ in ['PERSON', 'ORG']:
+                firstEntity = (e.text, e.label_)
+    try:
+        c = next(nlp(quotee).noun_chunks)
+    except:    
+        return firstEntity or ('', 'unknown')
+
+    #case that quotee entity exists.
+    for e in sentenceEntities:
+        if c.text == e.text and e.label_ in ['PERSON', 'ORG']:
+            return (e.text, e.label_)
+    
+    #case that quotee entity doesn't exist.
+    if c.root.lemma_ in sourcesKeywords:
+        return firstEntity or ('study', 'unknown')
+    elif c.root.lemma_ in peopleKeywords:
+        return firstEntity or('expert', 'unknown')
+    else:
+        return (c.text, 'unknown')
 
 #Improves quotee's name
 def improveQuotee(quotee, quoteeType, allEntities):
@@ -100,30 +127,17 @@ def improveQuotee(quotee, quoteeType, allEntities):
 
     return quotee, quoteeType
 
-#Resolves the quotee of a quote.
-def resolveQuotee(quotee, sentenceEntities, allEntities):
+#Discovers the most likely topic for a quote
+def findQuoteTopic(quote, tEmbeddings):
 
-    #heuristic: if there is no named entity as quotee, assume it's the first entity of the sentence.
-    useHeuristic = False
-    firstEntity = None
-    if useHeuristic:
-        for e in sentenceEntities + allEntities:
-            if e.label_ in ['PERSON', 'ORG']:
-                firstEntity = (e.text, e.label_)
-    try:
-        c = next(nlp(quotee).noun_chunks)
-    except:    
-        return firstEntity or ('', 'unknown')
+    maxSim = 0.0
+    topic = np.nan
+    quoteVec = sent2Vec(quote)
 
-    #case that quotee entity exists.
-    for e in sentenceEntities:
-        if c.text == e.text and e.label_ in ['PERSON', 'ORG']:
-            return (e.text, e.label_)
-    
-    #case that quotee entity doesn't exist.
-    if c.root.lemma_ in sourcesKeywords:
-        return firstEntity or ('study', 'unknown')
-    elif c.root.lemma_ in peopleKeywords:
-        return firstEntity or('expert', 'unknown')
-    else:
-        return (c.text, 'unknown')
+    for t, vec in tEmbeddings.items():
+        curSim = sim(quoteVec, vec)
+        if curSim > maxSim:
+            maxSim = curSim
+            topic = t
+
+    return topic, maxSim
