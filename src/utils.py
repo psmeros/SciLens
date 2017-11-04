@@ -142,7 +142,7 @@ def titleAndBodyNeighbors(limitDocuments=10):
         nbrs = NearestNeighbors(n_neighbors=numOfNeighbors, algorithm='ball_tree').fit(np.array(bodyVecs))
         distances, indices = nbrs.kneighbors(titleVec.reshape(1, -1))
         
-        allSentences = sent_tokenize(body)
+        allSentences = [sent.text.strip() for sent in nlp(body).sents]
         sentences = []
         for i in indices.tolist()[0]:
             sentences.append(allSentences[int(i)])

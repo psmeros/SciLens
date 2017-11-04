@@ -1,5 +1,6 @@
 from spacy.en import English
 from spacy.symbols import nsubj, dobj, VERB
+
 from settings import *
 from utils import *
 from gloveEmbeddings import *
@@ -17,15 +18,15 @@ def dependencyGraphSearch(title, body):
         sourcesKeywords = [nlp(x)[0].lemma_ for x in ['paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
         peopleKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist']]
         actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
-
     
     allEntities = nlp(body).ents + nlp(title).ents
     quotes = []
 
-    for s in sent_tokenize(body):
+    for s in nlp(body).sents:
         quoteFound = quoteeFound = False
         quote = quotee = quoteeType = ""
-
+        s = s.text.strip()
+        
         doc = nlp(s)
 
         #find all verbs of the sentence.
@@ -90,7 +91,7 @@ def improveQuotee(quotee, quoteeType, allEntities):
                         for l in w:
                             if (l.isupper()):
                                 upperAccronym += l
-                        if w.lower() not in stopWords:
+                        if not nlp(w)[0].is_stop:
                             compactAcronym += w[0]
                         fullAcronym += w[0]
                 
