@@ -11,6 +11,12 @@ cachedDataFrame = 'cachedDataFrame.pkl'
 #Use Spark for parallel processing
 useSpark = False
 
+#Limit retrieved documents
+limitDocuments = 10
+
+#Settings for database connection
+dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}
+
 #Creates a query for the DB
 def createQuery(limitDocuments, doc_type=''):
     limitline= 'limit '+str(limitDocuments) if(limitDocuments!=-1) else ''
@@ -35,7 +41,6 @@ def createQuery(limitDocuments, doc_type=''):
         """+limitline+"""
         ) """
     return query
-
 
 #Plots directory
 os.makedirs('plots', exist_ok=True)
