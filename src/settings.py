@@ -9,7 +9,7 @@ useCache = False
 cachedDataFrame = 'cachedDataFrame.pkl'
 
 #Use Spark for parallel processing
-useSpark = True
+useSpark = False
 
 #Creates a query for the DB
 def createQuery(limitDocuments, doc_type=''):
