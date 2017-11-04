@@ -3,23 +3,25 @@ from urllib.parse import urlparse
 from urllib.error import HTTPError, URLError
 from ssl import CertificateError
 from socket import timeout as SocketTimeoutError
+import sqlalchemy
+import warnings
 import re
 import sys
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
-
 from settings import *
 from gloveEmbeddings import *
 
 
-
-##DB##
-        
-#Poses query to DB.
-def queryDB(query, user='smeros', password='vasoula', db='sciArticles', host='localhost', port=5432):
-    import sqlalchemy
-    import warnings
+##Poses a query to the DB
+def queryDB(query):
+    #Database Settings
+    user = dbSettings['user']
+    password = dbSettings['password']
+    db = dbSettings['db']
+    host = dbSettings['host']
+    port = dbSettings['port']
 
     with warnings.catch_warnings():
         '''Returns a connection and a metadata object'''
@@ -42,7 +44,7 @@ def queryDB(query, user='smeros', password='vasoula', db='sciArticles', host='lo
         
         return results
 
-##Pretty print of numbers##
+#Pretty print of numbers
 def human_format(num):
     #by https://stackoverflow.com/a/45846841  
     num = float('{:.3g}'.format(num))
@@ -51,11 +53,11 @@ def human_format(num):
         magnitude += 1
         num /= 1000.0
     return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
-    
+
+
 ##URL Handling##
 
-
-#Resolves all the URLs of the documents.
+#Resolves all the URLs of the documents
 def resolveURLs(documents):
     #Timeout for URL resolving
     urlTimout = 5
@@ -95,26 +97,26 @@ def resolveURLs(documents):
     documents = pd.concat((documents, documents['url'].apply(lambda x: resolve(x))), axis=1)
     return documents
 
-#Flattens documents with multiple URLs.
+#Flattens documents with multiple URLs
 def flattenLinks(documents):
     applyUrlLimit = False
     urlLimit = 10
     removeDuplicateLinks = True
 
-    #Ignores Tweets with #URLs greater than @urlLimit.
+    #Ignores Tweets with #URLs greater than @urlLimit
     if (applyUrlLimit):
         documents = documents[documents['urls'].apply(lambda x: len(x)) <urlLimit]
     
-    #Converts pairs of <id, [url1, url2, ...]> to <id, url1>, <id, url2>.
+    #Converts pairs of <id, [url1, url2, ...]> to <id, url1>, <id, url2>
     documents = pd.DataFrame([(row[0], link, row[2]) for row in documents.itertuples() for link in row[1]], columns=['id', 'url', 'doc_type'])
     
-    #Removes duplicates.
+    #Removes duplicates
     if (removeDuplicateLinks):
         documents = documents.drop_duplicates()
     return documents
 
 
-#Extracts URLs using regex.
+#Extracts URLs using regex
 def extractLinks(documents):
 
     urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
@@ -128,7 +130,7 @@ def extractLinks(documents):
 ##Text Summarization##
 
 #Converts the title and each sentence of the body of a document
-#to vectors and then runs a NN algorithm.
+#to vectors and then runs a NN algorithm
 def titleAndBodyNeighbors(limitDocuments=10):
     numOfNeighbors = 3
     
@@ -153,7 +155,7 @@ def titleAndBodyNeighbors(limitDocuments=10):
     documents = documents.drop(['bodyVecs', 'titleVec'], axis=1)
     return documents
 
-#Creates a summary of a document based on gensim model (textRank).
+#Creates a summary of a document based on gensim model (textRank)
 def summarizeDocument(document):
     from gensim.summarization.summarizer import summarize       
     summary = summarize(document)
