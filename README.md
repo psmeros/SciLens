@@ -12,4 +12,4 @@ conda install pyspark
 
 
 # notebook to .py file
-ipython nbconvert --to=python notebook.ipynb
+jupyter nbconvert --to=python notebook.ipynb
