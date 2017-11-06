@@ -5,7 +5,7 @@ import os
 
 
 #Pickled dataframe
-useCache = False
+useCache = True
 cachedDataFrame = 'cachedDataFrame.pkl'
 
 #Use Spark for parallel processing
