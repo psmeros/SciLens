@@ -8,7 +8,7 @@ import os
 useCache = False
 
 #Use Spark for parallel processing
-useSpark = False
+useSpark = True
 
 #Limit retrieved documents
 limitDocuments = 10
