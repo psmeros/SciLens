@@ -13,7 +13,8 @@ if useSpark: ctx = SQLContext(SparkContext(conf = (SparkConf().setMaster('local[
 def quotePipeline():
     documents = cachefunc(queryDB, ('web'))
     documents = cachefunc(extractQuotes, (documents))
-    documents = cachefunc(flattenQuotes, (documents))    
+    documents = cachefunc(removeQuotes, (documents))
+    #documents = cachefunc(flattenQuotes, (documents))    
     return documents
 
 def extractQuotes(documents):
@@ -33,6 +34,16 @@ def extractQuotes(documents):
     
     return documents
 
+def removeQuotes(documents):
+    
+    if useSpark:
+        rddd = ctx.createDataFrame(documents[['article', 'quotes']]).rdd
+        documents['article'] = rddd.map(lambda s: removeQuotesFromArticle(s.article, s.quotes)).collect()
+    else:
+        documents['article'] = documents.apply(lambda x: removeQuotesFromArticle(x['article'], x['quotes'].copy()), axis=1)
+    
+    return documents
+
 def flattenQuotes(documents):
     documents = documents[['article', 'topic_label']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
     print('Total number of quotes:',human_format(documents.shape[0]))
@@ -46,6 +57,21 @@ def discoverTopics(documents):
     #tEmbeddings = topics2Vec(topics)
     #documents['quoteTopic'], documents['sim'] = zip(*documents['quote'].map(lambda x: findQuoteTopic(x, tEmbeddings)))
     return documents
+
+# Remove quotes from articles
+def removeQuotesFromArticle(article, quotes):
+    global nlp
+    try: nlp('')
+    except: nlp = English()
+        
+    articleWithoutQuotes = ''
+    for s in nlp(article).sents:
+        s = s.text.strip()
+        if (quotes and s == quotes[0]['quote']):
+            quotes.pop(0)
+        else:
+            articleWithoutQuotes += s + ' '
+    return articleWithoutQuotes
 
 # Search for quote patterns
 def dependencyGraphSearch(article):
