@@ -5,8 +5,7 @@ import os
 
 
 #Pickled dataframe
-useCache = True
-cachedDataFrame = 'cachedDataFrame.pkl'
+useCache = False
 
 #Use Spark for parallel processing
 useSpark = False
@@ -26,31 +25,9 @@ if not os.path.exists(gloveFile):
     print(gloveFile,'embeddings not found')
     sys.exit(0)
 
-#Creates a query for the DB
-def createQuery(limitDocuments, doc_type=''):
-    limitline= 'limit '+str(limitDocuments) if(limitDocuments!=-1) else ''
-    
-    if (doc_type=='web'):
-        query = """
-        select title, body, topic_label
-        from document, document_topic
-        where doc_type = 'web' and id = document_id
-        """+limitline
-    else:
-        query = """
-        (select body, doc_type
-        from document
-        where doc_type = 'web'
-        """+limitline+"""
-        )
-        UNION
-        (select body, doc_type
-        from document
-        where doc_type = 'twitter'
-        """+limitline+"""
-        ) """
-    return query
-
+#Cache directory
+os.makedirs('cache', exist_ok=True)
+ 
 #Plots directory
 os.makedirs('plots', exist_ok=True)
 

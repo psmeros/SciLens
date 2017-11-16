@@ -5,6 +5,47 @@ from settings import *
 from utils import *
 from gloveEmbeddings import *
 
+from pyspark.sql import SQLContext
+from pyspark import SparkConf, SparkContext
+if useSpark: ctx = SQLContext(SparkContext(conf = (SparkConf().setMaster('local[*]').setAppName('quoteExtraction').set('spark.executor.memory', '2G').set('spark.driver.memory', '40G').set('spark.driver.maxResultSize', '10G'))))
+
+##Pipeline functions
+def quotePipeline():
+    documents = cachefunc(queryDB, ('web'))
+    documents = cachefunc(extractQuotes, (documents))
+    documents = cachefunc(flattenQuotes, (documents))    
+    return documents
+
+def extractQuotes(documents):
+    #concatenation of title and body
+    documents['article'] = documents['title'] + '.\n ' + documents['body']
+    documents = documents.drop(['title', 'body'], axis=1)
+
+    #process articles to extract quotes
+    if useSpark:
+        rddd = ctx.createDataFrame(documents[['article']]).rdd
+        documents['quotes'] = rddd.map(lambda s: dependencyGraphSearch(s.article)).collect()
+    else:
+        documents['quotes'] = documents['article'].map(dependencyGraphSearch)
+
+    print('Dropping '+ str(np.count_nonzero(documents['quotes'].isnull())) + ' document(s) without quotes.')
+    documents = documents.dropna()
+    
+    return documents
+
+def flattenQuotes(documents):
+    documents = documents[['article', 'topic_label']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
+    print('Total number of quotes:',human_format(documents.shape[0]))
+    print ('Average number of quotes per Document:',len(documents)/limitDocuments)
+    return documents
+
+def discoverTopics(documents):
+    #print('Total number of topics:', len(documents.topic_label.unique()))
+    #discover the topic of each quote
+    #topics = documents.topic_label.unique()
+    #tEmbeddings = topics2Vec(topics)
+    #documents['quoteTopic'], documents['sim'] = zip(*documents['quote'].map(lambda x: findQuoteTopic(x, tEmbeddings)))
+    return documents
 
 # Search for quote patterns
 def dependencyGraphSearch(article):
@@ -25,20 +66,18 @@ def dependencyGraphSearch(article):
     for s in nlp(article).sents:
         quoteFound = quoteeFound = False
         quote = quotee = quoteeType = ""
-        s = s.text.strip()
-        
-        doc = nlp(s)
+        s = nlp(s.text)
 
         #find all verbs of the sentence.
         verbs = set()
-        for v in doc:
+        for v in s:
             if v.head.pos == VERB:
                 verbs.add(v.head)
 
         if not verbs:
             continue
 
-        rootVerb = ([w for w in doc if w.head is w] or [None])[0]
+        rootVerb = ([w for w in s if w.head is w] or [None])[0]
 
         #check first the root verb and then the others.
         verbs = [rootVerb] + list(verbs)
@@ -46,7 +85,7 @@ def dependencyGraphSearch(article):
         for v in verbs:
             if v.lemma_ in actionsKeywords:            
 
-                for np in doc.noun_chunks:
+                for np in s.noun_chunks:
                     if np.root.head == v:
 
                         if(np.root.dep == nsubj):
@@ -62,13 +101,16 @@ def dependencyGraphSearch(article):
                     break
 
         if quoteFound:
-                quote = s                    
-                quotee, quoteeType = resolveQuotee(quotee, doc.ents, allEntities)
+                quote = s.text.strip()                    
+                quotee, quoteeType = resolveQuotee(quotee, s.ents, allEntities)
                 quotee, quoteeType = improveQuotee(quotee, quoteeType, allEntities)                    
-
                 quotes.append({'quote': quote, 'quotee':quotee, 'quoteeType':quoteeType})
                 continue
-    return quotes
+    
+    if quotes == []:
+        return None
+    else:
+        return quotes
 
 #Resolves the quotee of a quote.
 def resolveQuotee(quotee, sentenceEntities, allEntities):
