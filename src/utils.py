@@ -7,21 +7,56 @@ import sqlalchemy
 import warnings
 import re
 import sys
+import os.path
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
 from settings import *
 from gloveEmbeddings import *
 
+#Reads/Writes the results of *func* from/to cache.
+def cachefunc(func, args):
+    cache = 'cache/'+func.__name__+'.pkl'
+    if useCache and os.path.exists(cache):
+        print ('Reading from cache:', cache)
+        documents = pd.read_pickle(cache)
+    else:
+        documents = func(args)
+        print ('Writing to cache:', cache)
+        documents.to_pickle(cache)
+    return documents
 
-##Poses a query to the DB
-def queryDB(query):
+#Poses a query to the DB
+def queryDB(doc_type=''):
     #Database Settings
     user = dbSettings['user']
     password = dbSettings['password']
     db = dbSettings['db']
     host = dbSettings['host']
     port = dbSettings['port']
+    
+    #create query
+    limitline= 'limit '+str(limitDocuments) if(limitDocuments!=-1) else ''
+    
+    if (doc_type=='web'):
+        query = """
+        select title, body, topic_label
+        from document, document_topic
+        where doc_type = 'web' and id = document_id
+        """+limitline
+    else:
+        query = """
+        (select body, doc_type
+        from document
+        where doc_type = 'web'
+        """+limitline+"""
+        )
+        UNION
+        (select body, doc_type
+        from document
+        where doc_type = 'twitter'
+        """+limitline+"""
+        ) """
 
     with warnings.catch_warnings():
         '''Returns a connection and a metadata object'''
