@@ -8,11 +8,20 @@ import warnings
 import re
 import sys
 import os.path
+from time import time
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
+from spacy.en import English
 
 from settings import *
 from gloveEmbeddings import *
+
+# Create Keyword Lists
+nlp = English()
+authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
+empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
+actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
+
 
 #Reads/Writes the results of *func* from/to cache.
 def cachefunc(func, args):
@@ -21,8 +30,9 @@ def cachefunc(func, args):
         print ('Reading from cache:', cache)
         documents = pd.read_pickle(cache)
     else:
+        t0 = time()
         documents = func(args)
-        print ('Writing to cache:', cache)
+        print(func.__name__, "ran in %0.3fs." % (time() - t0))
         documents.to_pickle(cache)
     return documents
 
@@ -40,9 +50,9 @@ def queryDB(doc_type=''):
     
     if (doc_type=='web'):
         query = """
-        select title, body, topic_label
-        from document, document_topic
-        where doc_type = 'web' and id = document_id
+        select title, body
+        from document
+        where doc_type = 'web'
         """+limitline
     else:
         query = """

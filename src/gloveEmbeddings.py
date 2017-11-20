@@ -29,11 +29,7 @@ def word2vec(word):
 
     
 #Returns the vector of a sentence.
-def sent2Vec(sentence):
-    global nlp
-    try: nlp('')
-    except: nlp = English()
-        
+def sent2Vec(sentence):    
     vec = word2vec('')
     for w in nlp(sentence):
          if not (w.is_stop or w.is_punct):
@@ -55,7 +51,7 @@ def sim(vec1, vec2):
 
 #Returns the vector of the body of an article.
 def body2Vec(body):    
-    sentences = [sent.text.strip() for sent in nlp(body).sents]
+    sentences = [sent.text.strip() for sent in nlp(body).sents] #TODO: change to sent tokenizer
     sentencesVector=[]
     for s in sentences:
         sentencesVector.append(sent2Vec(s))
