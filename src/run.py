@@ -5,4 +5,4 @@ documents = quotePipeline()
 
 #print (documents['quotes'].apply(len))
 #print (documents['quotes'].apply(len).sum())
-#print (documents.head(1))
+#print (documents.head(10))

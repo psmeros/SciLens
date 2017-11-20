@@ -11,15 +11,15 @@ useCache = False
 useSpark = False
 
 #Topic Discovery parameters
-numOfTopics = 4
+numOfTopics = 32
 topicTopfeatures = 3
 
 #Settings for database connection
 dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}
 
 #GloVe Embeddings file
-gloveFile = '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.300d.txt'
-#gloveFile = '/home/psmeros/var/workspaces/nutrition-workspace/bigFiles/glove.6B.300d.txt'
+#gloveFile = '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.300d.txt'
+gloveFile = '/home/psmeros/workspace/bigFiles/glove.6B.300d.txt'
 #gloveFile = '/home/smeros/glove_data/glove.6B.300d.txt'
 
 #Cache and Plots directory
