@@ -16,8 +16,9 @@ def quotePipeline():
     documents = cachefunc(queryDB, ('web'))
     documents = cachefunc(extractQuotes, (documents))
     documents = cachefunc(removeQuotes, (documents))
-    documents = cachefunc(discoverTopics, (documents))
-    #documents = cachefunc(flattenQuotes, (documents))    
+    documents = cachefunc(discoverArticleTopics, (documents))
+    documents = cachefunc(flattenQuotes, (documents))
+    documents = cachefunc(discoverQuoteTopics, (documents))    
     return documents
 
 def extractQuotes(documents):
@@ -179,8 +180,8 @@ def removeQuotes(documents):
 # Remove quotes from articles
 def removeQuotesFromArticle(article, quotes):        
     articleWithoutQuotes = ''
-    for s in nlp(article).sents:
-        s = s.text.strip()
+    for s in sent_tokenize(article):
+        s = s.strip()
         if (quotes and s == quotes[0]['quote']):
             quotes.pop(0)
         else:
@@ -188,15 +189,16 @@ def removeQuotesFromArticle(article, quotes):
     return articleWithoutQuotes
 
 
-def discoverTopics(documents):
+def discoverArticleTopics(documents):
+
+    global tfidf_vectorizer, lda, topiclabels
     
-    print(numOfTopics)
     #convert to tfidf vectors (1-2grams)
-    tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=10000, stop_words='english', ngram_range=(1,2), token_pattern='\w+')
+    tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=5000, stop_words='english', ngram_range=(1,2), token_pattern='\w+')
     tfidf = tfidf_vectorizer.fit_transform(documents['article'])
 
     #fit lda topic model
-    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=1024, learning_method='online', random_state=1, n_jobs=-1)
+    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=32, learning_method='online', random_state=1, n_jobs=-1)
     lda.fit(tfidf)
 
     #get the names of the top features of each topic that form its label 
@@ -206,47 +208,27 @@ def discoverTopics(documents):
         topiclabels.append(" ".join([feature_names[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
 
     #add the topic label as a column in the dataFrame
-    documents['topic_label'] = [topiclabels[t] for t in lda.transform(tfidf).argmax(axis=1)]
+    L = lda.transform(tfidf)
+    documents['articleTopic'] = [topiclabels[t] for t in L.argmax(axis=1)]
+    documents['articleSim'] = L.max(axis=1)
 
-    print('Total number of topics:', len(documents.topic_label.unique()))
-    print(documents.topic_label.unique())
-    #discover the topic of each quote
-    documents['quotes'].apply(lambda x: discoverQuoteTopic(x, tfidf_vectorizer, lda, topiclabels))
+    print('Total number of topics:', len(documents['articleTopic'].unique()))
 
-    #discover the topic of each quote
-    #topics = documents.topic_label.unique()
-    #tEmbeddings = topics2Vec(topics)
-    #documents['quoteTopic'], documents['sim'] = zip(*documents['quote'].map(lambda x: findQuoteTopic(x, tEmbeddings)))
     return documents
 
-def discoverQuoteTopic(quotes, tfidf_vectorizer, lda, topiclabels):
-    quotesWithTopic = []
-    for q in quotes:
-        tfidf = tfidf_vectorizer.transform([q['quote']])
-        print (topiclabels[lda.transform(tfidf).argmax(axis=1)[0]])
-        
-    return quotesWithTopic
-
-
-#Discovers the most likely topic for a quote
-def findQuoteTopic(quote, tEmbeddings):
-
-    maxSim = 0.0
-    topic = np.nan
-    quoteVec = sent2Vec(quote)
-
-    for t, vec in tEmbeddings.items():
-        curSim = sim(quoteVec, vec)
-        if curSim > maxSim:
-            maxSim = curSim
-            topic = t
-
-    return topic, maxSim
-
-
 def flattenQuotes(documents):
-    documents = documents[['article', 'topic_label']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
+    documents = documents[['article', 'articleTopic', 'articleSim']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
     print('Total number of quotes:',human_format(documents.shape[0]))
     print ('Average number of quotes per Document:',len(documents)/limitDocuments)
     return documents
 
+def discoverQuoteTopics(documents):
+    global tfidf_vectorizer, lda, topiclabels
+
+    tfidf = tfidf_vectorizer.transform(documents['quote'])
+    L = lda.transform(tfidf)
+
+    documents['quoteTopic'] = [topiclabels[t] for t in L.argmax(axis=1)]
+    documents['quoteSim'] = L.max(axis=1)
+        
+    return documents
