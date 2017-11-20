@@ -1,5 +1,6 @@
 from spacy.en import English
 from spacy.symbols import nsubj, dobj, VERB
+from nltk.tokenize import sent_tokenize
 
 from settings import *
 from utils import *
@@ -9,11 +10,23 @@ from pyspark.sql import SQLContext
 from pyspark import SparkConf, SparkContext
 if useSpark: ctx = SQLContext(SparkContext(conf = (SparkConf().setMaster('local[*]').setAppName('quoteExtraction').set('spark.executor.memory', '2G').set('spark.driver.memory', '40G').set('spark.driver.maxResultSize', '10G'))))
 
+# Create Keyword Lists
+#global nlp, authorityKeywords, empiricalKeywords, actionsKeywords
+try: 
+    nlp('')
+except:
+    nlp = English()
+    authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
+    empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
+    actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
+
+
 ##Pipeline functions
 def quotePipeline():
     documents = cachefunc(queryDB, ('web'))
     documents = cachefunc(extractQuotes, (documents))
     documents = cachefunc(removeQuotes, (documents))
+    documents = cachefunc(discoverTopics, (documents))
     #documents = cachefunc(flattenQuotes, (documents))    
     return documents
 
@@ -44,13 +57,8 @@ def removeQuotes(documents):
     
     return documents
 
-def flattenQuotes(documents):
-    documents = documents[['article', 'topic_label']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
-    print('Total number of quotes:',human_format(documents.shape[0]))
-    print ('Average number of quotes per Document:',len(documents)/limitDocuments)
-    return documents
-
 def discoverTopics(documents):
+    
     #print('Total number of topics:', len(documents.topic_label.unique()))
     #discover the topic of each quote
     #topics = documents.topic_label.unique()
@@ -58,12 +66,16 @@ def discoverTopics(documents):
     #documents['quoteTopic'], documents['sim'] = zip(*documents['quote'].map(lambda x: findQuoteTopic(x, tEmbeddings)))
     return documents
 
+
+def flattenQuotes(documents):
+    documents = documents[['article', 'topic_label']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
+    print('Total number of quotes:',human_format(documents.shape[0]))
+    print ('Average number of quotes per Document:',len(documents)/limitDocuments)
+    return documents
+
+
 # Remove quotes from articles
-def removeQuotesFromArticle(article, quotes):
-    global nlp
-    try: nlp('')
-    except: nlp = English()
-        
+def removeQuotesFromArticle(article, quotes):        
     articleWithoutQuotes = ''
     for s in nlp(article).sents:
         s = s.text.strip()
@@ -73,26 +85,35 @@ def removeQuotesFromArticle(article, quotes):
             articleWithoutQuotes += s + ' '
     return articleWithoutQuotes
 
+
 # Search for quote patterns
 def dependencyGraphSearch(article):
     
-    # Create Keyword Lists
-    global nlp, sourcesKeywords, peopleKeywords, actionsKeywords
-    try: 
-        nlp('')
-    except:
-        nlp = English()
-        sourcesKeywords = [nlp(x)[0].lemma_ for x in ['paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
-        peopleKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist']]
-        actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
+
     
-    allEntities = nlp(article).ents
+    allPerEntities = []
+    allOrgEntities = []
+    for e in nlp(article).ents:
+        if e.label_ == 'PERSON':
+            allPerEntities.append(e.text)
+        elif e.label_ == 'ORG':
+            allOrgEntities.append(e.text)
+            
     quotes = []
 
-    for s in nlp(article).sents:
-        quoteFound = quoteeFound = False
-        quote = quotee = quoteeType = ""
-        s = nlp(s.text)
+    for s in sent_tokenize(article):
+        quoteFound = False
+        quote = quotee = quoteeType = quoteeAffiliation = ""
+        s = nlp(s)
+
+        sPerEntities = []
+        sOrgEntities = []
+        for e in s.ents:
+            if e.label_ == 'PERSON':
+                sPerEntities.append(e.text)
+            elif e.label_ == 'ORG':
+                sOrgEntities.append(e.text)
+
 
         #find all verbs of the sentence.
         verbs = set()
@@ -111,27 +132,18 @@ def dependencyGraphSearch(article):
         for v in verbs:
             if v.lemma_ in actionsKeywords:            
 
-                for np in s.noun_chunks:
-                    if np.root.head == v:
+                quoteFound = True
+                
+                for np in v.children:
+                    if np.dep == nsubj:
+                        quotee = s[np.left_edge.i : np.right_edge.i+1].text
+                        break
 
-                        if(np.root.dep == nsubj):
-                            quotee = np.text
-                            quoteeFound = True
-
-                        if(np.root.dep == dobj): #TODO
-                            pass
-
-                        quoteFound = True
-
-                if quoteeFound:
+            if quoteFound:
+                    quote = s.text.strip()
+                    quotee, quoteeType, quoteeAffiliation = resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEntities)
+                    quotes.append({'quote': quote, 'quotee':quotee, 'quoteeType':quoteeType, 'quoteeAffiliation':quoteeAffiliation})
                     break
-
-        if quoteFound:
-                quote = s.text.strip()                    
-                quotee, quoteeType = resolveQuotee(quotee, s.ents, allEntities)
-                quotee, quoteeType = improveQuotee(quotee, quoteeType, allEntities)                    
-                quotes.append({'quote': quote, 'quotee':quotee, 'quoteeType':quoteeType})
-                continue
     
     if quotes == []:
         return None
@@ -139,61 +151,70 @@ def dependencyGraphSearch(article):
         return quotes
 
 #Resolves the quotee of a quote.
-def resolveQuotee(quotee, sentenceEntities, allEntities):
-
-    #heuristic: if there is no named entity as quotee, assume it's the first entity of the sentence.
-    useHeuristic = False
-    firstEntity = None
-    if useHeuristic:
-        for e in sentenceEntities + allEntities:
-            if e.label_ in ['PERSON', 'ORG']:
-                firstEntity = (e.text, e.label_)
-    try:
-        c = next(nlp(quotee).noun_chunks)
-    except:    
-        return firstEntity or ('', 'unknown')
-
-    #case that quotee entity exists.
-    for e in sentenceEntities:
-        if c.text == e.text and e.label_ in ['PERSON', 'ORG']:
-            return (e.text, e.label_)
+def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEntities):
     
-    #case that quotee entity doesn't exist.
-    if c.root.lemma_ in sourcesKeywords:
-        return firstEntity or ('study', 'unknown')
-    elif c.root.lemma_ in peopleKeywords:
-        return firstEntity or('expert', 'unknown')
-    else:
-        return (c.text, 'unknown')
+    q = qtype = qaff = 'unknown'
+    
+    #case that quotee PER entity exists
+    for e in sPerEntities:
+        if e in quotee:
+            q = e
+            qtype = 'PERSON'
+            
+            #find affiliation of person
+            for e in sOrgEntities:
+                if e in quotee:
+                    qaff = e
+                    break
+            
+            #case where PERSON is referred to with his/her first or last name       
+            if len(q.split()) == 1:
+                for e in allPerEntities:
+                    if q != e and q in e.split():
+                        q = e
+                        break
+                        
+            return (q, qtype, qaff)    
 
-#Improves quotee's name
-def improveQuotee(quotee, quoteeType, allEntities):
-    if len(quotee.split()) == 1:
+    #case that quotee ORG entity exists      
+    for e in sOrgEntities:
+
+        if e in quotee:
+            q = e
+            qtype = 'ORG'
+            qaff = e
+            
+            #case where ORG is referred to with an acronym
+            if len(q.split()) == 1:
+                for e in allOrgEntities:
+                    if q != e and len(e.split()) > 1:
+                        fullAcronym = compactAcronym = upperAccronym = ''
+                        for w in e.split():
+                            for l in w:
+                                if (l.isupper()):
+                                    upperAccronym += l
+                            if not nlp(w)[0].is_stop:
+                                compactAcronym += w[0]
+                            fullAcronym += w[0]
+
+                        if q.lower() in [fullAcronym.lower(), compactAcronym.lower(), upperAccronym.lower()]:
+                            q = e
+                            qaff = e
+                            break
+       
+            return (q, qtype, qaff)   
         
-        #case where quotee is referred to with his/her first or last name.
-        if quoteeType == 'PERSON':
-            for e in allEntities:
-                if quotee in e.text.split():
-                    return e.text, quoteeType
-
-        #case where quotee is referred to with an acronym.
-        if quoteeType == 'ORG':
-            for e in allEntities:
-                fullAcronym = compactAcronym = upperAccronym = ''
-
-                if len(e.text.split()) > 1:
-                    for w in e.text.split():
-                        for l in w:
-                            if (l.isupper()):
-                                upperAccronym += l
-                        if not nlp(w)[0].is_stop:
-                            compactAcronym += w[0]
-                        fullAcronym += w[0]
-                
-                if quotee.lower() in [fullAcronym.lower(), compactAcronym.lower(), upperAccronym.lower()]:
-                    return e.text, quoteeType
-
-    return quotee, quoteeType
+    #case that quotee entity doesn't exist
+    try:
+        noun = next(nlp(quotee).noun_chunks).root.lemma_
+    except:    
+        return (q, qtype, qaff)
+    
+    if noun in authorityKeywords:
+        q = 'authority'
+    elif noun in empiricalKeywords:
+        q = 'empirical observation'
+    return (q, qtype, qaff)
 
 #Discovers the most likely topic for a quote
 def findQuoteTopic(quote, tEmbeddings):

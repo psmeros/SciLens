@@ -3,15 +3,14 @@ import logging
 import sys
 import os
 
-
 #Pickled dataframe
 useCache = False
 
 #Use Spark for parallel processing
-useSpark = True
+useSpark = False
 
 #Limit retrieved documents
-limitDocuments = 10
+limitDocuments = 100
 
 #Settings for database connection
 dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}
@@ -32,4 +31,4 @@ os.makedirs('cache', exist_ok=True)
 os.makedirs('plots', exist_ok=True)
 
 #Pandas Settings
-pd.set_option('display.max_colwidth', 1024)
+pd.set_option('display.max_colwidth', -1)
