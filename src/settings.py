@@ -1,14 +1,18 @@
 import pandas as pd
 import os
 
+#Limit retrieved documents
+limitDocuments = 100
+
 #Pickled dataframe
 useCache = False
 
 #Use Spark for parallel processing
 useSpark = False
 
-#Limit retrieved documents
-limitDocuments = 10
+#Topic Discovery parameters
+numOfTopics = 4
+topicTopfeatures = 3
 
 #Settings for database connection
 dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}

@@ -1,6 +1,7 @@
-from spacy.en import English
 from spacy.symbols import nsubj, dobj, VERB
 from nltk.tokenize import sent_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
 
 from settings import *
 from utils import *
@@ -9,17 +10,6 @@ from gloveEmbeddings import *
 from pyspark.sql import SQLContext
 from pyspark import SparkConf, SparkContext
 if useSpark: ctx = SQLContext(SparkContext(conf = (SparkConf().setMaster('local[*]').setAppName('quoteExtraction').set('spark.executor.memory', '2G').set('spark.driver.memory', '40G').set('spark.driver.maxResultSize', '10G'))))
-
-# Create Keyword Lists
-#global nlp, authorityKeywords, empiricalKeywords, actionsKeywords
-try: 
-    nlp('')
-except:
-    nlp = English()
-    authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
-    empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
-    actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
-
 
 ##Pipeline functions
 def quotePipeline():
@@ -47,50 +37,9 @@ def extractQuotes(documents):
     
     return documents
 
-def removeQuotes(documents):
-    
-    if useSpark:
-        rddd = ctx.createDataFrame(documents[['article', 'quotes']]).rdd
-        documents['article'] = rddd.map(lambda s: removeQuotesFromArticle(s.article, s.quotes)).collect()
-    else:
-        documents['article'] = documents.apply(lambda x: removeQuotesFromArticle(x['article'], x['quotes'].copy()), axis=1)
-    
-    return documents
-
-def discoverTopics(documents):
-    
-    #print('Total number of topics:', len(documents.topic_label.unique()))
-    #discover the topic of each quote
-    #topics = documents.topic_label.unique()
-    #tEmbeddings = topics2Vec(topics)
-    #documents['quoteTopic'], documents['sim'] = zip(*documents['quote'].map(lambda x: findQuoteTopic(x, tEmbeddings)))
-    return documents
-
-
-def flattenQuotes(documents):
-    documents = documents[['article', 'topic_label']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
-    print('Total number of quotes:',human_format(documents.shape[0]))
-    print ('Average number of quotes per Document:',len(documents)/limitDocuments)
-    return documents
-
-
-# Remove quotes from articles
-def removeQuotesFromArticle(article, quotes):        
-    articleWithoutQuotes = ''
-    for s in nlp(article).sents:
-        s = s.text.strip()
-        if (quotes and s == quotes[0]['quote']):
-            quotes.pop(0)
-        else:
-            articleWithoutQuotes += s + ' '
-    return articleWithoutQuotes
-
-
 # Search for quote patterns
 def dependencyGraphSearch(article):
-    
-
-    
+        
     allPerEntities = []
     allOrgEntities = []
     for e in nlp(article).ents:
@@ -216,6 +165,69 @@ def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEnti
         q = 'empirical observation'
     return (q, qtype, qaff)
 
+
+def removeQuotes(documents):
+    
+    if useSpark:
+        rddd = ctx.createDataFrame(documents[['article', 'quotes']]).rdd
+        documents['article'] = rddd.map(lambda s: removeQuotesFromArticle(s.article, s.quotes)).collect()
+    else:
+        documents['article'] = documents.apply(lambda x: removeQuotesFromArticle(x['article'], x['quotes'].copy()), axis=1)
+    
+    return documents
+
+# Remove quotes from articles
+def removeQuotesFromArticle(article, quotes):        
+    articleWithoutQuotes = ''
+    for s in nlp(article).sents:
+        s = s.text.strip()
+        if (quotes and s == quotes[0]['quote']):
+            quotes.pop(0)
+        else:
+            articleWithoutQuotes += s + ' '
+    return articleWithoutQuotes
+
+
+def discoverTopics(documents):
+    
+    print(numOfTopics)
+    #convert to tfidf vectors (1-2grams)
+    tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=10000, stop_words='english', ngram_range=(1,2), token_pattern='\w+')
+    tfidf = tfidf_vectorizer.fit_transform(documents['article'])
+
+    #fit lda topic model
+    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=1024, learning_method='online', random_state=1, n_jobs=-1)
+    lda.fit(tfidf)
+
+    #get the names of the top features of each topic that form its label 
+    feature_names = tfidf_vectorizer.get_feature_names()
+    topiclabels = []
+    for _, topic in enumerate(lda.components_):
+        topiclabels.append(" ".join([feature_names[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
+
+    #add the topic label as a column in the dataFrame
+    documents['topic_label'] = [topiclabels[t] for t in lda.transform(tfidf).argmax(axis=1)]
+
+    print('Total number of topics:', len(documents.topic_label.unique()))
+    print(documents.topic_label.unique())
+    #discover the topic of each quote
+    documents['quotes'].apply(lambda x: discoverQuoteTopic(x, tfidf_vectorizer, lda, topiclabels))
+
+    #discover the topic of each quote
+    #topics = documents.topic_label.unique()
+    #tEmbeddings = topics2Vec(topics)
+    #documents['quoteTopic'], documents['sim'] = zip(*documents['quote'].map(lambda x: findQuoteTopic(x, tEmbeddings)))
+    return documents
+
+def discoverQuoteTopic(quotes, tfidf_vectorizer, lda, topiclabels):
+    quotesWithTopic = []
+    for q in quotes:
+        tfidf = tfidf_vectorizer.transform([q['quote']])
+        print (topiclabels[lda.transform(tfidf).argmax(axis=1)[0]])
+        
+    return quotesWithTopic
+
+
 #Discovers the most likely topic for a quote
 def findQuoteTopic(quote, tEmbeddings):
 
@@ -230,3 +242,11 @@ def findQuoteTopic(quote, tEmbeddings):
             topic = t
 
     return topic, maxSim
+
+
+def flattenQuotes(documents):
+    documents = documents[['article', 'topic_label']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
+    print('Total number of quotes:',human_format(documents.shape[0]))
+    print ('Average number of quotes per Document:',len(documents)/limitDocuments)
+    return documents
+
