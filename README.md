@@ -2,7 +2,7 @@
 
 - gloVe 6B (Wikipedia - 300d)
 - conda install psycopg2
-- [DEPRECATED] python > import nltk > nltk.download [punkt stopwords]
+- python > import nltk > nltk.download [punkt stopwords]
 - conda install spacy
 - python -m spacy download en
 - conda install pyspark
