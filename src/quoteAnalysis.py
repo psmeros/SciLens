@@ -173,17 +173,21 @@ def removeQuotes(documents):
         rddd = ctx.createDataFrame(documents[['article', 'quotes']]).rdd
         documents['article'] = rddd.map(lambda s: removeQuotesFromArticle(s.article, s.quotes)).collect()
     else:
-        documents['article'] = documents.apply(lambda x: removeQuotesFromArticle(x['article'], x['quotes'].copy()), axis=1)
+        documents['article'] = documents.apply(lambda x: removeQuotesFromArticle(x['article'], x['quotes']), axis=1)
     
     return documents
 
 # Remove quotes from articles
 def removeQuotesFromArticle(article, quotes):        
     articleWithoutQuotes = ''
+    it = iter(quotes)
+    q = next(it)['quote']
     for s in sent_tokenize(article):
         s = s.strip()
-        if (quotes and s == quotes[0]['quote']):
-            quotes.pop(0)
+        if (q and s == q):
+            q = next(it, None)
+            if q != None:
+                q = q['quote']
         else:
             articleWithoutQuotes += s + ' '
     return articleWithoutQuotes
@@ -194,7 +198,7 @@ def discoverArticleTopics(documents):
     global tfidf_vectorizer, lda, topiclabels
     
     #convert to tfidf vectors (1-2grams)
-    tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=5000, stop_words='english', ngram_range=(1,2), token_pattern='\w+')
+    tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=5000, stop_words='english', ngram_range=(1,2), token_pattern='\w{2}\w*')
     tfidf = tfidf_vectorizer.fit_transform(documents['article'])
 
     #fit lda topic model
@@ -217,7 +221,7 @@ def discoverArticleTopics(documents):
     return documents
 
 def flattenQuotes(documents):
-    documents = documents[['article', 'articleTopic', 'articleSim']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
+    documents = documents[['articleTopic', 'articleSim']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
     print('Total number of quotes:',human_format(documents.shape[0]))
     print ('Average number of quotes per Document:',len(documents)/limitDocuments)
     return documents
