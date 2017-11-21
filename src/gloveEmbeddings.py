@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from settings import *
 gloveEmbeddings = gloveEmbeddingsSize = None
 
-if not os.path.exists(gloveFile):
+if gloveFile and not os.path.exists(gloveFile):
     print(gloveFile,'embeddings not found')
     sys.exit(0)
 
