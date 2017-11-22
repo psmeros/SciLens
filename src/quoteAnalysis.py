@@ -20,7 +20,7 @@ def quotePipeline():
         documents = cachefunc(extractQuotes, (documents))
     if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes']:
         documents = cachefunc(removeQuotes, (documents))
-    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'discoverTopics', 'end']:
+    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
         documents = cachefunc(discoverTopics, (documents))
     return documents
 

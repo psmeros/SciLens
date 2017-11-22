@@ -8,13 +8,13 @@ limitDocuments = 1000
 useCache = True
 
 #Starting point of the pipeline
-startPipelineFrom ='removeQuotes' #values: 'start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes', 'end'
+startPipelineFrom ='removeQuotes' #values: 'start', 'extractQuotes', 'removeQuotes', 'end'
 
 #Use Spark for parallel processing
 useSpark = False
 
 #Topic Discovery parameters
-numOfTopics = 8
+numOfTopics = 32
 topicTopfeatures = 10
 
 #Settings for database connection
