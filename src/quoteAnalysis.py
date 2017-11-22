@@ -1,6 +1,6 @@
 from spacy.symbols import nsubj, dobj, VERB
 from nltk.tokenize import sent_tokenize
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 
 from settings import *
@@ -202,24 +202,24 @@ def removeQuotesFromArticle(article, quotes):
 
 def discoverArticleTopics(documents):
 
-    global tfidf_vectorizer, lda, topiclabels
+    global tf_vectorizer, lda, topiclabels
     
-    #convert to tfidf vectors (1-2grams)
-    tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=5000, stop_words='english', ngram_range=(1,2), token_pattern='\w{2}\w*')
-    tfidf = tfidf_vectorizer.fit_transform(documents['article'])
+    #convert to tf vectors (1-2grams)
+    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, max_features=5000, stop_words='english', ngram_range=(1,2), token_pattern='\w{2}\w*')
+    tf = tf_vectorizer.fit_transform(documents['article'])
 
     #fit lda topic model
-    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=32, learning_method='online', random_state=1, n_jobs=-1)
-    lda.fit(tfidf)
+    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=10, learning_method='online', random_state=1, n_jobs=-1)
+    lda.fit(tf)
 
     #get the names of the top features of each topic that form its label 
-    feature_names = tfidf_vectorizer.get_feature_names()
+    feature_names = tf_vectorizer.get_feature_names()
     topiclabels = []
     for _, topic in enumerate(lda.components_):
         topiclabels.append(" ".join([feature_names[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
 
     #add the topic label as a column in the dataFrame
-    L = lda.transform(tfidf)
+    L = lda.transform(tf)
     documents['articleTopic'] = [topiclabels[t] for t in L.argmax(axis=1)]
     documents['articleSim'] = L.max(axis=1)
 
@@ -234,10 +234,10 @@ def flattenQuotes(documents):
     return documents
 
 def discoverQuoteTopics(documents):
-    global tfidf_vectorizer, lda, topiclabels
+    global tf_vectorizer, lda, topiclabels
 
-    tfidf = tfidf_vectorizer.transform(documents['quote'])
-    L = lda.transform(tfidf)
+    tf = tf_vectorizer.transform(documents['quote'])
+    L = lda.transform(tf)
 
     documents['quoteTopic'] = [topiclabels[t] for t in L.argmax(axis=1)]
     documents['quoteSim'] = L.max(axis=1)

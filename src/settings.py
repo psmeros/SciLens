@@ -14,8 +14,8 @@ startPipelineFrom ='end'
 useSpark = False
 
 #Topic Discovery parameters
-numOfTopics = 32
-topicTopfeatures = 3
+numOfTopics = 128
+topicTopfeatures = 10
 
 #Settings for database connection
 dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}
