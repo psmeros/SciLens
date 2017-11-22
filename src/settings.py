@@ -8,17 +8,17 @@ limitDocuments = 1000
 useCache = True
 
 #Starting point of the pipeline
-startPipelineFrom ='end' #values: 'start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes', 'end'
+startPipelineFrom ='removeQuotes' #values: 'start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes', 'end'
 
 #Use Spark for parallel processing
 useSpark = False
 
 #Topic Discovery parameters
-numOfTopics = 32
+numOfTopics = 8
 topicTopfeatures = 10
 
 #Settings for database connection
-dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5435}
+dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}
 
 #GloVe Embeddings file
 gloveFile = None
@@ -26,9 +26,12 @@ gloveFile = None
 #gloveFile = '/home/psmeros/workspace/bigFiles/glove.6B.300d.txt'
 #gloveFile = '/home/smeros/glove_data/glove.6B.300d.txt'
 
-#Cache and Plots directory
+#Cache and plots directory
 os.makedirs('cache', exist_ok=True)
 os.makedirs('plots', exist_ok=True)
 
-#Pandas Settings
+#File with refined concepts
+conceptsFile = 'concepts.csv'
+
+#Pandas settings
 pd.set_option('display.max_colwidth', -1)
