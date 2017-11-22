@@ -205,11 +205,11 @@ def discoverArticleTopics(documents):
     global tf_vectorizer, lda, topiclabels
     
     #convert to tf vectors (1-2grams)
-    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, max_features=5000, stop_words='english', ngram_range=(1,2), token_pattern='\w{2}\w*')
+    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, max_features=5000, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}')
     tf = tf_vectorizer.fit_transform(documents['article'])
 
     #fit lda topic model
-    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=10, learning_method='online', random_state=1, n_jobs=-1)
+    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=20, learning_method='online', n_jobs=-1)
     lda.fit(tf)
 
     #get the names of the top features of each topic that form its label 
