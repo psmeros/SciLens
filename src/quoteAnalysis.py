@@ -13,12 +13,19 @@ if useSpark: ctx = SQLContext(SparkContext(conf = (SparkConf().setMaster('local[
 
 ##Pipeline functions
 def quotePipeline():
-    documents = cachefunc(queryDB, ('web'))
-    documents = cachefunc(extractQuotes, (documents))
-    documents = cachefunc(removeQuotes, (documents))
-    documents = cachefunc(discoverArticleTopics, (documents))
-    documents = cachefunc(flattenQuotes, (documents))
-    documents = cachefunc(discoverQuoteTopics, (documents))    
+    documents = None
+    if startPipelineFrom in ['start']:
+        documents = cachefunc(queryDB, ('web'))
+    if startPipelineFrom in ['start', 'extractQuotes']:
+        documents = cachefunc(extractQuotes, (documents))
+    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes']:
+        documents = cachefunc(removeQuotes, (documents))
+    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics']:
+        documents = cachefunc(discoverArticleTopics, (documents))
+    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes']:
+        documents = cachefunc(flattenQuotes, (documents))
+    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes', 'end']:
+        documents = cachefunc(discoverQuoteTopics, (documents))    
     return documents
 
 def extractQuotes(documents):
