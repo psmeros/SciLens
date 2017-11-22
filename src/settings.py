@@ -8,7 +8,7 @@ limitDocuments = 1000
 useCache = True
 
 #Starting point of the pipeline
-startPipelineFrom ='removeQuotes' #values: 'start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes', 'end'
+startPipelineFrom ='end' #values: 'start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes', 'end'
 
 #Use Spark for parallel processing
 useSpark = False
