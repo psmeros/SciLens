@@ -20,12 +20,8 @@ def quotePipeline():
         documents = cachefunc(extractQuotes, (documents))
     if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes']:
         documents = cachefunc(removeQuotes, (documents))
-    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics']:
-        documents = cachefunc(discoverArticleTopics, (documents))
-    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes']:
-        documents = cachefunc(flattenQuotes, (documents))
-    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes', 'end']:
-        documents = cachefunc(discoverQuoteTopics, (documents))    
+    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'discoverTopics', 'end']:
+        documents = cachefunc(discoverTopics, (documents))
     return documents
 
 def extractQuotes(documents):
@@ -200,23 +196,23 @@ def removeQuotesFromArticle(article, quotes):
     return articleWithoutQuotes
 
 
-def discoverArticleTopics(documents):
-
-    global tf_vectorizer, lda, topiclabels
+def discoverTopics(documents):
     
     #convert to tf vectors (1-2grams)
-    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, max_features=5000, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}')
+    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=createVocabulary())
     tf = tf_vectorizer.fit_transform(documents['article'])
+
+    #map to lower dimensions
+    tf, labels = transformTF(tf)
 
     #fit lda topic model
     lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=20, learning_method='online', n_jobs=-1)
     lda.fit(tf)
 
     #get the names of the top features of each topic that form its label 
-    feature_names = tf_vectorizer.get_feature_names()
     topiclabels = []
     for _, topic in enumerate(lda.components_):
-        topiclabels.append(" ".join([feature_names[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
+        topiclabels.append(", ".join([labels[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
 
     #add the topic label as a column in the dataFrame
     L = lda.transform(tf)
@@ -225,21 +221,18 @@ def discoverArticleTopics(documents):
 
     print('Total number of topics:', len(documents['articleTopic'].unique()))
 
-    return documents
-
-def flattenQuotes(documents):
+    #flatten quotes
     documents = documents[['articleTopic', 'articleSim']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
     print('Total number of quotes:',human_format(documents.shape[0]))
     print ('Average number of quotes per Document:',len(documents)/limitDocuments)
-    return documents
 
-def discoverQuoteTopics(documents):
-    global tf_vectorizer, lda, topiclabels
-
+    #discover quote topics
     tf = tf_vectorizer.transform(documents['quote'])
+    tf, labels = transformTF(tf)
     L = lda.transform(tf)
 
-    documents['quoteTopic'] = [topiclabels[t] for t in L.argmax(axis=1)]
+    documents['quoteTopic'] = [labels[t] for t in L.argmax(axis=1)]
     documents['quoteSim'] = L.max(axis=1)
-        
+
     return documents
+
