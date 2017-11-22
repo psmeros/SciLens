@@ -2,23 +2,23 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = 100
+limitDocuments = 1000
 
 #Pickled dataframe
 useCache = True
 
 #Starting point of the pipeline
-startPipelineFrom ='end'
+startPipelineFrom ='removeQuotes' #values: 'start', 'extractQuotes', 'removeQuotes', 'discoverArticleTopics', 'flattenQuotes', 'end'
 
 #Use Spark for parallel processing
 useSpark = False
 
 #Topic Discovery parameters
-numOfTopics = 128
+numOfTopics = 32
 topicTopfeatures = 10
 
 #Settings for database connection
-dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}
+dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5435}
 
 #GloVe Embeddings file
 gloveFile = None
