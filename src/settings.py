@@ -5,7 +5,10 @@ import os
 limitDocuments = 100
 
 #Pickled dataframe
-useCache = False
+useCache = True
+
+#Starting point of the pipeline
+startPipelineFrom ='end'
 
 #Use Spark for parallel processing
 useSpark = False
