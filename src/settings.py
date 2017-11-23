@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = 1000
+limitDocuments = 10
 
 #Pickled dataframe
 useCache = True
@@ -15,7 +15,7 @@ useSpark = False
 
 #Topic Discovery parameters
 numOfTopics = 32
-topicTopfeatures = 10
+topicTopfeatures = 3
 
 #Settings for database connection
 dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}

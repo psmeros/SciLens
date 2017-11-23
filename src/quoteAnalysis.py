@@ -203,7 +203,9 @@ def discoverTopics(documents):
     tf = tf_vectorizer.fit_transform(documents['article'])
 
     #map to lower dimensions
-    tf, labels = transformTF(tf)
+    #tf, labels = transformTF(tf)
+
+    labels = tf_vectorizer.get_feature_names()
 
     #fit lda topic model
     lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=20, learning_method='online', n_jobs=-1)
@@ -228,7 +230,8 @@ def discoverTopics(documents):
 
     #discover quote topics
     tf = tf_vectorizer.transform(documents['quote'])
-    tf, labels = transformTF(tf)
+    #tf, labels = transformTF(tf)
+    labels = tf_vectorizer.get_feature_names()
     L = lda.transform(tf)
 
     documents['quoteTopic'] = [labels[t] for t in L.argmax(axis=1)]
