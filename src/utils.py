@@ -6,10 +6,7 @@ import numpy as np
 import pandas as pd
 from spacy.en import English
 from pyspark.sql import SparkSession
-from pyspark.sql import SQLContext
-from pyspark import SparkConf, SparkContext 
-
-from pyspark.sql.types import *
+from pyspark import SparkConf
 
 from settings import *
 
@@ -21,10 +18,14 @@ actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 
 
 
 #Spark setup
-spark = SparkSession.builder.appName('quoteAnalysis').master("local[*]").config('spark.jars.packages', 'org.postgresql:postgresql:42.1.4').getOrCreate()
-spark.conf.set('spark.executor.memory', '2G')
-spark.conf.set('spark.driver.memory', '5G')
-spark.conf.set('spark.driver.maxResultSize', '10G')
+conf = SparkConf()
+conf.setAppName('quoteAnalysis')
+conf.setMaster('local[*]')
+conf.set('spark.executor.memory', '5G')
+conf.set('spark.driver.memory', '5G')
+conf.set('spark.driver.maxResultSize', '10G')
+conf.set('spark.jars.packages', 'org.postgresql:postgresql:42.1.4')
+spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
 
 #Read/Write the results of *func* from/to cache
@@ -99,13 +100,10 @@ def queryDB(doc_type=''):
         from document
         where doc_type = 'twitter') """
 
-
     df = spark.read.jdbc("jdbc:postgresql://" + host + ':' + port + '/' + db, query,properties={"user": user, "password": password, "driver": "org.postgresql.Driver"})    
     df = df.limit(limitDocuments) if(limitDocuments!=-1) else df
 
-    return df
-
-
+    return df.rdd
 
 
 #Pretty print of numbers (by https://stackoverflow.com/a/45846841)
