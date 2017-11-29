@@ -7,21 +7,18 @@ from settings import *
 from utils import *
 from gloveEmbeddings import *
 
-from pyspark.sql import SQLContext
-from pyspark import SparkConf, SparkContext
-if useSpark: ctx = SQLContext(SparkContext(conf = (SparkConf().setMaster('local[*]').setAppName('quoteExtraction').set('spark.executor.memory', '2G').set('spark.driver.memory', '40G').set('spark.driver.maxResultSize', '10G'))))
 
 ##Pipeline functions
 def quotePipeline():
     documents = None
     if startPipelineFrom in ['start']:
         documents = cachefunc(queryDB, ('web'))
-    if startPipelineFrom in ['start', 'extractQuotes']:
-        documents = cachefunc(extractQuotes, (documents))
-    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes']:
-        documents = cachefunc(removeQuotes, (documents))
-    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
-        documents = cachefunc(discoverTopics, (documents))
+    # if startPipelineFrom in ['start', 'extractQuotes']:
+    #     documents = cachefunc(extractQuotes, (documents))
+    # if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes']:
+    #     documents = cachefunc(removeQuotes, (documents))
+    # if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
+    #     documents = cachefunc(discoverTopics, (documents))
     return documents
 
 def extractQuotes(documents):
