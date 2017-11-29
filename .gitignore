@@ -1,8 +1,8 @@
 # MAC
 .DS_Store
 
-#pickle files
-*.pkl
+#cache files
+cache/
 
 #plots
 plots

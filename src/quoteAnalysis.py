@@ -3,6 +3,7 @@ from nltk.tokenize import sent_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from pyspark.sql.functions import *
+from pyspark.sql.types import *
 
 from settings import *
 from utils import *
@@ -11,36 +12,32 @@ from gloveEmbeddings import *
 
 ##Pipeline functions
 def quotePipeline():
+    initSpark()
     documents = None
     if startPipelineFrom in ['start']:
-        documents = cachefunc(queryDB, ('web'))
+        documents = cachefunc(queryDB, (documents))
     if startPipelineFrom in ['start', 'extractQuotes']:
         documents = cachefunc(extractQuotes, (documents))
-    # if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes']:
-    #     documents = cachefunc(removeQuotes, (documents))
     # if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
     #     documents = cachefunc(discoverTopics, (documents))
     return documents
 
 def extractQuotes(documents):
 
-    #documents.foreach(print)
-    documents = documents.map(lambda d: {d.article: d.title + '.\n ' + d.body})
-    print(documents.article)
-    exit()
     #concatenation of title and body
-    documents = documents.select(concat_ws().alias('article'))
+    documents = documents.select(concat_ws('.\n ', documents.title, documents.body).alias('article'))
 
     #process articles to extract quotes
-    rdd = documents['article'].rdd#.map(dependencyGraphSearch)
-    print(type(rdd))
-    #documents['quotes'] = 
+    documents = documents.select('article', udf(dependencyGraphSearch, ArrayType(MapType(StringType(), StringType())))('article').alias('quotes'))
 
-    exit()
-
-    print('Dropping '+ str(np.count_nonzero(documents['quotes'].isnull())) + ' document(s) without quotes.')
+    count = documents.count()
     documents = documents.dropna()
+
+    print('Dropped '+ str(count - documents.count()) + ' document(s) without quotes.')
     
+    #remove quotes from articles 
+    documents = documents.select(udf(removeQuotesFromArticle)('article', 'quotes').alias('article'), 'quotes')
+   
     return documents
 
 # Search for quote patterns
@@ -172,18 +169,8 @@ def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEnti
     return (q, qtype, qaff)
 
 
-def removeQuotes(documents):
-    
-    if useSpark:
-        rddd = ctx.createDataFrame(documents[['article', 'quotes']]).rdd
-        documents['article'] = rddd.map(lambda s: removeQuotesFromArticle(s.article, s.quotes)).collect()
-    else:
-        documents['article'] = documents.apply(lambda x: removeQuotesFromArticle(x['article'], x['quotes']), axis=1)
-    
-    return documents
-
 # Remove quotes from articles
-def removeQuotesFromArticle(article, quotes):        
+def removeQuotesFromArticle(article, quotes): 
     articleWithoutQuotes = ''
     it = iter(quotes)
     q = next(it)['quote']

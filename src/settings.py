@@ -5,10 +5,10 @@ import os
 limitDocuments = 10
 
 #Pickled dataframe
-useCache = False
+useCache = True
 
 #Starting point of the pipeline
-startPipelineFrom ='start' #values: 'start', 'extractQuotes', 'removeQuotes', 'end'
+startPipelineFrom ='extractQuotes' #values: 'start', 'extractQuotes', 'end'
 
 #Use Spark for parallel processing
 useSpark = True
