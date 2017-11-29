@@ -18,27 +18,30 @@ actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 
 
 
 #Spark setup
-conf = SparkConf()
-conf.setAppName('quoteAnalysis')
-conf.setMaster('local[*]')
-conf.set('spark.executor.memory', '5G')
-conf.set('spark.driver.memory', '5G')
-conf.set('spark.driver.maxResultSize', '10G')
-conf.set('spark.jars.packages', 'org.postgresql:postgresql:42.1.4')
-spark = SparkSession.builder.config(conf=conf).getOrCreate()
-
+def initSpark():
+    global spark
+    conf = SparkConf()
+    conf.setAppName('quoteAnalysis')
+    conf.setMaster('local[*]')
+    conf.set('spark.executor.memory', '5G')
+    conf.set('spark.driver.memory', '5G')
+    conf.set('spark.driver.maxResultSize', '10G')
+    conf.set('spark.jars.packages', 'org.postgresql:postgresql:42.1.4')
+    spark = SparkSession.builder.config(conf=conf).getOrCreate()
 
 #Read/Write the results of *func* from/to cache
 def cachefunc(func, args):
-    cache = 'cache/'+func.__name__+'.pkl'
+    
+
+    cache = 'cache/'+func.__name__+'.parquet'
     if useCache and os.path.exists(cache):
         print ('Reading from cache:', cache)
-        documents = pd.read_pickle(cache)
+        documents = spark.read.load(cache)
     else:
         t0 = time()
         documents = func(args)
         print(func.__name__, "ran in %0.3fs." % (time() - t0))
-        #documents.to_pickle(cache)
+        documents.write.save(cache, mode='overwrite')
     return documents
 
 #Create vocabulary for the Vectorizer
@@ -76,7 +79,7 @@ def transformTF(tf):
 
 
 #Pose a query to the DB
-def queryDB(doc_type=''):
+def queryDB(_):
 
     #Database Settings
     user = dbSettings['user']
@@ -85,25 +88,14 @@ def queryDB(doc_type=''):
     host = dbSettings['host']
     port = dbSettings['port']
 
-    if (doc_type=='web'):
-        query = """
-        (select title, body
-        from document
-        where doc_type = 'web') doc"""
-    else:
-        query = """
-        (select body, doc_type
-        from document
-        where doc_type = 'web')
-        UNION
-        (select body, doc_type
-        from document
-        where doc_type = 'twitter') """
+    query = """ (select title, body
+                from document
+                where doc_type = 'web') doc """
 
     df = spark.read.jdbc("jdbc:postgresql://" + host + ':' + port + '/' + db, query,properties={"user": user, "password": password, "driver": "org.postgresql.Driver"})    
     df = df.limit(limitDocuments) if(limitDocuments!=-1) else df
 
-    return df.rdd
+    return df
 
 
 #Pretty print of numbers (by https://stackoverflow.com/a/45846841)
