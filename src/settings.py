@@ -5,20 +5,20 @@ import os
 limitDocuments = 10
 
 #Pickled dataframe
-useCache = True
+useCache = False
 
 #Starting point of the pipeline
-startPipelineFrom ='removeQuotes' #values: 'start', 'extractQuotes', 'removeQuotes', 'end'
+startPipelineFrom ='start' #values: 'start', 'extractQuotes', 'removeQuotes', 'end'
 
 #Use Spark for parallel processing
-useSpark = False
+useSpark = True
 
 #Topic Discovery parameters
 numOfTopics = 32
 topicTopfeatures = 3
 
 #Settings for database connection
-dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':5432}
+dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':'5432'}
 
 #GloVe Embeddings file
 gloveFile = None
