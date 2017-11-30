@@ -2,16 +2,13 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = 10
+limitDocuments = -1
 
 #Pickled dataframe
-useCache = True
+useCache = False
 
 #Starting point of the pipeline
-startPipelineFrom ='extractQuotes' #values: 'start', 'extractQuotes', 'end'
-
-#Use Spark for parallel processing
-useSpark = True
+startPipelineFrom ='start' #values: 'start', 'extractQuotes', 'end'
 
 #Topic Discovery parameters
 numOfTopics = 32

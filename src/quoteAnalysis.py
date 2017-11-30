@@ -4,22 +4,25 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
+from pyspark.ml.clustering import LDA
 
 from settings import *
 from utils import *
 from gloveEmbeddings import *
 
-
 ##Pipeline functions
 def quotePipeline():
-    initSpark()
+    global spark
+    spark = initSpark()
+    t0 = time()
     documents = None
     if startPipelineFrom in ['start']:
         documents = cachefunc(queryDB, (documents))
     if startPipelineFrom in ['start', 'extractQuotes']:
         documents = cachefunc(extractQuotes, (documents))
-    # if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
-    #     documents = cachefunc(discoverTopics, (documents))
+    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
+        documents = cachefunc(discoverTopics, (documents))
+    print("Total time: %0.3fs." % (time() - t0))
     return documents
 
 def extractQuotes(documents):
@@ -186,24 +189,40 @@ def removeQuotesFromArticle(article, quotes):
 
 
 def discoverTopics(documents):
+
+    documents = documents.toPandas()
+    vocabulary = createVocabulary()
     
     #convert to tf vectors (1-2grams)
-    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=createVocabulary())
+    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=vocabulary['literal'].tolist())
     tf = tf_vectorizer.fit_transform(documents['article'])
-
-    #map to lower dimensions
-    #tf, labels = transformTF(tf)
-
-    labels = tf_vectorizer.get_feature_names()
 
     #fit lda topic model
     lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=20, learning_method='online', n_jobs=-1)
     lda.fit(tf)
 
-    #get the names of the top features of each topic that form its label 
+    #get the names of the top features of each topic and map it to lower dimensions (concepts)
+    labels = pd.DataFrame(tf_vectorizer.get_feature_names(), columns=['literal'])
+    labels = labels.merge(vocabulary, left_on='literal', right_on='literal')['concept'].tolist()
+
     topiclabels = []
     for _, topic in enumerate(lda.components_):
-        topiclabels.append(", ".join([labels[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
+        topiclabels.append([labels[i] for i in topic.argsort()[:-50 - 1:-1]])
+
+    newlabels = []
+    for t in topiclabels:
+        t = pd.DataFrame(t, columns=['concept'])
+        t = t.groupby('concept', sort=False).size().reset_index(name='size')#.sort_values(ascending=False)
+        nl = ', '.join(t[t['size']>1].sort_values(by='size', ascending=False).head(topicTopfeatures)['concept'].tolist())
+        
+        rest = topicTopfeatures - len(t[t['size']>1])
+        if rest == topicTopfeatures:
+            nl += ', '.join(t.head(rest)['concept'].tolist())
+        elif  rest > 0 :
+            nl += ', ' + ', '.join(t.head(rest)['concept'].tolist())
+
+        newlabels.append(nl)
+    topiclabels = newlabels
 
     #add the topic label as a column in the dataFrame
     L = lda.transform(tf)
@@ -219,12 +238,11 @@ def discoverTopics(documents):
 
     #discover quote topics
     tf = tf_vectorizer.transform(documents['quote'])
-    #tf, labels = transformTF(tf)
-    labels = tf_vectorizer.get_feature_names()
     L = lda.transform(tf)
 
-    documents['quoteTopic'] = [labels[t] for t in L.argmax(axis=1)]
+    documents['quoteTopic'] = [topiclabels[t] for t in L.argmax(axis=1)]
     documents['quoteSim'] = L.max(axis=1)
 
+    documents = spark.createDataFrame(documents)
     return documents
 
