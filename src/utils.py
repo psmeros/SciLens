@@ -16,23 +16,22 @@ authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'research
 empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
 actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
 
-
 #Spark setup
 def initSpark():
     global spark
     conf = SparkConf()
     conf.setAppName('quoteAnalysis')
     conf.setMaster('local[*]')
-    conf.set('spark.executor.memory', '5G')
-    conf.set('spark.driver.memory', '5G')
-    conf.set('spark.driver.maxResultSize', '10G')
+    conf.set('spark.executor.memory', '40G')
+    conf.set('spark.driver.memory', '40G')
+    conf.set('spark.driver.maxResultSize', '40G')
     conf.set('spark.jars.packages', 'org.postgresql:postgresql:42.1.4')
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
+    return spark
 
 #Read/Write the results of *func* from/to cache
 def cachefunc(func, args):
     
-
     cache = 'cache/'+func.__name__+'.parquet'
     if useCache and os.path.exists(cache):
         print ('Reading from cache:', cache)
@@ -44,9 +43,11 @@ def cachefunc(func, args):
         documents.write.save(cache, mode='overwrite')
     return documents
 
-#Create vocabulary for the Vectorizer
+#Create vocabulary for lowering dimensions
 def createVocabulary():
-    return pd.read_csv(conceptsFile)['Concept literal'].tolist()
+    df = pd.read_csv(conceptsFile)[['Concept name', 'Concept literal']]
+    df.columns = ['concept', 'literal']
+    return df
 
 #Transform tf matrix (map to lower dimensions)
 def transformTF(tf):
