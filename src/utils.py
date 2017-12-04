@@ -16,8 +16,8 @@ def initSpark():
     conf = SparkConf()
     conf.setAppName('quoteAnalysis')
     conf.setMaster('local[*]')
-    conf.set('spark.executor.memory', '16G')
-    conf.set('spark.driver.memory', '16G')
+    conf.set('spark.executor.memory', memory)
+    conf.set('spark.driver.memory', memory)
     conf.set('spark.driver.maxResultSize', '40G')
     conf.set('spark.jars.packages', 'org.postgresql:postgresql:42.1.4')
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
@@ -90,7 +90,7 @@ def queryDB():
 
     df = spark.read.jdbc("jdbc:postgresql://" + host + ':' + port + '/' + db, query,properties={"user": user, "password": password, "driver": "org.postgresql.Driver"})    
     df = df.limit(limitDocuments) if(limitDocuments!=-1) else df
-    df = df.repartition(100) if(limitDocuments!=-1) else df.repartition(df.count())
+    df = df.repartition(cores)
 
     return df
 
