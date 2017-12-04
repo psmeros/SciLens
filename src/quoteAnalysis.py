@@ -28,15 +28,26 @@ def extractQuotes(documents):
     documents = queryDB()
 
     #process articles to extract quotes
-    documents = documents.select('article', udf(dependencyGraphSearch, ArrayType(MapType(StringType(), StringType())))('article').alias('quotes'))
+    documents = documents.select('article', dependencyGraphSearchUDF('article').alias('quotes'))
 
     #drop documents without quotes
     documents = documents.dropna()
     
     #remove quotes from articles 
-    documents = documents.select(udf(removeQuotesFromArticle)('article', 'quotes').alias('article'), 'quotes')
+    documents = documents.select(removeQuotesFromArticleUDF('article', 'quotes').alias('article'), 'quotes')
    
     return documents
+
+#UDFs
+@udf(ArrayType(MapType(StringType(), StringType())))
+def dependencyGraphSearchUDF(article):
+    dependencyGraphSearch(article)
+
+
+@udf(StringType())
+def removeQuotesFromArticleUDF(article, quotes):
+    removeQuotesFromArticle(article, quotes)
+
 
 # Search for quote patterns
 def dependencyGraphSearch(article):

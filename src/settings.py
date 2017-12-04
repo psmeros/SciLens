@@ -4,6 +4,9 @@ import os
 #Limit retrieved documents
 limitDocuments = 500
 
+memory = '16G'
+cores = 4
+
 #Pickled dataframe
 useCache = False
 
