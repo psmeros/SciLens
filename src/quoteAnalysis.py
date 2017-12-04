@@ -17,47 +17,31 @@ def quotePipeline():
     t0 = time()
     documents = None
     if startPipelineFrom in ['start']:
-        documents = cachefunc(queryDB, (documents))
-    if startPipelineFrom in ['start', 'extractQuotes']:
         documents = cachefunc(extractQuotes, (documents))
-    if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
-        documents = cachefunc(discoverTopics, (documents))
+    # if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
+    #     documents = cachefunc(discoverTopics, (documents))
     print("Total time: %0.3fs." % (time() - t0))
     return documents
 
 def extractQuotes(documents):
 
+    documents = queryDB()
+
     #process articles to extract quotes
     documents = documents.select('article', udf(dependencyGraphSearch, ArrayType(MapType(StringType(), StringType())))('article').alias('quotes'))
 
-    count = documents.count()
+    #drop documents without quotes
     documents = documents.dropna()
-
-    print('Dropped '+ str(count - documents.count()) + ' document(s) without quotes.')
     
     #remove quotes from articles 
     documents = documents.select(udf(removeQuotesFromArticle)('article', 'quotes').alias('article'), 'quotes')
    
     return documents
 
-#nlp = English()
-#authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
-#empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
-#actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
-
 # Search for quote patterns
 def dependencyGraphSearch(article):
 
-    global nlp, authorityKeywords, empiricalKeywords, actionsKeywords
-    try:
-        nlp('')
-    except:
-        nlp = English()
-        print('except')
-        authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
-        empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
-        actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
-
+    initNLP()
     allPerEntities = []
     allOrgEntities = []
     for e in nlp(article).ents:

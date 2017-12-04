@@ -10,15 +10,15 @@ from pyspark import SparkConf
 
 from settings import *
 
-
 #Spark setup
 def initSpark():
     global spark
     conf = SparkConf()
     conf.setAppName('quoteAnalysis')
-    conf.setMaster('local[4]')
-    conf.set('spark.executor.memory', '3G')
-    conf.set('spark.driver.memory', '3G')
+    conf.setMaster('local[*]')
+    conf.set('spark.executor.memory', '16G')
+    conf.set('spark.driver.memory', '16G')
+    conf.set('spark.driver.maxResultSize', '40G')
     conf.set('spark.jars.packages', 'org.postgresql:postgresql:42.1.4')
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
     return spark
@@ -33,8 +33,9 @@ def cachefunc(func, args):
     else:
         t0 = time()
         documents = func(args)
+        documents.write.parquet(cache, mode='overwrite')
         print(func.__name__, "ran in %0.3fs." % (time() - t0))
-        documents.write.save(cache, mode='overwrite')
+        
     return documents
 
 #Create vocabulary for lowering dimensions
@@ -74,7 +75,7 @@ def transformTF(tf):
 
 
 #Pose a query to the DB
-def queryDB(_):
+def queryDB():
 
     #Database Settings
     user = dbSettings['user']
@@ -89,6 +90,7 @@ def queryDB(_):
 
     df = spark.read.jdbc("jdbc:postgresql://" + host + ':' + port + '/' + db, query,properties={"user": user, "password": password, "driver": "org.postgresql.Driver"})    
     df = df.limit(limitDocuments) if(limitDocuments!=-1) else df
+    df = df.repartition(100) if(limitDocuments!=-1) else df.repartition(df.count())
 
     return df
 
