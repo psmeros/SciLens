@@ -27,9 +27,6 @@ def quotePipeline():
 
 def extractQuotes(documents):
 
-    #concatenation of title and body
-    documents = documents.select(concat_ws('.\n ', documents.title, documents.body).alias('article'))
-
     #process articles to extract quotes
     documents = documents.select('article', udf(dependencyGraphSearch, ArrayType(MapType(StringType(), StringType())))('article').alias('quotes'))
 
@@ -43,9 +40,24 @@ def extractQuotes(documents):
    
     return documents
 
+#nlp = English()
+#authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
+#empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
+#actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
+
 # Search for quote patterns
 def dependencyGraphSearch(article):
-        
+
+    global nlp, authorityKeywords, empiricalKeywords, actionsKeywords
+    try:
+        nlp('')
+    except:
+        nlp = English()
+        print('except')
+        authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
+        empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
+        actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
+
     allPerEntities = []
     allOrgEntities = []
     for e in nlp(article).ents:
@@ -104,6 +116,17 @@ def dependencyGraphSearch(article):
         return None
     else:
         return quotes
+
+#Create Keyword Lists and SpaCy NLP object
+def initNLP():
+    global nlp, authorityKeywords, empiricalKeywords, actionsKeywords
+    try:
+        nlp('')
+    except:
+        nlp = English()
+        authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
+        empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
+        actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
 
 #Resolves the quotee of a quote.
 def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEntities):

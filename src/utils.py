@@ -10,21 +10,15 @@ from pyspark import SparkConf
 
 from settings import *
 
-#Create Keyword Lists
-nlp = English()
-authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
-empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
-actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
 
 #Spark setup
 def initSpark():
     global spark
     conf = SparkConf()
     conf.setAppName('quoteAnalysis')
-    conf.setMaster('local[*]')
-    conf.set('spark.executor.memory', '40G')
-    conf.set('spark.driver.memory', '40G')
-    conf.set('spark.driver.maxResultSize', '40G')
+    conf.setMaster('local[4]')
+    conf.set('spark.executor.memory', '3G')
+    conf.set('spark.driver.memory', '3G')
     conf.set('spark.jars.packages', 'org.postgresql:postgresql:42.1.4')
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
     return spark
@@ -89,7 +83,7 @@ def queryDB(_):
     host = dbSettings['host']
     port = dbSettings['port']
 
-    query = """ (select title, body
+    query = """ (select (title || '.\n ' || body) as article
                 from document
                 where doc_type = 'web') doc """
 
