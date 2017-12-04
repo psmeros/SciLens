@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = -1
+limitDocuments = 100
 
 #Pickled dataframe
 useCache = False
