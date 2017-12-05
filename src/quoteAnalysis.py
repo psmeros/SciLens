@@ -10,6 +10,14 @@ from settings import *
 from utils import *
 from gloveEmbeddings import *
 
+
+#Create Keyword Lists and SpaCy NLP object
+nlp = English()
+authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
+empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
+actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
+
+
 ##Pipeline functions
 def quotePipeline():
     global spark
@@ -38,7 +46,7 @@ def extractQuotes(documents):
    
     return documents
 
-#UDFs
+#UDF definitions
 @udf(ArrayType(MapType(StringType(), StringType())))
 def dependencyGraphSearchUDF(article):
     dependencyGraphSearch(article)
@@ -52,7 +60,6 @@ def removeQuotesFromArticleUDF(article, quotes):
 # Search for quote patterns
 def dependencyGraphSearch(article):
 
-    initNLP()
     allPerEntities = []
     allOrgEntities = []
     for e in nlp(article).ents:
@@ -111,17 +118,6 @@ def dependencyGraphSearch(article):
         return None
     else:
         return quotes
-
-#Create Keyword Lists and SpaCy NLP object
-def initNLP():
-    global nlp, authorityKeywords, empiricalKeywords, actionsKeywords
-    try:
-        nlp('')
-    except:
-        nlp = English()
-        authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
-        empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
-        actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
 
 #Resolves the quotee of a quote.
 def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEntities):

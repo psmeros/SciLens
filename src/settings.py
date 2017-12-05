@@ -2,9 +2,9 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = 500
+limitDocuments = 100
 
-memory = '16G'
+memory = '8G'
 cores = 4
 
 #Pickled dataframe
