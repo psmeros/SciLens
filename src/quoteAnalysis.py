@@ -4,7 +4,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-from pyspark.ml.clustering import LDA
+from pyspark.sql import Row
 
 from settings import *
 from utils import *
@@ -36,14 +36,17 @@ def extractQuotes(documents):
     documents = queryDB()
 
     #process articles to extract quotes
-    documents = documents.select('article', dependencyGraphSearchUDF('article').alias('quotes'))
+    #documents = documents.select('article', dependencyGraphSearchUDF('article').alias('quotes'))
+    documents = documents.rdd.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article))).toDF(['article', 'quotes'])
+
 
     #drop documents without quotes
     documents = documents.dropna()
     
     #remove quotes from articles 
-    documents = documents.select(removeQuotesFromArticleUDF('article', 'quotes').alias('article'), 'quotes')
-   
+    #documents = documents.select(removeQuotesFromArticleUDF('article', 'quotes').alias('article'), 'quotes')
+    documents = documents.rdd.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes)).toDF(['article', 'quotes'])
+
     return documents
 
 #UDF definitions
