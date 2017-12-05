@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = 100
+limitDocuments = 1000
 
 memory = '8G'
 cores = 4
