@@ -2,16 +2,16 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = 1000
+limitDocuments = 10
 
 memory = '8G'
 cores = 4
 
 #Pickled dataframe
-useCache = False
+useCache = True
 
 #Starting point of the pipeline
-startPipelineFrom ='start' #values: 'start', 'extractQuotes', 'end'
+startPipelineFrom ='start' #values: 'start', 'end'
 
 #Topic Discovery parameters
 numOfTopics = 32
