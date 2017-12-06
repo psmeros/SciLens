@@ -26,8 +26,8 @@ def quotePipeline():
     documents = None
     if startPipelineFrom in ['start']:
         documents = cachefunc(extractQuotes, (documents))
-    # if startPipelineFrom in ['start', 'extractQuotes', 'removeQuotes', 'end']:
-    #     documents = cachefunc(discoverTopics, (documents))
+    if startPipelineFrom in ['start', 'end']:
+        documents = cachefunc(discoverTopics, (documents))
     print("Total time: %0.3fs." % (time() - t0))
     return documents
 
@@ -37,15 +37,16 @@ def extractQuotes(documents):
 
     #process articles to extract quotes
     #documents = documents.select('article', dependencyGraphSearchUDF('article').alias('quotes'))
-    documents = documents.rdd.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article))).toDF(['article', 'quotes'])
-
-
-    #drop documents without quotes
-    documents = documents.dropna()
+    documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
     
     #remove quotes from articles 
     #documents = documents.select(removeQuotesFromArticleUDF('article', 'quotes').alias('article'), 'quotes')
-    documents = documents.rdd.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes)).toDF(['article', 'quotes'])
+    documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
+
+    #convert rdd to dataFrame
+    documents = documents.toDF(['article', 'quotes'])
+    #drop documents without quotes
+    documents = documents.dropna()
 
     return documents
 
@@ -190,7 +191,9 @@ def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEnti
 
 
 # Remove quotes from articles
-def removeQuotesFromArticle(article, quotes): 
+def removeQuotesFromArticle(article, quotes):
+    if quotes == None:
+        return None
     articleWithoutQuotes = ''
     it = iter(quotes)
     q = next(it)['quote']
@@ -215,38 +218,18 @@ def discoverTopics(documents):
     tf = tf_vectorizer.fit_transform(documents['article'])
 
     #fit lda topic model
-    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=20, learning_method='online', n_jobs=-1)
+    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=5, learning_method='online', n_jobs=-1)
     lda.fit(tf)
 
-    #get the names of the top features of each topic and map it to lower dimensions (concepts)
-    labels = pd.DataFrame(tf_vectorizer.get_feature_names(), columns=['literal'])
-    labels = labels.merge(vocabulary, left_on='literal', right_on='literal')['concept'].tolist()
-
-    topiclabels = []
-    for _, topic in enumerate(lda.components_):
-        topiclabels.append([labels[i] for i in topic.argsort()[:-50 - 1:-1]])
-
-    newlabels = []
-    for t in topiclabels:
-        t = pd.DataFrame(t, columns=['concept'])
-        t = t.groupby('concept', sort=False).size().reset_index(name='size')#.sort_values(ascending=False)
-        nl = ', '.join(t[t['size']>1].sort_values(by='size', ascending=False).head(topicTopfeatures)['concept'].tolist())
-        
-        rest = topicTopfeatures - len(t[t['size']>1])
-        if rest == topicTopfeatures:
-            nl += ', '.join(t.head(rest)['concept'].tolist())
-        elif  rest > 0 :
-            nl += ', ' + ', '.join(t.head(rest)['concept'].tolist())
-
-        newlabels.append(nl)
-    topiclabels = newlabels
-
+    #get the topic labels
+    topicLabels = getTopicLabels(tf_vectorizer, lda, vocabulary)
+    
     #add the topic label as a column in the dataFrame
     L = lda.transform(tf)
-    documents['articleTopic'] = [topiclabels[t] for t in L.argmax(axis=1)]
+    documents['articleTopic'] = [topicLabels[t] for t in L.argmax(axis=1)]
     documents['articleSim'] = L.max(axis=1)
 
-    print('Total number of topics:', len(documents['articleTopic'].unique()))
+    #print('Total number of topics:', len(documents['articleTopic'].unique()))
 
     #flatten quotes
     documents = documents[['articleTopic', 'articleSim']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
@@ -257,9 +240,32 @@ def discoverTopics(documents):
     tf = tf_vectorizer.transform(documents['quote'])
     L = lda.transform(tf)
 
-    documents['quoteTopic'] = [topiclabels[t] for t in L.argmax(axis=1)]
+    documents['quoteTopic'] = [topicLabels[t] for t in L.argmax(axis=1)]
     documents['quoteSim'] = L.max(axis=1)
 
     documents = spark.createDataFrame(documents)
     return documents
 
+#get the names of the top features of each topic and map them to concepts (dimensionality reduction)
+def getTopicLabels(tf_vectorizer, lda, vocabulary):
+    labels = pd.DataFrame(tf_vectorizer.get_feature_names(), columns=['literal'])
+    labels = labels.merge(vocabulary, left_on='literal', right_on='literal')['concept'].tolist()
+
+    topicLabels = []
+    for _, topic in enumerate(lda.components_):
+        topicLabels.append([labels[i] for i in topic.argsort()[:-50 - 1:-1]])
+
+    labels = []
+    for t in topicLabels:
+        t = pd.DataFrame(t, columns=['concept'])
+        t = t.groupby('concept', sort=False).size().reset_index(name='size')
+        nl = ', '.join(t[t['size']>1].sort_values(by='size', ascending=False).head(topicTopfeatures)['concept'].tolist())
+        
+        rest = topicTopfeatures - len(t[t['size']>1])
+        if rest == topicTopfeatures:
+            nl += ', '.join(t.head(rest)['concept'].tolist())
+        elif  rest > 0 :
+            nl += ', ' + ', '.join(t.head(rest)['concept'].tolist())
+
+        labels.append(nl)
+    return labels

@@ -89,11 +89,11 @@ def queryDB():
                 from document
                 where doc_type = 'web') doc """
 
-    df = spark.read.jdbc("jdbc:postgresql://" + host + ':' + port + '/' + db, query,properties={"user": user, "password": password, "driver": "org.postgresql.Driver"})    
-    df = df.limit(limitDocuments) if(limitDocuments!=-1) else df
-    df = df.repartition(cores)
+    documents = spark.read.jdbc("jdbc:postgresql://" + host + ':' + port + '/' + db, query,properties={"user": user, "password": password, "driver": "org.postgresql.Driver"})    
+    documents = documents.limit(limitDocuments) if(limitDocuments!=-1) else documents
+    documents = documents.rdd.repartition(cores)
 
-    return df
+    return documents
 
 
 #Pretty print of numbers (by https://stackoverflow.com/a/45846841)
