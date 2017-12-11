@@ -33,7 +33,7 @@ def quotePipeline():
 
 def extractQuotes(documents):
 
-    documents = queryDB()
+    documents = readCorpus()
 
     #process articles to extract quotes
     #documents = documents.select('article', dependencyGraphSearchUDF('article').alias('quotes'))

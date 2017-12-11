@@ -7,6 +7,7 @@ import pandas as pd
 from spacy.en import English
 from pyspark.sql import SparkSession
 from pyspark import SparkConf
+from pyspark.sql.types import *
 
 from settings import *
 
@@ -20,7 +21,6 @@ def initSpark():
     conf.set('spark.executor.memory', memory)
     conf.set('spark.driver.memory', memory)
     conf.set('spark.driver.maxResultSize', '40G')
-    conf.set('spark.jars.packages', 'org.postgresql:postgresql:42.1.4')
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
     return spark
 
@@ -75,21 +75,9 @@ def transformTF(tf):
     return new_tf.T, labels
 
 
-#Pose a query to the DB
-def queryDB():
-
-    #Database Settings
-    user = dbSettings['user']
-    password = dbSettings['password']
-    db = dbSettings['db']
-    host = dbSettings['host']
-    port = dbSettings['port']
-
-    query = """ (select (title || '.\n ' || body) as article
-                from document
-                where doc_type = 'web') doc """
-
-    documents = spark.read.jdbc("jdbc:postgresql://" + host + ':' + port + '/' + db, query,properties={"user": user, "password": password, "driver": "org.postgresql.Driver"})    
+#Read the corpus to the memory
+def readCorpus():
+    documents = spark.read.option('sep', '\t').csv(corpusFile, header=False, schema=StructType([StructField('article', StringType())]))
     documents = documents.limit(limitDocuments) if(limitDocuments!=-1) else documents
     documents = documents.rdd.repartition(cores)
 
