@@ -8,17 +8,19 @@ memory = '8G'
 cores = 4
 
 #Pickled dataframe
-useCache = True
+useCache = False
 
 #Starting point of the pipeline
 startPipelineFrom ='start' #values: 'start', 'end'
 
 #Topic Discovery parameters
-numOfTopics = 32
+numOfTopics = 2
 topicTopfeatures = 3
 
-#Settings for database connection
-dbSettings = {'user':'smeros', 'password':'vasoula', 'db':'sciArticles', 'host':'localhost', 'port':'5432'}
+#Corpus file
+corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
+#gloveFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
+#gloveFile = '/home/smeros/backup_data/sampleFoodArticles.tsv'
 
 #GloVe Embeddings file
 gloveFile = None
