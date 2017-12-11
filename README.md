@@ -1,12 +1,16 @@
-# dependencies
+# Dependencies
+- ```conda install nltk, spacy```
+- ```python -m nltk.downloader punkt```
+- ```python -m spacy download en```
+- ```conda install pyspark```
+- ```gloVe 6B (Wikipedia - 300d) [deprecated]```
 
-- gloVe 6B (Wikipedia - 300d)
-- conda install psycopg2
-- python > import nltk > nltk.download [punkt stopwords]
-- conda install spacy
-- python -m spacy download en
-- conda install pyspark
-- load sciArticles.db (corpus)
-
-# notebook to .py file
-- jupyter nbconvert --to=python notebook.ipynb
+# Corpus Preparation
+- extract remote postgres dump
+  - ``` export PGPASSWORD=<PGPASSWORD>; pg_dump -h <HOST> -U <USER> -f <DBNAME>.db <DBNAME> ```
+- load dump to local postgres
+  - ```psql <DBNAME> < <DBNAME>.db```
+- extract query result into a .tsv file
+  - ``` \copy (select (title || '.\n ' || body) as article from document where doc_type = 'web') TO '/path/to/file.tsv';```
+- sample .tsv file
+  - ```shuf -n 10000 file.tsv > sampleFile.tsv```
