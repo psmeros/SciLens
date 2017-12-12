@@ -2,20 +2,20 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = 10
+limitDocuments = 1000
 
 memory = '8G'
 cores = 4
 
 #Pickled dataframe
-useCache = False
+useCache = True
 
 #Starting point of the pipeline
 startPipelineFrom ='start' #values: 'start', 'end'
 
 #Topic Discovery parameters
-numOfTopics = 2
-topicTopfeatures = 3
+numOfTopics = 32
+topicTopfeatures = 1
 
 #Corpus file
 corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
