@@ -2,13 +2,13 @@ import pandas as pd
 import os
 
 #Limit retrieved documents
-limitDocuments = 1000
+limitDocuments = 100
 
 memory = '8G'
 cores = 4
 
 #Pickled dataframe
-useCache = True
+useCache = False
 
 #Starting point of the pipeline
 startPipelineFrom ='start' #values: 'start', 'end'
@@ -16,6 +16,7 @@ startPipelineFrom ='start' #values: 'start', 'end'
 #Topic Discovery parameters
 numOfTopics = 32
 topicTopfeatures = 1
+max_iter = 5
 
 #Corpus file
 corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
@@ -32,8 +33,8 @@ gloveFile = None
 os.makedirs('cache', exist_ok=True)
 os.makedirs('plots', exist_ok=True)
 
-#File with refined concepts
-conceptsFile = 'concepts.csv'
+#File with refined topics
+topicsFile = 'topics.txt'
 
 #Pandas settings
 pd.set_option('display.max_colwidth', -1)
