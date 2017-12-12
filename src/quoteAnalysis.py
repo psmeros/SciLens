@@ -214,16 +214,19 @@ def discoverTopics(documents):
     vocabulary = createVocabulary()
     
     #convert to tf vectors (1-2grams)
-    tf_vectorizer = CountVectorizer(max_df=0.8, min_df=0.2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=vocabulary['literal'].tolist())
+    tf_vectorizer = CountVectorizer(max_df=0.8, min_df=0.2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=vocabulary)
     tf = tf_vectorizer.fit_transform(documents['article'])
 
     #fit lda topic model
-    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=5, learning_method='online', n_jobs=-1)
+    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=max_iter, learning_method='online', n_jobs=-1)
     lda.fit(tf)
 
     #get the topic labels
-    topicLabels = getTopicLabels(tf_vectorizer, lda, vocabulary)
-    
+    feature_names = tf_vectorizer.get_feature_names()
+    topicLabels = []
+    for _, topic in enumerate(lda.components_):
+        topicLabels.append(" ".join([feature_names[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
+
     #add the topic label as a column in the dataFrame
     L = lda.transform(tf)
     documents['articleTopic'] = [topicLabels[t] for t in L.argmax(axis=1)]
@@ -245,27 +248,3 @@ def discoverTopics(documents):
 
     documents = spark.createDataFrame(documents)
     return documents
-
-#get the names of the top features of each topic and map them to concepts (dimensionality reduction)
-def getTopicLabels(tf_vectorizer, lda, vocabulary):
-    labels = pd.DataFrame(tf_vectorizer.get_feature_names(), columns=['literal'])
-    labels = labels.merge(vocabulary, left_on='literal', right_on='literal')['concept'].tolist()
-
-    topicLabels = []
-    for _, topic in enumerate(lda.components_):
-        topicLabels.append([labels[i] for i in topic.argsort()[:-50 - 1:-1]])
-
-    labels = []
-    for t in topicLabels:
-        t = pd.DataFrame(t, columns=['concept'])
-        t = t.groupby('concept', sort=False).size().reset_index(name='size')
-        nl = ', '.join(t[t['size']>1].sort_values(by='size', ascending=False).head(topicTopfeatures)['concept'].tolist())
-        
-        rest = topicTopfeatures - len(t[t['size']>1])
-        if rest == topicTopfeatures:
-            nl += ', '.join(t.head(rest)['concept'].tolist())
-        elif  rest > 0 :
-            nl += ', ' + ', '.join(t.head(rest)['concept'].tolist())
-
-        labels.append(nl)
-    return labels
