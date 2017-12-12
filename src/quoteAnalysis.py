@@ -214,7 +214,7 @@ def discoverTopics(documents):
     vocabulary = createVocabulary()
     
     #convert to tf vectors (1-2grams)
-    tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=vocabulary['literal'].tolist())
+    tf_vectorizer = CountVectorizer(max_df=0.8, min_df=0.2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=vocabulary['literal'].tolist())
     tf = tf_vectorizer.fit_transform(documents['article'])
 
     #fit lda topic model
