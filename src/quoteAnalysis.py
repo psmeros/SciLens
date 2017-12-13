@@ -11,23 +11,20 @@ from utils import *
 from gloveEmbeddings import *
 
 
-#Create Keyword Lists and SpaCy NLP object
-nlp = English()
-authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
-empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
-actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
-
-
 ##Pipeline functions
 def quotePipeline():
-    global spark
-    spark = initSpark()
     t0 = time()
+
+    global nlp, authorityKeywords, empiricalKeywords, actionsKeywords, spark
+    nlp, authorityKeywords, empiricalKeywords, actionsKeywords = initNLP()
+    spark = initSpark()
     documents = None
+
     if startPipelineFrom in ['start']:
         documents = cachefunc(extractQuotes, (documents))
     if startPipelineFrom in ['start', 'end']:
         documents = cachefunc(discoverTopics, (documents))
+    
     print("Total time: %0.3fs." % (time() - t0))
     return documents
 
@@ -210,12 +207,19 @@ def removeQuotesFromArticle(article, quotes):
 
 def discoverTopics(documents):
 
+    samplingThreshold = 50000
     documents = documents.toPandas()
     vocabulary = createVocabulary()
     
-    #convert to tf vectors (1-2grams)
+    #define vectorizer (1-2grams)
     tf_vectorizer = CountVectorizer(max_df=0.8, min_df=0.2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=vocabulary)
-    tf = tf_vectorizer.fit_transform(documents['article'])
+
+    #subsampling
+    if documents.shape[0] > samplingThreshold:
+        print('Subsampling...')
+        tf = tf_vectorizer.transform(documents.sample(n=samplingThreshold)['article'])
+    else:
+        tf = tf_vectorizer.transform(documents['article'])
 
     #fit lda topic model
     lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=max_iter, learning_method='online', n_jobs=-1)
@@ -226,6 +230,10 @@ def discoverTopics(documents):
     topicLabels = []
     for _, topic in enumerate(lda.components_):
         topicLabels.append(" ".join([feature_names[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
+
+
+    if documents.shape[0] > samplingThreshold:
+        tf = tf_vectorizer.transform(documents['article'])
 
     #add the topic label as a column in the dataFrame
     L = lda.transform(tf)
