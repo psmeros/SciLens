@@ -8,18 +8,16 @@ from pyspark.sql import Row
 
 from settings import *
 from utils import *
-from gloveEmbeddings import *
 
+nlp, authorityKeywords, empiricalKeywords, actionsKeywords = initNLP()
 
 ##Pipeline functions
 def quotePipeline():
-    t0 = time()
-
-    global nlp, authorityKeywords, empiricalKeywords, actionsKeywords, spark
-    nlp, authorityKeywords, empiricalKeywords, actionsKeywords = initNLP()
+    global spark
     spark = initSpark()
     documents = None
 
+    t0 = time()
     if startPipelineFrom in ['start']:
         documents = cachefunc(extractQuotes, (documents))
     if startPipelineFrom in ['start', 'end']:
@@ -37,10 +35,9 @@ def extractQuotes(documents):
     
     #remove quotes from articles 
     documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
-    
+
     #convert rdd to dataFrame
     documents = documents.toDF(['article', 'quotes'])
-    
     #drop documents without quotes
     documents = documents.dropna()
 
@@ -210,6 +207,7 @@ def discoverTopics(documents):
         tf = tf_vectorizer.transform(documents['article'])
 
     #fit lda topic model
+    print('Fitting LDA model...')
     lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=max_iter, learning_method='online', n_jobs=-1)
     lda.fit(tf)
 
@@ -224,6 +222,7 @@ def discoverTopics(documents):
         tf = tf_vectorizer.transform(documents['article'])
 
     #add the topic label as a column in the dataFrame
+    print('Discovering article topics...')
     L = lda.transform(tf)
     documents['articleTopic'] = [topicLabels[t] for t in L.argmax(axis=1)]
     documents['articleSim'] = L.max(axis=1)
@@ -236,6 +235,7 @@ def discoverTopics(documents):
     print ('Average number of quotes per Document:',len(documents)/limitDocuments)
 
     #discover quote topics
+    print('Discovering quote topics...')
     tf = tf_vectorizer.transform(documents['quote'])
     L = lda.transform(tf)
 

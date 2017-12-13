@@ -17,6 +17,7 @@ startPipelineFrom ='start' #values: 'start', 'end'
 numOfTopics = 32
 topicTopfeatures = 1
 max_iter = 5
+samplingThreshold = 50000
 
 #Corpus file
 corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
