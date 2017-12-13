@@ -20,8 +20,8 @@ max_iter = 5
 
 #Corpus file
 corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
-#gloveFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
-#gloveFile = '/home/smeros/backup_data/sampleFoodArticles.tsv'
+#corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
+#corpusFile = '/home/smeros/backup_data/sampleFoodArticles.tsv'
 
 #GloVe Embeddings file
 gloveFile = None
