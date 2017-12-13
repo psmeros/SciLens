@@ -25,6 +25,14 @@ def initSpark():
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
     return spark
 
+#Create Keyword Lists and SpaCy NLP object
+def initNLP():
+    nlp = English()
+    authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
+    empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
+    actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
+    return nlp, authorityKeywords, empiricalKeywords, actionsKeywords
+
 #Read/Write the results of *func* from/to cache
 def cachefunc(func, args):
     

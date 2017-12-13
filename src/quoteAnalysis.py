@@ -33,30 +33,18 @@ def extractQuotes(documents):
     documents = readCorpus()
 
     #process articles to extract quotes
-    #documents = documents.select('article', dependencyGraphSearchUDF('article').alias('quotes'))
     documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
     
     #remove quotes from articles 
-    #documents = documents.select(removeQuotesFromArticleUDF('article', 'quotes').alias('article'), 'quotes')
     documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
-
+    
     #convert rdd to dataFrame
     documents = documents.toDF(['article', 'quotes'])
+    
     #drop documents without quotes
     documents = documents.dropna()
 
     return documents
-
-#UDF definitions
-@udf(ArrayType(MapType(StringType(), StringType())))
-def dependencyGraphSearchUDF(article):
-    dependencyGraphSearch(article)
-
-
-@udf(StringType())
-def removeQuotesFromArticleUDF(article, quotes):
-    removeQuotesFromArticle(article, quotes)
-
 
 # Search for quote patterns
 def dependencyGraphSearch(article):
