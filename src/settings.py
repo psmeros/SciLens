@@ -14,10 +14,10 @@ useCache = False
 startPipelineFrom ='start' #values: 'start', 'end'
 
 #Topic Discovery parameters
-numOfTopics = 32
+numOfTopics = 4
 topicTopfeatures = 1
 max_iter = 5
-samplingThreshold = 50000
+samplingFraction = 0.1
 
 #Corpus file
 corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'

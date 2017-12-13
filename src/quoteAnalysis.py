@@ -21,10 +21,10 @@ def quotePipeline():
     if startPipelineFrom in ['start']:
         documents = cachefunc(extractQuotes, (documents))
     if startPipelineFrom in ['start', 'end']:
-        documents = cachefunc(discoverTopics, (documents))
+        topics = cachefunc(discoverTopics, (documents))
     
     print("Total time: %0.3fs." % (time() - t0))
-    return documents
+    return documents, topics
 
 def extractQuotes(documents):
 
@@ -192,23 +192,19 @@ def removeQuotesFromArticle(article, quotes):
 
 def discoverTopics(documents):
 
-    samplingThreshold = 50000
+    #subsampling
+    documents = documents.sample(withReplacement=False, fraction=samplingFraction)
     documents = documents.toPandas()
+    
     vocabulary = createVocabulary()
     
     #define vectorizer (1-2grams)
     tf_vectorizer = CountVectorizer(max_df=0.8, min_df=0.2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=vocabulary)
-
-    #subsampling
-    if documents.shape[0] > samplingThreshold:
-        print('Subsampling...')
-        tf = tf_vectorizer.transform(documents.sample(n=samplingThreshold)['article'])
-    else:
-        tf = tf_vectorizer.transform(documents['article'])
+    tf = tf_vectorizer.transform(documents['article'])
 
     #fit lda topic model
     print('Fitting LDA model...')
-    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=max_iter, learning_method='online', n_jobs=-1)
+    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=max_iter, learning_method='online', n_jobs=cores)
     lda.fit(tf)
 
     #get the topic labels
@@ -217,17 +213,11 @@ def discoverTopics(documents):
     for _, topic in enumerate(lda.components_):
         topicLabels.append(" ".join([feature_names[i] for i in topic.argsort()[:-topicTopfeatures - 1:-1]]))
 
-
-    if documents.shape[0] > samplingThreshold:
-        tf = tf_vectorizer.transform(documents['article'])
-
     #add the topic label as a column in the dataFrame
     print('Discovering article topics...')
     L = lda.transform(tf)
     documents['articleTopic'] = [topicLabels[t] for t in L.argmax(axis=1)]
     documents['articleSim'] = L.max(axis=1)
-
-    #print('Total number of topics:', len(documents['articleTopic'].unique()))
 
     #flatten quotes
     documents = documents[['articleTopic', 'articleSim']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
@@ -242,5 +232,5 @@ def discoverTopics(documents):
     documents['quoteTopic'] = [topicLabels[t] for t in L.argmax(axis=1)]
     documents['quoteSim'] = L.max(axis=1)
 
-    documents = spark.createDataFrame(documents)
-    return documents
+    topics = spark.createDataFrame(documents)
+    return topics
