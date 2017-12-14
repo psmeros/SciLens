@@ -221,7 +221,7 @@ def discoverTopics(documents):
 
     #flatten quotes
     documents = documents[['articleTopic', 'articleSim']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
-    print('Total number of quotes:',human_format(documents.shape[0]))
+    print('Sample quotes:',human_format(documents.shape[0]))
     print ('Average number of quotes per Document:',len(documents)/limitDocuments)
 
     #discover quote topics

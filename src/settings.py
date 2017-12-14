@@ -4,14 +4,14 @@ import os
 #Limit retrieved documents
 limitDocuments = 100
 
-memory = '8G'
-cores = 4
+memory = '8G'	#8 or 60
+cores = 4		#4 or 24
 
 #Pickled dataframe
-useCache = False
+useCache = True
 
 #Starting point of the pipeline
-startPipelineFrom ='start' #values: 'start', 'end'
+startPipelineFrom ='start' #'start' or 'end'
 
 #Topic Discovery parameters
 numOfTopics = 4
@@ -20,7 +20,8 @@ max_iter = 5
 samplingFraction = 0.1
 
 #Corpus file
-corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
+corpusFile = None
+#corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
 #corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
 #corpusFile = '/home/smeros/backup_data/sampleFoodArticles.tsv'
 
