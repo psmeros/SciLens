@@ -1,11 +1,3 @@
-from spacy.symbols import nsubj, dobj, VERB
-from nltk.tokenize import sent_tokenize
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-from pyspark.sql.functions import *
-from pyspark.sql.types import *
-from pyspark.sql import Row
-
 from settings import *
 from utils import *
 
@@ -17,16 +9,41 @@ def quotePipeline():
     spark = initSpark()
     documents = None
 
-    t0 = time()
+    t00 = time()
     if startPipelineFrom in ['start']:
-        documents = cachefunc(extractQuotes, (documents))
+        func = extractQuotes
+        cache_doc = 'cache/'+func.__name__+'_doc.pkl'
+        cache_q = 'cache/'+func.__name__+'_q.pkl'
+        if useCache and os.path.exists(cache_doc) and os.path.exists(cache_q):
+            print ('Reading from cache:', cache_doc)
+            documents = spark.sparkContext.pickleFile(cache_doc)
+            print ('Reading from cache:', cache_q)
+            quotes = spark.sparkContext.pickleFile(cache_q)
+        else:
+            t0 = time()
+            documents, quotes = func()
+            shutil.rmtree(cache_doc, ignore_errors=True)
+            shutil.rmtree(cache_q, ignore_errors=True)
+            documents.saveAsPickleFile(cache_doc)
+            quotes.saveAsPickleFile(cache_q)
+            print(func.__name__, "ran in %0.3fs." % (time() - t0))
     if startPipelineFrom in ['start', 'end']:
-        topics = cachefunc(discoverTopics, (documents))
+        func = discoverTopics
+        cache = 'cache/'+func.__name__+'.pkl'
+        if useCache and os.path.exists(cache):
+            print ('Reading from cache:', cache)
+            topics = spark.sparkContext.pickleFile(cache)
+        else:
+            t0 = time()
+            topics = func(documents)
+            shutil.rmtree(cache, ignore_errors=True)
+            documents.saveAsPickleFile(cache)
+            print(func.__name__, "ran in %0.3fs." % (time() - t0))
     
-    print("Total time: %0.3fs." % (time() - t0))
-    return documents, topics
+    print("Total time: %0.3fs." % (time() - t00))
+    return documents, quotes, topics
 
-def extractQuotes(documents):
+def extractQuotes():
 
     documents = readCorpus()
 
@@ -36,12 +53,17 @@ def extractQuotes(documents):
     #remove quotes from articles 
     documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
 
-    #convert rdd to dataFrame
-    documents = documents.toDF(['article', 'quotes'])
     #drop documents without quotes
-    documents = documents.dropna()
+    documents = documents.filter(lambda s: s.article is not None)
 
-    return documents
+    quotes = documents.flatMap(lambda s: [Row(quote=q['quote'], quotee=q['quotee'], quoteeType=q['quoteeType'], quoteeAffiliation=q['quoteeAffiliation']) for q in s.quotes])
+
+    documents = documents.map(lambda s: Row(article=s.article, quotes=[q['quote']for q in s.quotes]))
+
+    #convert rdd to dataFrame
+    #documents = documents.toDF()
+
+    return documents, quotes
 
 # Search for quote patterns
 def dependencyGraphSearch(article):
@@ -194,7 +216,7 @@ def discoverTopics(documents):
 
     #subsampling
     documents = documents.sample(withReplacement=False, fraction=samplingFraction)
-    documents = documents.toPandas()
+    documents = documents.toDF(['article', 'quotes']).toPandas()
     
     vocabulary = createVocabulary()
     
@@ -221,6 +243,7 @@ def discoverTopics(documents):
 
     #flatten quotes
     documents = documents[['articleTopic', 'articleSim']].join(documents['quotes'].apply(pd.Series).stack().reset_index(level=1, drop=True).apply(pd.Series))    
+    documents.columns = ['articleTopic', 'articleSim', 'quote']
     print('Sample quotes:',human_format(documents.shape[0]))
     print ('Average number of quotes per Document:',len(documents)/limitDocuments)
 
@@ -232,5 +255,5 @@ def discoverTopics(documents):
     documents['quoteTopic'] = [topicLabels[t] for t in L.argmax(axis=1)]
     documents['quoteSim'] = L.max(axis=1)
 
-    topics = spark.createDataFrame(documents)
+    topics = spark.createDataFrame(documents).rdd
     return topics

@@ -1,14 +1,3 @@
-import re
-import sys
-import os.path
-from time import time
-import numpy as np
-import pandas as pd
-from spacy.en import English
-from bs4 import BeautifulSoup
-from pyspark.sql import SparkSession
-from pyspark import SparkConf
-from pyspark.sql.types import *
 
 from settings import *
 
@@ -32,20 +21,6 @@ def initNLP():
     empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
     actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
     return nlp, authorityKeywords, empiricalKeywords, actionsKeywords
-
-#Read/Write the results of *func* from/to cache
-def cachefunc(func, args):
-    cache = 'cache/'+func.__name__+'.parquet'
-    if useCache and os.path.exists(cache):
-        print ('Reading from cache:', cache)
-        documents = spark.read.load(cache)
-    else:
-        t0 = time()
-        documents = func(args)
-        documents.write.parquet(cache, mode='overwrite')
-        print(func.__name__, "ran in %0.3fs." % (time() - t0))
-        
-    return documents
 
 #Create vocabulary for lowering dimensions
 def createVocabulary():
@@ -81,7 +56,7 @@ def readCorpus():
 def human_format(num):
     num = float('{:.3g}'.format(num))
     magnitude = 0
-    while abs(num) >= 1000:
+    while builtins.abs(num) >= 1000:
         magnitude += 1
         num /= 1000.0
     return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])

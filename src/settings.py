@@ -1,14 +1,31 @@
-import pandas as pd
 import os
+import re
+import sys
+import shutil
+import builtins
+from time import time
+import numpy as np
+import pandas as pd
+from spacy.en import English
+from spacy.symbols import nsubj, dobj, VERB
+from nltk.tokenize import sent_tokenize
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+from bs4 import BeautifulSoup
+from pyspark.sql import SparkSession
+from pyspark import SparkConf
+from pyspark.sql.types import *
+from pyspark.sql.functions import *
+from pyspark.sql import Row
 
 #Limit retrieved documents
-limitDocuments = 100
+limitDocuments = 10
 
 memory = '8G'	#8 or 60
 cores = 4		#4 or 24
 
 #Pickled dataframe
-useCache = True
+useCache = False
 
 #Starting point of the pipeline
 startPipelineFrom ='start' #'start' or 'end'
@@ -17,11 +34,11 @@ startPipelineFrom ='start' #'start' or 'end'
 numOfTopics = 4
 topicTopfeatures = 1
 max_iter = 5
-samplingFraction = 0.1
+samplingFraction = 0.9
 
 #Corpus file
-corpusFile = None
-#corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
+#corpusFile = None
+corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
 #corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
 #corpusFile = '/home/smeros/backup_data/sampleFoodArticles.tsv'
 
