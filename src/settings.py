@@ -19,10 +19,10 @@ from pyspark.sql.functions import *
 from pyspark.sql import Row
 
 #Limit retrieved documents
-limitDocuments = 10
+limitDocuments = 100
 
-memory = '8G'	#8 or 60
-cores = 4		#4 or 24
+memory = '8G' #8 or 60
+cores = 4 #4 or 24
 
 #Pickled dataframe
 useCache = False
