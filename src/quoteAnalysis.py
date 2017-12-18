@@ -37,7 +37,7 @@ def quotePipeline():
             t0 = time()
             topics = func(documents)
             shutil.rmtree(cache, ignore_errors=True)
-            documents.saveAsPickleFile(cache)
+            topics.saveAsPickleFile(cache)
             print(func.__name__, "ran in %0.3fs." % (time() - t0))
     
     print("Total time: %0.3fs." % (time() - t00))
