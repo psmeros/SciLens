@@ -19,7 +19,7 @@ from pyspark.sql.functions import *
 from pyspark.sql import Row
 
 #Limit retrieved documents
-limitDocuments = 100
+limitDocuments = 10
 
 memory = '8G' #8 or 60
 cores = 4 #4 or 24

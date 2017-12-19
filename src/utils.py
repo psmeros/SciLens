@@ -33,7 +33,7 @@ def createVocabulary():
         with open(topicsFile, 'w') as f:
             for t in BeautifulSoup(nutrition_facts_topics_html, 'html.parser').find_all('a', title=True):
                 topic = t['title']
-                if topic != 'All Topics' and not topic.startswith('Dr.'):
+                if not topic.startswith('Dr.') and topic not in ['All Topics', 'farmers', 'book']:
                     f.write(topic + '\n')
 
 
