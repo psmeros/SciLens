@@ -57,11 +57,7 @@ def extractQuotes():
     documents = documents.filter(lambda s: s.article is not None)
 
     quotes = documents.flatMap(lambda s: [Row(quote=q['quote'], quotee=q['quotee'], quoteeType=q['quoteeType'], quoteeAffiliation=q['quoteeAffiliation']) for q in s.quotes])
-
     documents = documents.map(lambda s: Row(article=s.article, quotes=[q['quote']for q in s.quotes]))
-
-    #convert rdd to dataFrame
-    #documents = documents.toDF()
 
     return documents, quotes
 
@@ -144,12 +140,9 @@ def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEnti
                     qaff = e
                     break
             
-            #case where PERSON is referred to with his/her first or last name       
-            if len(q.split()) == 1:
-                for e in allPerEntities:
-                    if q != e and q in e.split():
-                        q = e
-                        break
+            p = resolvePerson(q, allPerEntities)
+            if p != None:
+                q = p
                         
             return (q, qtype, qaff)    
 
@@ -161,23 +154,10 @@ def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEnti
             qtype = 'ORG'
             qaff = e
             
-            #case where ORG is referred to with an acronym
-            if len(q.split()) == 1:
-                for e in allOrgEntities:
-                    if q != e and len(e.split()) > 1:
-                        fullAcronym = compactAcronym = upperAccronym = ''
-                        for w in e.split():
-                            for l in w:
-                                if (l.isupper()):
-                                    upperAccronym += l
-                            if not nlp(w)[0].is_stop:
-                                compactAcronym += w[0]
-                            fullAcronym += w[0]
-
-                        if q.lower() in [fullAcronym.lower(), compactAcronym.lower(), upperAccronym.lower()]:
-                            q = e
-                            qaff = e
-                            break
+            o = resolveOrganization(q, allOrgEntities)
+            if o != None:
+                q = o
+                qaff = o
        
             return (q, qtype, qaff)   
         
@@ -193,6 +173,33 @@ def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEnti
         q = 'empirical observation'
     return (q, qtype, qaff)
 
+#Resolve cases where PERSON is referred to with his/her first or last name       
+def resolvePerson(per, plist):
+    if len(per.split()) == 1:
+        for p in plist:
+            if per != p and per in p.split():
+                #print(per, ' to ', p)
+                return p
+    return None
+
+#Resolve cases where ORG is referred to with an acronym
+def resolveOrganization(org, olist):
+    if len(org.split()) == 1:
+        for o in olist:
+            if org != o and len(o.split()) > 1:
+                fullAcronym = compactAcronym = upperAccronym = ''
+                for w in o.split():
+                    for l in w:
+                        if (l.isupper()):
+                            upperAccronym += l
+                    if not nlp(w)[0].is_stop:
+                        compactAcronym += w[0]
+                    fullAcronym += w[0]
+
+                if org.lower() in [fullAcronym.lower(), compactAcronym.lower(), upperAccronym.lower()]:
+                    #print(org, ' to ', o)
+                    return o
+    return None
 
 # Remove quotes from articles
 def removeQuotesFromArticle(article, quotes):
