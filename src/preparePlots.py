@@ -1,5 +1,5 @@
 from settings import *
-from quoteAnalysis import quotePipeline
+from quoteAnalysis import quotePipeline, resolvePerson, resolveOrganization
 
 #Plot functions
 
@@ -51,8 +51,16 @@ def plotTopQuoteesDF():
 
     df_p = quotes[quotes['quoteeType'] == 'PERSON']['quotee'].value_counts().reset_index()
     df_p.columns = ['quotee', 'count']
+    plist = df_p['quotee'].tolist()
+    df_p['quotee'] = df_p['quotee'].apply(lambda x: resolvePerson(x, plist))
+    df_p = df_p.groupby(['quotee']).sum().reset_index()
+    df_p.columns = ['quotee', 'count']
 
     df_o = quotes[quotes['quoteeType'] == 'ORG']['quoteeAffiliation'].value_counts().reset_index()
+    df_o.columns = ['organization', 'count']
+    olist = df_o['organization'].tolist()
+    df_o['organization'] = df_o['organization'].apply(lambda x: resolveOrganization(x, olist))
+    df_o = df_o.groupby(['organization']).sum().reset_index()
     df_o.columns = ['organization', 'count']
 
     df_p.to_pickle(dfPath_p)
