@@ -31,16 +31,17 @@ useCache = False
 startPipelineFrom ='start' #'start' or 'end'
 
 #Topic Discovery parameters
-numOfTopics = 4
+numOfTopics = 32
 topicTopfeatures = 1
 max_iter = 5
 samplingFraction = 0.9
+topicSimThreshold = 0.7
 
 #Corpus file
-#corpusFile = None
-corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
+corpusFile = None
+#corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
 #corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
-#corpusFile = '/home/smeros/backup_data/sampleFoodArticles.tsv'
+#corpusFile = '/home/smeros/backup_data/FoodArticles.tsv'
 
 #GloVe Embeddings file
 gloveFile = None

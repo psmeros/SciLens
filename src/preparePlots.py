@@ -11,7 +11,7 @@ def plotNumOfQuotesDF():
     documents, quotes, topics = quotePipeline()
     topics = topics.toDF().toPandas()
     quotes = quotes.toDF().toPandas()
-    topics = topics[(topics['articleSim']>0.5) & (topics['quoteSim']>0.5)]
+    topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
     topics = quotes.merge(topics)
 
     df = pd.DataFrame()
@@ -32,7 +32,7 @@ def plotHeatMapDF():
     
     documents, quotes, topics = quotePipeline()
     topics = topics.toDF().toPandas()
-    topics = topics[(topics['articleSim']>0.5) & (topics['quoteSim']>0.5)]
+    topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
 
     df = topics[['articleTopic', 'quoteTopic']].groupby(['articleTopic', 'quoteTopic']).size().reset_index(name='counts').pivot(index='articleTopic', columns='quoteTopic', values='counts').fillna(0)
     df = df.div(df.sum(axis=1), axis=0)
