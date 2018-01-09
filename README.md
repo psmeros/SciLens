@@ -11,6 +11,6 @@
 - load dump to local postgres
   - ```psql <DBNAME> < <DBNAME>.db```
 - extract query result into a .tsv file
-  - ``` \copy (select (title || '.\n ' || body) as article from document where doc_type = 'web') TO '/path/to/file.tsv';```
+  - ``` \copy (select (title || '.\n ' || body) as article, publishing_date, url from document where doc_type = 'web') TO '/path/to/file.tsv';```
 - sample .tsv file
   - ```shuf -n 10000 file.tsv > sampleFile.tsv```
