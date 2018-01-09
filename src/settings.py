@@ -25,10 +25,10 @@ memory = '8G' #8 or 60
 cores = 4 #4 or 24
 
 #Pickled dataframe
-useCache = True
+useCache = False
 
 #Starting point of the pipeline
-startPipelineFrom ='start' #'start' or 'end'
+runFromPipeline ='extract' # 'all', 'extract' or 'topics'
 
 #Topic Discovery parameters
 numOfTopics = 32

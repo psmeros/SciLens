@@ -4,4 +4,4 @@ from preparePlots import *
 quotePipeline()
 #plotNumOfQuotesDF()
 #plotHeatMapDF()
-plotTopQuoteesDF()
+#plotTopQuoteesDF()
