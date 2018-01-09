@@ -1,7 +1,7 @@
 from quoteAnalysis import quotePipeline
 from preparePlots import *
 
-quotePipeline()
+#quotePipeline()
 #plotNumOfQuotesDF()
 #plotHeatMapDF()
 #plotTopQuoteesDF()
