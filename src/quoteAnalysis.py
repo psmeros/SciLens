@@ -7,10 +7,10 @@ nlp, authorityKeywords, empiricalKeywords, actionsKeywords = initNLP()
 def quotePipeline():
     global spark
     spark = initSpark()
-    documents = None
+    documents = quotes = topics = None
 
     t00 = time()
-    if startPipelineFrom in ['start']:
+    if runFromPipeline in ['all','extract']:
         func = extractQuotes
         cache_doc = 'cache/'+func.__name__+'_doc.pkl'
         cache_q = 'cache/'+func.__name__+'_q.pkl'
@@ -27,7 +27,8 @@ def quotePipeline():
             documents.saveAsPickleFile(cache_doc)
             quotes.saveAsPickleFile(cache_q)
             print(func.__name__, "ran in %0.3fs." % (time() - t0))
-    if startPipelineFrom in ['start', 'end']:
+
+    if runFromPipeline in ['all', 'topics']:
         func = discoverTopics
         cache = 'cache/'+func.__name__+'.pkl'
         if useCache and os.path.exists(cache):
@@ -47,19 +48,25 @@ def extractQuotes():
 
     documents = readCorpus()
 
-    #process articles to extract quotes
-    documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
+
+    documents = documents.map(lambda s: Row(article=s.article, publishing_date=s.publishing_date, url=s.url))
+
+
+    return documents, documents #tmp
+
+    # #process articles to extract quotes
+    # documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
     
-    #remove quotes from articles 
-    documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
+    # #remove quotes from articles 
+    # documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
 
-    #drop documents without quotes
-    documents = documents.filter(lambda s: s.article is not None)
+    # #drop documents without quotes
+    # documents = documents.filter(lambda s: s.article is not None)
 
-    quotes = documents.flatMap(lambda s: [Row(quote=q['quote'], quotee=q['quotee'], quoteeType=q['quoteeType'], quoteeAffiliation=q['quoteeAffiliation']) for q in s.quotes])
-    documents = documents.map(lambda s: Row(article=s.article, quotes=[q['quote']for q in s.quotes]))
+    # quotes = documents.flatMap(lambda s: [Row(quote=q['quote'], quotee=q['quotee'], quoteeType=q['quoteeType'], quoteeAffiliation=q['quoteeAffiliation']) for q in s.quotes])
+    # documents = documents.map(lambda s: Row(article=s.article, quotes=[q['quote']for q in s.quotes]))
 
-    return documents, quotes
+    # return documents, quotes
 
 # Search for quote patterns
 def dependencyGraphSearch(article):
