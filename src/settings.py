@@ -25,10 +25,10 @@ memory = '8G' #8 or 60
 cores = 4 #4 or 24
 
 #Pickled dataframe
-useCache = False
+useCache = True
 
 #Starting point of the pipeline
-runFromPipeline ='extract' # 'all', 'extract' or 'topics'
+runFromPipeline ='all' # 'all', 'extract' or 'topics'
 
 #Topic Discovery parameters
 numOfTopics = 32
@@ -39,8 +39,8 @@ topicSimThreshold = 0.7
 
 #Corpus file
 #corpusFile = None
-corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
-#corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
+#corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
+corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
 #corpusFile = '/home/smeros/backup_data/FoodArticles.tsv'
 
 #GloVe Embeddings file

@@ -48,25 +48,21 @@ def extractQuotes():
 
     documents = readCorpus()
 
+    #documents = documents.map(lambda s: Row(article=s.article, publishing_date=s.publishing_date, url=s.url)) TODO
 
-    documents = documents.map(lambda s: Row(article=s.article, publishing_date=s.publishing_date, url=s.url))
-
-
-    return documents, documents #tmp
-
-    # #process articles to extract quotes
-    # documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
+    #process articles to extract quotes
+    documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
     
-    # #remove quotes from articles 
-    # documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
+    #remove quotes from articles 
+    documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
 
-    # #drop documents without quotes
-    # documents = documents.filter(lambda s: s.article is not None)
+    #drop documents without quotes
+    documents = documents.filter(lambda s: s.article is not None)
 
-    # quotes = documents.flatMap(lambda s: [Row(quote=q['quote'], quotee=q['quotee'], quoteeType=q['quoteeType'], quoteeAffiliation=q['quoteeAffiliation']) for q in s.quotes])
-    # documents = documents.map(lambda s: Row(article=s.article, quotes=[q['quote']for q in s.quotes]))
+    quotes = documents.flatMap(lambda s: [Row(quote=q['quote'], quotee=q['quotee'], quoteeType=q['quoteeType'], quoteeAffiliation=q['quoteeAffiliation']) for q in s.quotes])
+    documents = documents.map(lambda s: Row(article=s.article, quotes=[q['quote']for q in s.quotes]))
 
-    # return documents, quotes
+    return documents, quotes
 
 # Search for quote patterns
 def dependencyGraphSearch(article):
