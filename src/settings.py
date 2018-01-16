@@ -22,10 +22,10 @@ from pyspark.sql import Row
 limitDocuments = 100
 
 memory = '8G' #8 or 60
-cores = 4 #4 or 24
+#cores = 4 #4 or 24
 
 #Pickled dataframe
-useCache = True
+useCache = False
 
 #Starting point of the pipeline
 runFromPipeline ='all' # 'all', 'extract' or 'topics'
@@ -33,8 +33,8 @@ runFromPipeline ='all' # 'all', 'extract' or 'topics'
 #Topic Discovery parameters
 numOfTopics = 32
 topicTopfeatures = 1
-max_iter = 5
-samplingFraction = 0.9
+max_iter = 10
+samplingFraction = 0.3
 topicSimThreshold = 0.7
 
 #Corpus file
