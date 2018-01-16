@@ -3,6 +3,22 @@ from quoteAnalysis import quotePipeline, resolvePerson, resolveOrganization
 
 #Plot functions
 
+def plotQuotesAndTopicsDF():
+    dfPath = 'cache/'+sys._getframe().f_code.co_name+'.tsv'
+    if os.path.exists(dfPath):
+        return pd.read_csv(dfPath, sep='\t')
+    
+    documents, quotes, topics = quotePipeline()
+    topics = topics.toDF().toPandas()
+    quotes = quotes.toDF().toPandas()
+    topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
+    topics = quotes.merge(topics)
+
+    df = topics.query("quoteeType != 'unknown'")
+    
+    df.to_csv(dfPath, sep='\t')
+    return df
+
 def plotNumOfQuotesDF():
     dfPath = 'cache/'+sys._getframe().f_code.co_name+'.pkl'
     if os.path.exists(dfPath):
