@@ -47,9 +47,9 @@ def createVocabulary():
 def readCorpus():
     documents = spark.read.option('sep', '\t').csv(corpusFile, header=False, schema=StructType([StructField('article', StringType()),StructField('publishing_date', StringType()),StructField('url', StringType())]))
     documents = documents.limit(limitDocuments) if(limitDocuments!=-1) else documents
-    documents = documents.rdd.repartition(cores)
+    #documents = documents.rdd.repartition(cores)
 
-    return documents
+    return documents.rdd
 
 
 #Pretty print of numbers (by https://stackoverflow.com/a/45846841)

@@ -54,10 +54,10 @@ def extractQuotes():
     documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
     
     #remove quotes from articles 
-    documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
+    #documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
 
     #drop documents without quotes
-    documents = documents.filter(lambda s: s.article is not None)
+    documents = documents.filter(lambda s: s.quotes is not None)
 
     quotes = documents.flatMap(lambda s: [Row(quote=q['quote'], quotee=q['quotee'], quoteeType=q['quoteeType'], quoteeAffiliation=q['quoteeAffiliation']) for q in s.quotes])
     documents = documents.map(lambda s: Row(article=s.article, quotes=[q['quote']for q in s.quotes]))
@@ -69,6 +69,9 @@ def dependencyGraphSearch(article):
 
     allPerEntities = []
     allOrgEntities = []
+
+    article = re.sub(r'\\n', '. ', article)
+
     for e in nlp(article).ents:
         if e.label_ == 'PERSON':
             allPerEntities.append(e.text)
@@ -171,9 +174,9 @@ def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEnti
         return (q, qtype, qaff)
     
     if noun in authorityKeywords:
-        q = 'authority'
+        q = qtype = qaff = 'authority'
     elif noun in empiricalKeywords:
-        q = 'empirical observation'
+        q = qtype = qaff = 'empirical observation'
     return (q, qtype, qaff)
 
 #Resolve cases where PERSON is referred to with his/her first or last name       
@@ -236,7 +239,7 @@ def discoverTopics(documents):
 
     #fit lda topic model
     print('Fitting LDA model...')
-    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=max_iter, learning_method='online', n_jobs=cores)
+    lda = LatentDirichletAllocation(n_components=numOfTopics, max_iter=max_iter, learning_method='online', n_jobs=-1)
     lda.fit(tf)
 
     #get the topic labels
