@@ -70,8 +70,6 @@ def dependencyGraphSearch(article):
     allPerEntities = []
     allOrgEntities = []
 
-    article = re.sub(r'\\n', '. ', article)
-
     for e in nlp(article).ents:
         if e.label_ == 'PERSON':
             allPerEntities.append(e.text)
