@@ -48,13 +48,13 @@ def extractQuotes():
 
     documents = readCorpus()
 
-    #documents = documents.map(lambda s: Row(article=s.article, publishing_date=s.publishing_date, url=s.url)) TODO
+    #documents = documents.map(lambda s: Row(article=s.article, publishing_date=s.publishing_date, url=s.url)) #TODO
 
     #process articles to extract quotes
     documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
     
     #remove quotes from articles 
-    #documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes))
+    #documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes)) #TORM
 
     #drop documents without quotes
     documents = documents.filter(lambda s: s.quotes is not None)
@@ -207,7 +207,7 @@ def resolveOrganization(org, olist):
                     return o
     return None
 
-# Remove quotes from articles
+# Remove quotes from articles (DEPRECATED)
 def removeQuotesFromArticle(article, quotes):
     if quotes == None:
         return None
