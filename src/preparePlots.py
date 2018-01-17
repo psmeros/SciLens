@@ -11,6 +11,7 @@ def plotQuotesAndTopicsDF():
     documents, quotes, topics = quotePipeline()
     topics = topics.toDF().toPandas()
     quotes = quotes.toDF().toPandas()
+    topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
     topics = quotes.merge(topics)
     df = topics.query("quoteeType != 'unknown'")
     
