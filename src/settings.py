@@ -19,9 +19,9 @@ from pyspark.sql.functions import *
 from pyspark.sql import Row
 
 #Limit retrieved documents
-limitDocuments = 100
+limitDocuments = -1
 
-memory = '8G' #8 or 60
+memory = '60G' #8 or 60
 #cores = 4 #4 or 24
 
 #Pickled dataframe
@@ -33,15 +33,15 @@ runFromPipeline ='all' # 'all', 'extract' or 'topics'
 #Topic Discovery parameters
 numOfTopics = 32
 topicTopfeatures = 1
-max_iter = 10
-samplingFraction = 0.3
+max_iter = 20
+samplingFraction = 0.2
 topicSimThreshold = 0.7
 
 #Corpus file
 #corpusFile = None
 #corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
-corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
-#corpusFile = '/home/smeros/backup_data/FoodArticles.tsv'
+#corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
+corpusFile = '/home/smeros/backup_data/foodArticles.tsv'
 
 #GloVe Embeddings file
 gloveFile = None
