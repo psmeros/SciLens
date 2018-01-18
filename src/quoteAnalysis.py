@@ -107,7 +107,7 @@ def dependencyGraphSearch(article):
         verbs = [rootVerb] + list(verbs)
 
         for v in verbs:
-            if v.lemma_ in actionsKeywords:            
+            if v is not None and v.lemma_ in actionsKeywords:            
 
                 quoteFound = True
                 
