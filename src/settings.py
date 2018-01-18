@@ -6,7 +6,7 @@ import builtins
 from time import time
 import numpy as np
 import pandas as pd
-from spacy.en import English
+import spacy
 from spacy.symbols import nsubj, dobj, VERB
 from nltk.tokenize import sent_tokenize
 from sklearn.feature_extraction.text import CountVectorizer
