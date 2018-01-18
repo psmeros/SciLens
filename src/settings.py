@@ -21,8 +21,7 @@ from pyspark.sql import Row
 #Limit retrieved documents
 limitDocuments = -1
 
-memory = '60G' #8 or 60
-#cores = 4 #4 or 24
+memory = '60G' #8 or 60 or 250
 
 #Pickled dataframe
 useCache = False
@@ -41,7 +40,8 @@ topicSimThreshold = 0.7
 #corpusFile = None
 #corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
 #corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
-corpusFile = '/home/smeros/backup_data/foodArticles.tsv'
+#corpusFile = '/home/smeros/backup_data/foodArticles.tsv'
+corpusFile = '/root/foodArticles.tsv'
 
 #GloVe Embeddings file
 gloveFile = None
