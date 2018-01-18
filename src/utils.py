@@ -1,4 +1,3 @@
-
 from settings import *
 
 #Spark setup
@@ -16,7 +15,7 @@ def initSpark():
 
 #Create Keyword Lists and SpaCy NLP object
 def initNLP():
-    nlp = English()
+    nlp = spacy.load('en')
     authorityKeywords = [nlp(x)[0].lemma_ for x in ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']]
     empiricalKeywords = [nlp(x)[0].lemma_ for x in ['study', 'people']]
     actionsKeywords = [nlp(x)[0].lemma_ for x in ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']]
