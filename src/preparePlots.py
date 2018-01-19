@@ -26,7 +26,7 @@ def plotQuotesAndTopicsDF(quotes, topics):
 def plotHeatMapDF(topics):
     
     topics = topics.toDF().toPandas()
-    #topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
+    topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
 
     df = topics[['articleTopic', 'quoteTopic']].groupby(['articleTopic', 'quoteTopic']).size().reset_index(name='counts').pivot(index='articleTopic', columns='quoteTopic', values='counts').fillna(0)
     df = df.div(df.sum(axis=1), axis=0)
