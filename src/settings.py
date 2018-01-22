@@ -24,7 +24,7 @@ limitDocuments = -1
 memory = '60G' #8 or 60 or 250
 
 #Pickled dataframe
-useCache = False
+useCache = True
 
 #Starting point of the pipeline
 runFromPipeline ='all' # 'all', 'extract' or 'topics'
@@ -34,14 +34,14 @@ numOfTopics = 32
 topicTopfeatures = 1
 max_iter = 20
 samplingFraction = 0.2
-topicSimThreshold = 0.7
+topicSimThreshold = 0.5
 
 #Corpus file
 #corpusFile = None
 #corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
 #corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
-#corpusFile = '/home/smeros/backup_data/foodArticles.tsv'
-corpusFile = '/root/foodArticles.tsv'
+corpusFile = '/home/smeros/backup_data/foodArticles.tsv'
+#corpusFile = '/root/foodArticles.tsv'
 
 #GloVe Embeddings file
 gloveFile = None
