@@ -1,10 +1,5 @@
 # Dependencies
-- ```wget https://repo.continuum.io/archive/Anaconda3-5.0.1-Linux-x86_64.sh; chmod +x Anaconda3-5.0.1-Linux-x86_64.sh; ./Anaconda3-5.0.1-Linux-x86_64.sh```
-- ```conda install -y nltk; python -m nltk.downloader punkt```
-- ```conda install -y spacy; python -m spacy download en```
-- ```conda install -y pyspark```
-- ```gloVe 6B (Wikipedia - 300d) [deprecated]```
-
+  Run ```configure.sh``` to install the dependencies.
 # Corpus Preparation
 - extract remote postgres dump
   - ``` export PGPASSWORD=<PGPASSWORD>; pg_dump -h <HOST> -U <USER> -f <DBNAME>.db <DBNAME> ```
