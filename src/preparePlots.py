@@ -7,7 +7,7 @@ def plotQuotesAndTopicsDF(quotes, topics):
     
     topics = topics.toDF().toPandas()
     quotes = quotes.toDF().toPandas()
-    #topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
+    topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
     topics = quotes.merge(topics)
 
     df = pd.DataFrame()
@@ -33,22 +33,22 @@ def plotHeatMapDF(topics):
 
     df.to_csv('cache/'+sys._getframe().f_code.co_name+'.tsv', sep='\t')
 
-def plotTopQuoteesDF(quotes):
-    countThreshold = 10
+def plotTopQuoteesDF(quotes, topics):
 
+    topics = topics.toDF().toPandas()
     quotes = quotes.toDF().toPandas()
+    topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
+    topics = quotes.merge(topics)
 
-    df_p = quotes[quotes['quoteeType'] == 'PERSON']['quotee'].value_counts().reset_index()
+    df_p = topics[topics['quoteeType'] == 'PERSON']['quotee'].value_counts().reset_index()
     df_p.columns = ['quotee', 'count']
-    df_p = df_p[df_p['count'] > countThreshold]
     plist = df_p['quotee'].tolist()
     df_p['quotee'] = df_p['quotee'].apply(lambda x: resolvePerson(x, plist))
     df_p = df_p.groupby(['quotee']).sum().reset_index()
     df_p.columns = ['quotee', 'count']
 
-    df_o = quotes[quotes['quoteeType'] == 'ORG']['quoteeAffiliation'].value_counts().reset_index()
+    df_o = topics[topics['quoteeType'] in ['ORG', 'PERSON']]['quoteeAffiliation'].value_counts().reset_index()
     df_o.columns = ['organization', 'count']
-    df_o = df_o[df_o['count'] > countThreshold]
     olist = df_o['organization'].tolist()
     df_o['organization'] = df_o['organization'].apply(lambda x: resolveOrganization(x, olist))
     df_o = df_o.groupby(['organization']).sum().reset_index()
