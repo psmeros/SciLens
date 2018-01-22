@@ -47,7 +47,7 @@ def plotTopQuoteesDF(quotes, topics):
     df_p = df_p.groupby(['quotee']).sum().reset_index()
     df_p.columns = ['quotee', 'count']
 
-    df_o = topics[topics['quoteeType'] in ['ORG', 'PERSON']]['quoteeAffiliation'].value_counts().reset_index()
+    df_o = topics[topics['quoteeType'].isin(['ORG', 'PERSON'])]['quoteeAffiliation'].value_counts().reset_index()
     df_o.columns = ['organization', 'count']
     olist = df_o['organization'].tolist()
     df_o['organization'] = df_o['organization'].apply(lambda x: resolveOrganization(x, olist))

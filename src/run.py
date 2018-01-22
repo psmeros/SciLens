@@ -5,4 +5,4 @@ documents, quotes, topics = quotePipeline()
 
 #plotQuotesAndTopicsDF(quotes, topics)
 #plotHeatMapDF(topics)
-#plotTopQuoteesDF(quotes)
+plotTopQuoteesDF(quotes, topics)
