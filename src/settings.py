@@ -1,25 +1,5 @@
-import os
-import re
-import sys
-import shutil
-import builtins
-from time import time
-import numpy as np
-import pandas as pd
-import spacy
-from spacy.symbols import nsubj, dobj, VERB
-from nltk.tokenize import sent_tokenize
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-from bs4 import BeautifulSoup
-from pyspark.sql import SparkSession
-from pyspark import SparkConf
-from pyspark.sql.types import *
-from pyspark.sql.functions import *
-from pyspark.sql import Row
-
 #Limit retrieved documents
-limitDocuments = -1
+limitDocuments = 10
 
 memory = '60G' #8 or 60 or 250
 
@@ -27,7 +7,7 @@ memory = '60G' #8 or 60 or 250
 useCache = True
 
 #Starting point of the pipeline
-runFromPipeline ='all' # 'all', 'extract' or 'topics'
+runFromPipeline ='all' # 'all', 'extract'
 
 #Topic Discovery parameters
 numOfTopics = 32
@@ -49,12 +29,42 @@ gloveFile = None
 #gloveFile = '/home/psmeros/workspace/bigFiles/glove.6B.300d.txt'
 #gloveFile = '/home/smeros/glove_data/glove.6B.300d.txt'
 
+#File with refined topics
+topicsFile = 'topics.txt'
+
+#Twitter URLs
+twitter_urls='/home/psmeros/workspace/bigFiles/twitter_urls.tsv'
+urlTimout = 1
+
+import os
+import re
+import sys
+import shutil
+import builtins
+from time import time
+from urllib.request import urlopen
+from urllib.parse import urlparse
+from urllib.error import HTTPError, URLError
+from ssl import CertificateError
+from socket import timeout as SocketTimeoutError
+import numpy as np
+import pandas as pd
+import spacy
+from spacy.symbols import nsubj, dobj, VERB
+from nltk.tokenize import sent_tokenize
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.metrics.pairwise import cosine_similarity
+from bs4 import BeautifulSoup
+from pyspark.sql import SparkSession
+from pyspark import SparkConf
+from pyspark.sql.types import *
+from pyspark.sql.functions import *
+from pyspark.sql import Row
+
 #Cache and plots directory
 os.makedirs('cache', exist_ok=True)
 os.makedirs('plots', exist_ok=True)
-
-#File with refined topics
-topicsFile = 'topics.txt'
 
 #Pandas settings
 pd.set_option('display.max_colwidth', -1)

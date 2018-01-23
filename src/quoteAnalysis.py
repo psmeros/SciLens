@@ -53,9 +53,6 @@ def extractQuotes():
     #process articles to extract quotes
     documents = documents.map(lambda s: Row(article=s.article, quotes=dependencyGraphSearch(s.article)))
     
-    #remove quotes from articles 
-    #documents = documents.map(lambda s: Row(article=removeQuotesFromArticle(s.article, s.quotes), quotes=s.quotes)) #TORM
-
     #drop documents without quotes
     documents = documents.filter(lambda s: s.quotes is not None)
 

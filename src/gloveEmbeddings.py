@@ -1,8 +1,5 @@
-import sys
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-
 from settings import *
+
 gloveEmbeddings = gloveEmbeddingsSize = None
 
 if gloveFile and not os.path.exists(gloveFile):
