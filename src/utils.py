@@ -11,6 +11,7 @@ def initSpark():
     conf.set('spark.driver.memory', memory)
     conf.set('spark.driver.maxResultSize', '40G')
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
+    spark.sparkContext.setLogLevel('ERROR')
     return spark
 
 #Create Keyword Lists and SpaCy NLP object

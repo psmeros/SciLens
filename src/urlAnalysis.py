@@ -4,52 +4,35 @@ from utils import *
 #Resolve all the URLs of the tweets
 def resolveURLs():
 
-
-    def resolve(url):
-
-        resolved = {'resolvedURL':'', 'error':'', 'errorDesc':''}
-        
+    def resolve(tweet_url, out_url):        
         try:
-            url = url[1:-1]
             #Follow the redirections of a url
-            resolvedURL = urlopen(url,timeout=urlTimout).geturl()
-
-            #Some *.ly link do not redirect but neither return an error code
-            if(urlparse(resolvedURL).geturl().endswith('.ly')):
-                resolved = {'resolvedURL':resolvedURL, 'error':'NoRedirectError', 'errorDesc':''}
-            else:
-                resolved = {'resolvedURL':resolvedURL, 'error':'NoError', 'errorDesc':''}
+            r = requests.head(out_url, allow_redirects=True, timeout=urlTimout)
+            r.raise_for_status()
+            return Row(tweet_url=tweet_url, out_url=r.url, out_error='NoError')
 
         #Catch the different errors       
-        except HTTPError as e:
-            resolved = {'resolvedURL':url, 'error':'HTTPError', 'errorDesc':str(e.code)}
-        except URLError as e:
-            resolved = {'resolvedURL':url, 'error':'URLError', 'errorDesc':str(e)}
-        except ConnectionResetError as e:
-            resolved = {'resolvedURL':url, 'error':'ConnectionResetError', 'errorDesc':str(e)}
-        except CertificateError as e:
-            resolved = {'resolvedURL':url, 'error':'CertificateError', 'errorDesc':str(e)}
-        except SocketTimeoutError as e:
-            resolved = {'resolvedURL':url, 'error':'SocketTimeoutError', 'errorDesc':str(e)}
-        except UnicodeEncodeError as e:    
-            resolved = {'resolvedURL':url, 'error':'UnicodeEncodeError', 'errorDesc':str(e)}            
+        except requests.HTTPError as e:
+            return Row(tweet_url=tweet_url, out_url=out_url, out_error='HTTPError')
         except:
-            with open('error.log', 'a') as f: f.write('URL: '+url+' Error: '+str(sys.exc_info())+'\n')
+            return Row(tweet_url=tweet_url, out_url=out_url, out_error='TimeoutError')
 
-        return resolved
 
     spark = initSpark()
 
-    documents = spark.read.option('sep', '\t').csv(twitter_urls, header=False, schema=StructType([StructField('id', StringType()), StructField('url', StringType())]))
+    documents = spark.read.option('sep', '\t').csv(twitterCorpusFile, header=False)
     documents = documents.limit(limitDocuments) if(limitDocuments!=-1) else documents
     documents = documents.rdd
+    documents = documents.map(lambda s: Row(tweet_url=s[0], tweet=s[1], timestamp=s[2]))
 
-    documents = documents.flatMap(lambda s: Row(resolve(s.url)))
-    documents = documents.filter(lambda s: s['error']=='NoError')
+    documents = documents.flatMap(lambda s: [Row(tweet_url=s.tweet_url, out_url=u) for u in re.findall(urlRegex, s.tweet) or ['']])
 
-    documents = documents.map(lambda s : Row(url=s['resolvedURL']))
 
-    documents.toDF().toPandas().to_csv('cache/'+sys._getframe().f_code.co_name+'.tsv', sep='\t')
+    documents = documents.map(lambda s: resolve(s.tweet_url, s.out_url))
+    
+    documents = documents.filter(lambda s: s.out_error=='NoError')
+
+    documents.map(lambda s : Row(tweet_url=s.tweet_url, out_url=s.out_url)).toDF().write.csv('cache/'+sys._getframe().f_code.co_name, mode='overwrite')
 
 
 #[DEPRECATED] Plot bar chart with the number of links per tweet
