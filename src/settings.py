@@ -1,7 +1,7 @@
 #Limit retrieved documents
-limitDocuments = 10
+limitDocuments = -1
 
-memory = '60G' #8 or 60 or 250
+memory = '8G' #8 or 60 or 250
 
 #Pickled dataframe
 useCache = True
@@ -16,25 +16,23 @@ max_iter = 20
 samplingFraction = 0.2
 topicSimThreshold = 0.5
 
-#Corpus file
-#corpusFile = None
-#corpusFile = '/home/psmeros/workspace/bigFiles/sampleFoodArticles.tsv'
-#corpusFile = '/Users/smeros/workspace/etc/bigFiles/sampleFoodArticles.tsv'
-corpusFile = '/home/smeros/backup_data/foodArticles.tsv'
-#corpusFile = '/root/foodArticles.tsv'
+#Corpus path 
+#corpusPath = '/home/psmeros/workspace/bigFiles/'
+corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
+#corpusPath = '/home/smeros/backup_data/'
+#corpusFile = '/root/backup_data/'
 
-#GloVe Embeddings file
-gloveFile = None
-#gloveFile = '/Users/smeros/workspace/etc/bigFiles/glove.6B/glove.6B.300d.txt'
-#gloveFile = '/home/psmeros/workspace/bigFiles/glove.6B.300d.txt'
-#gloveFile = '/home/smeros/glove_data/glove.6B.300d.txt'
+
+corpusFile = corpusPath + 'foodArticles.tsv'
+twitterCorpusFile = corpusPath + 'twitterFood.tsv'
+urlTimout = 1
+
+
+urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
 #File with refined topics
 topicsFile = 'topics.txt'
 
-#Twitter URLs
-twitter_urls='/home/psmeros/workspace/bigFiles/twitter_urls.tsv'
-urlTimout = 1
 
 import os
 import re
@@ -42,11 +40,7 @@ import sys
 import shutil
 import builtins
 from time import time
-from urllib.request import urlopen
-from urllib.parse import urlparse
-from urllib.error import HTTPError, URLError
-from ssl import CertificateError
-from socket import timeout as SocketTimeoutError
+import requests
 import numpy as np
 import pandas as pd
 import spacy
@@ -62,9 +56,8 @@ from pyspark.sql.types import *
 from pyspark.sql.functions import *
 from pyspark.sql import Row
 
-#Cache and plots directory
+#Cache directory
 os.makedirs('cache', exist_ok=True)
-os.makedirs('plots', exist_ok=True)
 
 #Pandas settings
 pd.set_option('display.max_colwidth', -1)

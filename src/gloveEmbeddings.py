@@ -1,5 +1,8 @@
 from settings import *
 
+#GloVe Embeddings file
+gloveFile = None
+
 gloveEmbeddings = gloveEmbeddingsSize = None
 
 if gloveFile and not os.path.exists(gloveFile):
