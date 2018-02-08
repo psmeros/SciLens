@@ -13,6 +13,6 @@ psql -U $user -d $db -c "\copy (select url, (title || '. ' || regexp_replace(reg
 mv $tmpfolder$webfile .
 
 rm -f $tmpfolder$twitterfile
-psql -U $user -d $db -c "\copy (select url, body as tweet, publishing_date, array_to_string(document_urls, ',', '') from document where doc_type = 'twitter' $limit ) TO $tmpfolder$twitterfile;"
+psql -U $user -d $db -c "\copy (select url, body as tweet, publishing_date, base_popularity, retweet_count from document where doc_type = 'twitter' $limit ) TO $tmpfolder$twitterfile;"
 mv $tmpfolder$twitterfile .
 
