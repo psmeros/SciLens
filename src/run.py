@@ -1,4 +1,4 @@
-from urlAnalysis import resolveURLs
+from urlAnalysis import first_level_graph
 from quoteAnalysis import quotePipeline
 from preparePlots import *
 
@@ -8,4 +8,4 @@ from preparePlots import *
 #plotHeatMapDF(topics)
 #plotTopQuoteesDF(quotes, topics)
 
-resolveURLs()
+first_level_graph()
