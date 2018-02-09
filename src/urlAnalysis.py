@@ -2,19 +2,19 @@ from settings import *
 from utils import *
 
 
-#Resolve all the URLs
-def resolveURLs(tweet_url, out_url):        
+#Resolve url
+def resolveURL(url):        
     try:
         #Follow the redirections of a URL
-        r = requests.head(out_url, allow_redirects=True, timeout=urlTimout)
+        r = requests.head(url, allow_redirects=True, timeout=urlTimout)
         r.raise_for_status()
-        return Row(tweet_url=tweet_url, out_url=r.url, out_error='')
+        return r.url
 
     #Catch the different errors       
     except requests.HTTPError as e:
-        return Row(tweet_url=tweet_url, out_url=out_url, out_error='HTTPError')
+        return 'http://HTTPError.org'
     except:
-        return Row(tweet_url=tweet_url, out_url=out_url, out_error='TimeoutError')
+        return 'http://TimeoutError.org'
 
 
 #Create the first level of the diffusion graph
@@ -22,22 +22,18 @@ def first_level_graph():
 
     spark = initSpark()
 
-    documents = spark.read.option('sep', '\t').csv(twitterCorpusFile, header=False)
-    documents = documents.limit(limitDocuments) if(limitDocuments!=-1) else documents
-    documents = documents.rdd
+    documents = spark.sparkContext.textFile(twitterCorpusFile) 
 
+    documents = documents.map(lambda r: (lambda l=r.split('\t'): Row(tweet_url=l[0], tweet=l[1], timestamp=datetime.strptime(l[2], '%Y-%m-%d %H:%M:%S'), popularity=int(l[3]), RTs=int(l[4])))())
 
-    documents = documents.map(lambda s: Row(tweet_url=s[0], tweet=s[1], timestamp=datetime.strptime(s[2], '%Y-%m-%d %H:%M:%S'), popularity=int(s[3]), RTs=int(s[4])))
+    documents = documents.flatMap(lambda r: [Row(tweet_url=r.tweet_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, out_url=u) for u in re.findall(urlRegex, r.tweet) or ['']])
 
-    documents = documents.flatMap(lambda s: [Row(tweet_url=s.tweet_url, out_url=u) for u in re.findall(urlRegex, s.tweet) or ['']])
-
-
-    documents = documents.map(lambda s: resolveURLs(s.tweet_url, s.out_url))
+    documents = documents.map(lambda r: Row(tweet_url=r.tweet_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, out_url=resolveURL(r.out_url)))
     
-    documents = documents.filter(lambda s: s.out_error=='')
+    #documents = documents.filter(lambda r: r.out_url not in ['http://HTTPError.org', 'http://TimeoutError.org'])
 
-    documents.map(lambda s : Row(tweet_url=s.tweet_url, out_url=s.out_url)).toDF().write.csv('cache/'+sys._getframe().f_code.co_name, mode='overwrite')
-
+    documents.map(lambda r : '\t'.join(str(a) for a in [r.tweet_url, r.timestamp, r.popularity, r.RTs, r.out_url])).saveAsTextFile('cache/'+sys._getframe().f_code.co_name)
+    
 
 
 #[DEPRECATED] Get the DMOZ categories of a domain from Amazon Alexa (limited to 1000 requests/month)
