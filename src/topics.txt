@@ -28,8 +28,6 @@ adrenal gland
 Advanced Glycation End-products
 Adventist Health Studies
 affordability
-Africa
-African Americans
 agaritine
 agave nectar
 Agent Orange
@@ -65,6 +63,7 @@ ALS
 alternative medicine
 aluminum
 Alzheimer’s disease
+Alzheimer
 amalgam fillings
 amaranth
 American Academy of Pediatrics
@@ -94,7 +93,6 @@ anchovies
 anemia
 anesthesia
 aneurysm
-Angelina Jolie
 angina
 angiogenesis
 angiogram
@@ -141,7 +139,6 @@ arachidonic acid
 areca nuts
 arginine
 Aricept
-Arkansas
 armpits
 aromatase
 aromatherapy
@@ -153,7 +150,6 @@ artificial flavors
 artificial sweeteners
 asbestos
 ascorbic acid
-Asia
 Asian markets
 asparagus
 aspartame
@@ -167,7 +163,6 @@ ATP
 atrial fibrillation
 attention deficit
 auraptene
-Australia
 autism
 autoimmune diseases
 autonomic nervous system
@@ -178,7 +173,6 @@ avocados
 Ayurvedic medicine
 azarcon
 b12
-Bach
 back pain
 bacon
 bacterial vaginosis
@@ -208,7 +202,6 @@ beet juice
 Beethoven
 beets
 beeturia
-Belgium
 bell peppers
 belladonna
 benzene
@@ -229,7 +222,6 @@ bibhitaki fruit
 biblical teachings
 Big Mac
 bile acids
-Bill Gates
 billberries
 Bilophila wadsworthia
 bio identical hormones
@@ -278,7 +270,6 @@ bone loss
 bone marrow health
 bone mineral density
 boron
-Boston
 botulism
 bovine leukemia virus
 bowel movements
@@ -323,12 +314,10 @@ brown sugar
 Brussels sprouts
 BT corn
 buckwheat
-Buddhists
 Burger King
 burgers
 burping
 burritos
-Bush administration
 butcher's warts
 butter
 butter flavor
@@ -348,7 +337,6 @@ caffeine
 cake
 calcium
 calendula
-California
 California Dried Plum Board
 California Medical Association
 California Raisin Marketing Board
@@ -356,7 +344,6 @@ caloric restriction
 calories
 Campbell's Soup
 Campylobacter
-Canada
 cancer
 cancer stem cells
 cancer survival
@@ -409,7 +396,6 @@ cell phones
 cellulite
 Center for Food Safety
 Center for Science in the Public Interest
-Centrum
 ceramide
 cervical cancer
 cervix health
@@ -443,7 +429,6 @@ chickpeas
 children
 chili peppers
 Chili's
-China
 China Study
 Chinese food
 chlorella
@@ -555,7 +540,6 @@ cyclamate
 cycling
 cysticercosis
 cytoskeleton
-Czechoslovakia
 Daily Dozen
 dairy
 dandelion
@@ -572,7 +556,6 @@ dehydration
 deli meat
 delta waves
 dementia
-Denmark
 dental health
 depression
 detoxification
@@ -653,7 +636,6 @@ enemas
 energy
 energy drinks
 energy gels
-England
 enoki mushrooms
 Enterococcus
 enterotypes
@@ -675,7 +657,6 @@ estragole
 estrogen
 ethnicity
 eudaemonia
-Europe
 European Food Safety Authority
 evidence-based medicine
 evolution
@@ -754,7 +735,6 @@ Fox News
 foxglove
 fragrance
 Framingham Heart Study
-France
 Freedom of Information Act
 french fries
 Froot Loops
@@ -791,7 +771,6 @@ genital health
 genital warts
 George McGovern
 GERD
-Germany
 Gerson Therapy
 gestational diabetes
 giantism
@@ -962,7 +941,6 @@ incontinence
 India
 indigestion
 indoles
-Indonesia
 industrial pollutants
 industry influence
 infant formula
@@ -989,7 +967,6 @@ iodine
 Iowa Women’s Health Study
 ipecac
 IQ45b
-Ireland
 iritis
 iron
 irritable bowel syndrome
@@ -999,17 +976,14 @@ Italy
 Jack Norris
 jalapeno
 jam
-Japan
 jasmine tea
 jaundice
-jazz
 Jeff Novick
 jelly beans
 Jerusalem artichokes
 Johns Hopkins University
 joint disease
 joint health
-Judaism
 juice
 Juice Plus supplements
 junk food
@@ -1035,7 +1009,6 @@ kiwifruit
 kohlrabi
 kombu
 kombucha tea
-Korea
 Kraft
 Kuna Indians
 kwashiorkor
@@ -1094,11 +1067,9 @@ liver failure
 liver health
 liver inflammation
 Loma Linda University
-Long Island
 longevity
 Lou Gehrig's disease
 Louis Pasteur
-Louisiana
 lovastatin
 low-carb diets
 low-fat diets
@@ -1126,7 +1097,6 @@ magnesium
 Maimonides
 maitake mushrooms
 malaria
-Malaysia
 maltodextrin
 manganese
 mango
@@ -1188,11 +1158,8 @@ metastatic calcification
 methionine
 methylmalonic acid
 Mevacor
-Mexican Americans
-Mexico
 MGUS
 Michael Pollan
-Michelle Obama
 microalbuminuria
 microbiome
 microcephaly
@@ -1210,8 +1177,6 @@ mint
 Mioscene
 miscarriage
 miso
-Mississippi
-Missouri
 MIT
 mitochondria
 molasses
@@ -1241,7 +1206,6 @@ muscle inflammation
 muscle soreness
 muscle strength
 mushrooms
-music
 mustard greens
 mustard oil
 mustard powder
@@ -1250,7 +1214,6 @@ mycotoxins
 myelopathy
 MyPlate
 myristic acid
-Nagasaki
 nail health
 nameko mushrooms
 nanoparticles
@@ -1267,27 +1230,20 @@ National Dairy Council
 National Dairy Promotion and Research Board
 National Pork Board
 National Pork Producers Council
-Native Americans
 natural toxins
 nausea
 navy beans
 necrotizing fasciitis
-Nepal
 nerve health
-Netherlands
 neti pot
 Neu5Gc
 neurocysticercosis
 neuropathy
 neurotoxins
 neutropenic diet
-New Orleans
-New York City
 New York Coalition for Healthy School Food
-New Zealand
 NF-κB
 nicotine
-Nigeria
 nightshades
 NIH-AARP study
 nitrates
@@ -1314,7 +1270,6 @@ nuts
 oat milk
 oatmeal
 oats
-Obama
 obesity
 obesogens
 occupational health
@@ -1323,7 +1278,6 @@ offal
 oil pulling
 oils
 Okinawan diet
-Oklahoma
 okra
 olive oil
 olives
@@ -1337,7 +1291,6 @@ oral intraepithelial neoplasia
 orange juice
 oranges
 oregano
-Oregon
 organ meats
 organic foods
 organic milk
@@ -1354,7 +1307,6 @@ ovary health
 overeating
 oxalates
 oxen meat
-Oxford
 oxidative stress
 oyster mushrooms
 oysters
@@ -1363,7 +1315,6 @@ paella
 pain
 paleolithic diets
 palmitic acid
-Panama
 pancakes
 pancreas health
 pancreatic cancer
@@ -1418,7 +1369,6 @@ pharmacists
 pheasants
 phenolics
 Philip Morris
-Philippines
 PhIP
 phosgene
 phosphate additives
@@ -1458,7 +1408,6 @@ plutonium
 pneumonia
 Pneumovax
 poisonous plants
-Poland
 polonium
 polycarbonate plastic
 polychlorinated naphthalenes
@@ -1627,7 +1576,6 @@ Sara Lee
 sarcocystis
 sarcopenia
 sardines
-Sardinia
 saturated fat
 sauerkraut
 sausage
@@ -1669,7 +1617,6 @@ shrimp
 side effects
 SIDS
 sigmoidoscopy
-Singapore
 sinus health
 sinusitis
 sirtuins
@@ -1681,8 +1628,6 @@ skin health
 SLE
 sleep
 sleeping pills
-Slovakia
-Slovenia
 Smithfield
 smoked foods
 smoking
@@ -1701,14 +1646,11 @@ soil health
 sorbitol
 sore throat
 soup
-South Africa
-South Dakota
 soy
 soy milk
 soy sauce
 soybean oil
 soybeans
-Spain
 spearmint
 speech impairment
 sperm counts
@@ -1814,7 +1756,6 @@ testicular cancer
 testicular health
 testosterone
 tetrodotoxin
-Texas
 TGI Friday's
 thalidomide
 The Plant Paradox
@@ -1882,17 +1823,14 @@ U.S. Department of Defense
 U.S. Dry Bean Council
 U.S. Preventive Services Task Force
 ubiquinol
-Uganda
 ulcerative colitis
 ultra-processed foods
 underweight
 Union of Concerned Scientists
-United Kingdom
 uric acid
 urinary tract infections
 urine
 urticaria
-Uruguay
 USDA
 uterine cancer
 uterine health
@@ -1923,7 +1861,6 @@ venison
 venous thrombosis
 Vesanto Melina
 Viagra
-Vietnam
 vincristine
 vinegar
 Vioxx
