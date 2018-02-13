@@ -3,7 +3,10 @@ from utils import *
 
 
 #Resolve url
-def resolveURL(url):        
+def resolveURL(url):
+    if url=='':
+        return 'http://TweetWithoutURL.org'
+        
     try:
         #Follow the redirections of a URL
         r = requests.head(url, allow_redirects=True, timeout=urlTimout)
@@ -29,8 +32,6 @@ def first_level_graph():
     documents = documents.flatMap(lambda r: [Row(tweet_url=r.tweet_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, out_url=u) for u in re.findall(urlRegex, r.tweet) or ['']])
 
     documents = documents.map(lambda r: Row(tweet_url=r.tweet_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, out_url=resolveURL(r.out_url)))
-    
-    #documents = documents.filter(lambda r: r.out_url not in ['http://HTTPError.org', 'http://TimeoutError.org'])
 
     documents.map(lambda r : '\t'.join(str(a) for a in [r.tweet_url, r.timestamp, r.popularity, r.RTs, r.out_url])).saveAsTextFile('cache/'+sys._getframe().f_code.co_name)
     
