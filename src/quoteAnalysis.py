@@ -226,7 +226,13 @@ def discoverTopics(documents):
     documents = documents.sample(withReplacement=False, fraction=samplingFraction)
     documents = documents.toDF(['article', 'quotes']).toPandas()
     
-    vocabulary = createVocabulary()
+    #use topics as vocabulary to reduce dimensions
+    if not os.path.exists(topicsFile):
+        print(topicsFile,'topics not found!')
+        sys.exit(0)
+
+    with open(topicsFile) as f:
+        vocabulary = f.read().splitlines()
     
     #define vectorizer (1-2grams)
     tf_vectorizer = CountVectorizer(max_df=0.8, min_df=0.2, stop_words='english', ngram_range=(1,2), token_pattern='[a-zA-Z]{2,}', vocabulary=vocabulary)
