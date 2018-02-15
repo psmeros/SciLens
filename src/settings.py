@@ -17,8 +17,8 @@ samplingFraction = 0.2
 topicSimThreshold = 0.5
 
 #Corpus path 
-#corpusPath = '/home/psmeros/workspace/bigFiles/'
-corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
+corpusPath = '/home/psmeros/workspace/bigFiles/'
+#corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
 #corpusPath = '/home/smeros/backup_data/'
 #corpusFile = '/root/backup_data/'
 
@@ -31,7 +31,7 @@ urlTimout = 1
 urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
 #File with refined topics
-topicsFile = 'topics.txt'
+topicsFile = 'auxiliary_files/topics/topics.txt'
 
 
 import os
