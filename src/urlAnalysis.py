@@ -34,12 +34,3 @@ def first_level_graph():
     documents = documents.map(lambda r: Row(tweet_url=r.tweet_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, out_url=resolveURL(r.out_url)))
 
     documents.map(lambda r : '\t'.join(str(a) for a in [r.tweet_url, r.timestamp, r.popularity, r.RTs, r.out_url])).saveAsTextFile('cache/'+sys._getframe().f_code.co_name)
-    
-
-
-#[DEPRECATED] Get the DMOZ categories of a domain from Amazon Alexa (limited to 1000 requests/month)
-def alexa():
-    from myawis import CallAwis
-    # Get credentials from: https://console.aws.amazon.com/iam/home#security_credential
-    obj=CallAwis('www.ncbi.nlm.nih.gov','Categories','<Access Key ID>','<Secret Access Key>')
-    print(obj.urlinfo())
