@@ -1,5 +1,3 @@
-5-alpha pregnanedione
-A/V ratio
 A2 milk
 abdominal aortic aneurysm
 abdominal fat
@@ -8,7 +6,6 @@ abortion
 Academy of Nutrition and Dietetics
 acaí berries
 acarbose
-accidents
 acesulfame K
 acetaldehyde
 acetaminophen
@@ -21,23 +18,18 @@ acute myeloid leukemia
 addiction
 adenovirus 36
 ADHD
-adipocytes
 adiponectin
 adolescence
 adrenal gland
-Advanced Glycation End-products
+advanced glycation end-products (AGEs)
 Adventist Health Studies
-affordability
-agaritine
 agave nectar
 Agent Orange
 AGEs
 aggression
 aging
-Ah receptor
 AIDS
 air pollution
-air travel
 Airborne supplements
 airport scanners
 Albert Einstein
@@ -47,98 +39,58 @@ alfalfa sprouts
 algae
 alkaline diet
 alkaline water
-alkylphenols
 allergies
-Alli
-allopurinol
 allspice
 almond milk
 almond oil
 almonds
 aloe vera
-alpha waves
-alpha-carotene
-alpha-gal
 ALS
 alternative medicine
 aluminum
 Alzheimer’s disease
-Alzheimer
 amalgam fillings
 amaranth
-American Academy of Pediatrics
-American Cancer Society
-American College of Cardiology
 American College of Lifestyle Medicine
-American Dental Association
 American Diabetes Association
 American Dietetic Association
 American Egg Board
-American Geriatric Society
-American Institute for Cancer Research
-American Meat Institute
 American Medical Association
-American Public Health Association
-American Thyroid Association
 amla
 ammonia
-amnesia
-amphetamines
-amputations
-amylase
 anal fissure
 anal health
-Ancel Keys
 anchovies
 anemia
-anesthesia
 aneurysm
 angina
 angiogenesis
-angiogram
-angiography
-anhedonia
 animal fat
 animal products
 animal protein
 animal studies
-anisakis
-anise
 ankylosing spondylitis
-anorectal angle
-anosmia
-antacids
-Antarctica
 anthocyanins
-antiangiogenesis
 antibiotics
 antidepressants
 antihistamines
 antinutrients
 antioxidants
 antiperspirant
-antiseptic
 anxiety
-aorta
 aortic aneurysm
-apes
 aphthous ulcers
-apigen
 apnea
 ApoE gene
 appendicitis
-appetite
 apple cider vinegar
 apple juice
 apple peels
 apple sauce
-Applebee's
 apples
 apricots
 arachidonic acid
-areca nuts
 arginine
-Aricept
 armpits
 aromatase
 aromatherapy
@@ -149,29 +101,19 @@ artificial colors
 artificial flavors
 artificial sweeteners
 asbestos
-ascorbic acid
-Asian markets
 asparagus
 aspartame
 aspirin
 asthma
-astrocytes
 athletes
-Ativan
 Atkins diet
-ATP
 atrial fibrillation
-attention deficit
-auraptene
 autism
 autoimmune diseases
-autonomic nervous system
 autophagy
-avian leukosis/sarcoma virus
 avocado oil
 avocados
 Ayurvedic medicine
-azarcon
 b12
 back pain
 bacon
@@ -183,75 +125,52 @@ bagels
 baked beans
 baking
 baking soda
-bamboo shoots
 bananas
 barbecuing
 barberries
-bargains
 barley
 Barrett's esophagus
 basal cell carcinoma
-basal cell nevus syndrome
 basil
 beans
 beef
-beef brains
 beer
 beet greens
 beet juice
-Beethoven
 beets
 beeturia
 bell peppers
-belladonna
 benzene
-benzodiazepines
 berberine
-bergamots
-bergamottin
 beriberi
 berries
 beta carotene
 beta glucan
-beta waves
 beta-carboline alkaloids
 betel nuts
 beverages
 BHA
-bibhitaki fruit
-biblical teachings
-Big Mac
 bile acids
 billberries
 Bilophila wadsworthia
 bio identical hormones
-bioaccumulation
-bioavailability
-biogenic amines
-biomagnification
-biomarkers
 bipolar disorder
 birth control pills
 birth defects
-bison
 black beans
 black raspberries
 black tea
 blackberries
 bladder cancer
-bladder disease
 bladder health
 bladder infections
-blindness
 bloating
 blood cancer
 blood clots
 blood donation
 blood pressure
 blood sugar
-blood thinning
 blood type diet
-blood-letting
 blue-green algae
 blueberries
 BMAA
@@ -260,17 +179,16 @@ body fat
 body odor
 boiling
 bok choy
-bokhoor
 bolete mushroom
 bologna
+bone broth
 bone cancer
+bone disease
 bone fractures
 bone health
 bone loss
-bone marrow health
 bone mineral density
 boron
-botulism
 bovine leukemia virus
 bowel movements
 BPA
@@ -280,11 +198,8 @@ BPS
 Bragg Liquid Aminos
 brain disease
 brain health
-brain parasites
 brain surgery
 brain tumors
-brain waves
-brains
 brazil nuts
 BRCA genes
 bread
@@ -298,152 +213,91 @@ breast health
 breast milk
 breast pain
 breastfeeding
-Brenda Davis
 brewer's yeast
-bristle cone pine
-British Heart Foundation
-broad beans
 broccoli
-broccoli raab
 broccoli sprouts
-Broccomax
 bronchiolitis obliterans
 brown fat
 brown rice syrup
-brown sugar
 Brussels sprouts
-BT corn
 buckwheat
-Burger King
-burgers
-burping
-burritos
 butcher's warts
 butter
-butter flavor
-buttermilk
 butternut squash
 button mushrooms
 butyrate
 C-reactive protein
 C. diff
 cabbage
-cadaverine
-cadavers
-Cadbury
 cadmium
 caesarean section
 caffeine
-cake
 calcium
-calendula
-California Dried Plum Board
-California Medical Association
-California Raisin Marketing Board
 caloric restriction
 calories
-Campbell's Soup
 Campylobacter
 cancer
-cancer stem cells
 cancer survival
 cancer viruses
 candida
 candy
 canker sores
 cannabis
-cannibalism
 canola
 cans
 cantaloupe
-canthaxanthines
 capers
 capsaicin
 caramel color
-carboxy-methyl cellulose
 carcinogens
 cardamom
-cardiac disease
-cardiac health
 cardiovascular disease
 cardiovascular health
 carnitine
-carnitine palmitoyl transferase
 carnosine
 carob
-carotenoid
-carotid arteries
 carrageenan
 carrots
-cartilage health
 casein
 cashews
 casomorphins
-CAT scan
 cataracts
-catechins
 cats
-Caucasian
 cauliflower
 cavities
 Cayenne pepper
 CDC
 celery
-celery root
 celiac disease
-cell death
 cell phones
 cellulite
-Center for Food Safety
 Center for Science in the Public Interest
-ceramide
 cervical cancer
-cervix health
-cesium
-cetuximab
 chai tea
-CHAMACOS study
 chamomile tea
 chanterelle mushrooms
 Cheerios
 cheese
-cheese effect
-cheese fly
-cheese itch
-cheese mites
-cheese puffs
-chelation
-chemical sensitivities
 chemotherapy
-Chernobyl
 cherries
-chervil
 chestnuts
-chewing
 chewing gum
 chia seeds
-Chick-fil-A
 chicken
-chicken embryo lethal orphan virus
 chickpeas
 children
 chili peppers
-Chili's
 China Study
-Chinese food
 chlorella
 chlorhexidine
-chlorination
 chlorophyll
 chocolate
 cholecystokinin
-cholera
 cholesterol
 choline
-Chomorro
-choy sum
 chronic diseases
 chronic fatigue syndrome
+cigarettes
 ciguatera
 cilantro
 cinnamon
@@ -451,42 +305,28 @@ cirrhosis
 citric acid
 citrulline
 citrus
-clams
 clamshell mushrooms
-claudication
-Cleveland Clinic
 climate change
 cloves
 cluster headaches
 Coca-Cola
 cocaine
-Cochrane Collaboration
 cocoa
 cocoa butter
 coconut milk
 coconut oil
 coconut water
-coconut-derived emulsion
 coconuts
-cod
 cod liver oil
 Coenzyme Q10
 coffee
 cognition
-cognitive health
-cola
-colchicine
-cold hands
-coleslaw
-colibacillosis
-colic
 collard greens
 colon cancer
 colon disease
 colon health
 colonoscopy
 colorectal cancer
-coma
 common cold
 complementary medicine
 computer eye strain
@@ -494,200 +334,119 @@ Concord grapes
 constipation
 Consumer Reports
 Consumers Union
-contagious pustular dermatitis
-convenience
-cookies
 cooking methods
-cooking temperature
 COPD
 copper
 coriander
 corn
-corn oil
-Corn Refiners Association
-corn syrup
-Cornell
 cortisol
-cosmetics
-cosmic rays
 cost savings
 cough
-coumarin
 cranberries
 cranberry juice
-cream
-cream cheese
 creatine
-cretinism
 Creutzfeldt-Jakob disease
-crib death
 crimini mushrooms
-Crisco
 Crohn's disease
-crowberries
 cruciferous vegetables
 cryptoxanthin
-CSPI
 CT scan
 cucumbers
 cumin
-cupcakes
 curcumin
 currants
 curry powder
-cyanopsia
 cyclamate
-cycling
-cysticercosis
-cytoskeleton
 Daily Dozen
 dairy
 dandelion
 Daniel Fast
-Dannon
 dark chocolate
-dark meat
 DASH diet
 date sugar
 dates
-DDT
-deafness
 dehydration
 deli meat
-delta waves
 dementia
 dental health
 depression
 detoxification
 DHA
 DHEA
-Diabeta
 diabetes
-diacetyl
-diacylglycerol
 dialysis
 diarrhea
 dieldrin
 dietary guidelines
-dietary scoring
-digoxin
 dioxins
-dishwashing detergent
 diverticulitis
 diverticulosis
 dizziness
 DNA damage
-DNP
-dogs
-domoic acid
 dopamine
 douching
-doughnuts
-Dow Chemical
+doughnuts 
 dragon fruit
-dragon's blood
-dressings
 dried fruit
-drug residues
-drug stores
-drug testing
 ductus arteriosus
 dulse
-Duncan Hines
 Dutched cocoa
-dwarfism
 dyspepsia
 E. coli
 ear health
 ear infections
 Earl Grey tea
-Easter Island
-ECMO
 Eco-Atkins diet
-ecstasy
 eczema
 edamame
-Eden Foods
 EEG
-EGCG
-Egg Farmers of Canada
 Egg McMuffin
-Eggbeaters
-eggnog
 eggplant
 eggs
 elderly
-electroconvulsive therapy
 elephant garlic
-ellagic acid
 emphysema
-empty calories
-endive
-endocannabinoids
 endocrine disruptors
 endometrial cancer
 endometrial health
 endometriosis
-endorphins
 endothelium
 endotoxemia
-endurance
 enemas
 energy
 energy drinks
-energy gels
-enoki mushrooms
-Enterococcus
-enterotypes
 environment
 enzymes
-eosinophilia–myalgia syndrome
-EPA
 EPIC Study
 epigenetic changes
 epilepsy
+Equol
 erectile dysfunction
 ergothioneine
 erythritol
 esophageal cancer
 esophagus health
-espresso
 essential tremor
 estragole
 estrogen
-ethnicity
-eudaemonia
-European Food Safety Authority
 evidence-based medicine
-evolution
 exercise
-exotic fruit
 ExPEC
 Exponent Inc.
-extracorporeal membranous oxygenation
 eye disease
 eye health
-eye parasites
 factory farming practices
-fainting
 fake meat
-fall risk
-farm animals
-Farm Bill
 fast food
 fat
 fatigue
 fatty liver disease
 fava beans
 FDA
-feather meal
 fecal bacteria
 fecal contamination
-fecal continence
 fecal transplant
-Federal Trade Commission
 feed additives
-feline leukemia virus
 fennel seeds
 fenugreek
 fermented foods
@@ -699,158 +458,99 @@ fibroids
 fibromyalgia
 fiddlehead ferns
 figs
-filberts
 Finland
 Firmicutes
 fish
 fish oil
-fisitin
-flame-retardant chemicals
 flatulence
 flavonoids
-flavonols
 flax oil
 flax seeds
-flesh-eating bacteria
 flexitarians
 Flomax
-flowers
 flu shots
 fluoride
-flying foxes
 FODMAPs
 folate
 folic acid
 food additives
 food dyes
 food poisoning
-food recalls
-food sensitivities
 foodborne illness
-foreign body
-Forks Over Knives
-formaldehyde
 Fosamax
-Fox News
-foxglove
-fragrance
 Framingham Heart Study
 Freedom of Information Act
 french fries
-Froot Loops
 frozen fruit
 fructans
 fructose
 fruit
-fruit and vegetable wash
 fruit juice
 frying
-FTC
-fuji apples
-Fukushima
 fungicides
-gala apples
 galactose
 galactosemia
 gallbladder disease
 gallbladder health
 gallstones
-gangrene
 garbanzo beans
 gargling
 garlic
-gas
-gasoline
 gastric bypass
 gastric emptying
 gastrocolic reflex
 gelatin
-General Mills
-genetic manipulation
-genital health
 genital warts
-George McGovern
 GERD
 Gerson Therapy
 gestational diabetes
-giantism
 ginger
-ginger ale
-gingerols
 glaucoma
 Global Burden of Disease Study
-global warming
 Glucophage
-glucose
 glutamic acid
 gluten
-glyburide
 glycemic index
 glycoalkaloids
-glyconutrients
 glycotoxins
 glyphosate
 GMO
-gnathostomiasis
 goiter
 goitrogens
 goji berries
-gold
-gold dust retinopathy
-golden delicious apples
-golden raisins
 gooseberries
 Gorlin syndrome
 gout
 grains
-Granny Smith apples
 grape juice
-grape seed oil
 grapefruit
 grapefruit juice
 grapes
 Grave’s disease
-gravy
-Great Lakes
-Greece
 green beans
-green onions
 green tea
-greenhouse gases
 greens
-greta
-grilling
-growth promoters
 guacamole
 guava
 Guillain-Barré syndrome
 gum arabic
 gut flora
 gynecomastia
-Häagen-Dazs
 hair growth
 hair health
 hair loss
-halibut
 halitosis
 Hallelujah diet
 ham
 hamburgers
 hand washing
 happiness
-haritaki fruit
-harmane
 Harvard
 Harvard Nurses' Health Study
-Harvard Physicians’ Study II
-Hawaii
-hawthorn
 hay fever
-hazelnut oil
 hazelnuts
 HDL cholesterol
 head lice
-head trauma
 headaches
 health food stores
 hearing
@@ -861,86 +561,60 @@ heart rate variability
 heartbeat
 heartburn
 heavy metals
-Hegsted Equation
-HeLa cells
 heme iron
-hemlock
-hemolytic-uremic syndrome
 hemorrhoids
 hepatitis
 hepatitis E
-hepatotoxins
-herbal medicine
 herbal remedies
 herbal tea
 Herbalife
 herbs
 hernia
 herpes
-herring
-Hershey's
-hesperidin
 heterocyclic amines
 hexachlorobenzene
 hiatal hernia
 hibiscus tea
 hiccups
 hidradenitis suppurativa
-high altitude pulmonary edema
 high blood pressure
 high fructose corn syrup
 hijiki
-Hiroshima
 hirsutism
-Hispanic Paradox
 histones
 HIV/AIDS
 hives
-holotranscobalamin
 holy basil tea
 homeopathy
 homocysteine
 honey
 honeybush tea
-Honolulu Heart Study
 hormesis
 hormonal dysfunction
 hormones
-horsemeat
 hot dogs
 hot flashes
 hot sauce
 How Not to Die
 human papilloma virus
 hummus
-hunger
 Huntington’s disease
 hydrogen sulfide
 hydrogenated fats
-hydroponic
 Hydroxycut
-hyperactivity
 Hyperemesis gravidarum
-hyperpigmentation
 hypertension
-hypospadias
 hysterectomy
 iatrogenic
 Ibuprofen
 ice cream
-ice diet
 iceberg lettuce
-Idaho
 IgA
 IGF-1
 immune function
-immunosuppressive drugs
 impotence
-in vitro studies
 incontinence
 India
-indigestion
-indoles
 industrial pollutants
 industry influence
 infant formula
@@ -949,39 +623,17 @@ infertility
 inflammation
 inflammatory bowel disease
 influenza
-informed consent
-inner ear cancer
-insecticides
 insects
 insomnia
-Institute of Medicine
 insulin
-intact grains
-intelligence
-INTERHEART study
-interleukin-1
-internal bleeding
+insulin resistance
 intestinal health
 Introductory Videos
 iodine
-Iowa Women’s Health Study
-ipecac
-IQ45b
-iritis
 iron
 irritable bowel syndrome
 isoflavones
-Israel
-Italy
-Jack Norris
-jalapeno
-jam
 jasmine tea
-jaundice
-Jeff Novick
-jelly beans
-Jerusalem artichokes
-Johns Hopkins University
 joint disease
 joint health
 juice
@@ -990,12 +642,9 @@ junk food
 Kaiser Permanente
 kale
 kangaroo meat
-Kaposi’s sarcoma
 kelp
 keriorrhea
-ketchup
 ketogenic agent AC-1202
-KFC
 kidney beans
 kidney cancer
 kidney disease
@@ -1004,15 +653,11 @@ kidney function
 kidney health
 kidney stones
 kimchi
-kissing
 kiwifruit
 kohlrabi
 kombu
 kombucha tea
-Kraft
 Kuna Indians
-kwashiorkor
-lactation
 lactescence
 lactic acid
 lactose
@@ -1020,9 +665,6 @@ LAKE score
 lamb
 lard
 Laron syndrome
-lasers
-LASIK
-laughter
 lauric acid
 lavender
 laxatives
@@ -1031,7 +673,6 @@ lead
 leaky gut theory
 lecithin
 lectins
-leeks
 legumes
 lemon balm
 lemon verbena
@@ -1050,93 +691,61 @@ lifestyle medicine
 lignans
 lima beans
 limes
-limonin
-Lindane
 Linguatula serrate
 Lipitor
 liposuction
 lipotoxicity
-lipotropes
-lipstick
 liquid smoke
 Listeria
 liver
 liver cancer
 liver disease
-liver failure
 liver health
 liver inflammation
-Loma Linda University
 longevity
 Lou Gehrig's disease
-Louis Pasteur
-lovastatin
 low-carb diets
 low-fat diets
 lower back pain
-lox
-lunch meat
 lung cancer
 lung disease
 lung health
 lupus
 lutein
-luteolin
 lycopene
 lyme disease
 lymphoma
 Lyon Diet Heart Study
-M&M's
 macadamia nuts
-macadamia oil
-mackerel
 macular degeneration
 mad cow disease
 maggots
 magnesium
-Maimonides
 maitake mushrooms
-malaria
 maltodextrin
+mammograms
 manganese
 mango
 mangosteen
-manure
-MAO Inhibitors
 maple syrup
-maraschino cherry
-Marek's disease virus
 margarine
-Marion Nestle
+marijuana
 marjoram
-marketing
-marshmallows
-masculinity
 massage
-mastalgia
-mastectomy
 mastitis
 matcha
-maté
-Mayo Clinic
 McDonalds
-McGovern Report
 meat
-meat glue
 meat substitutes
 Meatless Mondays
 medical education
-medical ethics
-medical journals
 medical profession
-Medicare
 medications
 meditation
 Mediterranean diet
 medium-chain fatty acids
 melanoma
 melatonin
-MelQx
 memory
 men's health
 Mendelian randomization
@@ -1147,93 +756,55 @@ mental health
 mercury
 mesclun mix
 mesothelioma
-mesquite
-meta-analysis
 metabolic syndrome
 Metabolife
 metabolism
 Metamucil
-metastases
-metastatic calcification
 methionine
 methylmalonic acid
-Mevacor
 MGUS
-Michael Pollan
-microalbuminuria
 microbiome
-microcephaly
 microcystins
-Micronase
-microwaves
 microwaving
 migraine headaches
 milk
-milk chocolate
 milk thistle
 millet
-mineral clay
 mint
-Mioscene
 miscarriage
 miso
-MIT
 mitochondria
 molasses
 mold
-monounsaturated fats
 Monsanto
 mood
-moose meat
-morbidity
 morel mushrooms
 moringa
 morning sickness
-morphine
 mortality
-mouth cancer
 mouthwash
 Mozart
-MPTP
 MRSA
 MSG
-mucus
 multiple myeloma
 multiple sclerosis
 multivitamins
 muscle health
-muscle inflammation
 muscle soreness
 muscle strength
 mushrooms
 mustard greens
-mustard oil
 mustard powder
 mustard seeds
 mycotoxins
-myelopathy
-MyPlate
 myristic acid
 nail health
 nameko mushrooms
-nanoparticles
-naphthalene
-naproxen
-NASA
-nasal cavity cancer
 nasal irrigation
-National Academy of Sciences
 National Cancer Institute
-National Cattlemen's Beef Association
-National Confectioners Association
-National Dairy Council
-National Dairy Promotion and Research Board
 National Pork Board
-National Pork Producers Council
-natural toxins
 nausea
 navy beans
-necrotizing fasciitis
 nerve health
 neti pot
 Neu5Gc
@@ -1241,26 +812,19 @@ neurocysticercosis
 neuropathy
 neurotoxins
 neutropenic diet
-New York Coalition for Healthy School Food
 NF-κB
-nicotine
 nightshades
-NIH-AARP study
 nitrates
 nitric oxide
 nitrite
-nitroglycerin
 nitrosamines
 non-Hodgkin lymphoma
 nonalcoholic fatty liver disease
 noni fruit
 nori
 norovirus
-Norway
 NRF-2
-Nuremberg Code
 nutmeg
-NutraSweet
 nutrient absorption
 nutrient density
 nutrient synergy
@@ -1272,9 +836,6 @@ oatmeal
 oats
 obesity
 obesogens
-occupational health
-octopus
-offal
 oil pulling
 oils
 Okinawan diet
@@ -1287,50 +848,36 @@ onions
 oolong tea
 oral cancer
 oral health
-oral intraepithelial neoplasia
 orange juice
 oranges
 oregano
 organ meats
 organic foods
-organic milk
-organochlorines
 organotins
 orgasm
-Orville Redenbacher
 osmanthus tea
 osteoarthritis
 osteoporosis
-Outback Steakhouse
 ovarian cancer
 ovary health
-overeating
 oxalates
-oxen meat
 oxidative stress
 oyster mushrooms
 oysters
-paclitaxel
-paella
 pain
 paleolithic diets
 palmitic acid
-pancakes
 pancreas health
 pancreatic cancer
-pancreatic enzymes
 pancreatitis
 pap smear
 papaya
 paprika
-paralysis
 parasites
 paratuberculosis
 Parkinson's disease
 parsley
 pasta
-pasteurization
-patent
 patulin
 PBDEs
 PCBs
@@ -1341,19 +888,14 @@ peanuts
 pears
 peas
 pecans
-penicillin
-penile bone
 penis cancer
 penis health
 penis size
-Peoria
 pepper
 peppermint
 peppermint oil
 pepperoni
 peppers
-Pepsi
-perfluorochemicals
 periodontal disease
 peripheral artery disease
 persin
@@ -1361,112 +903,71 @@ persistent organic pollutants
 pesticides
 petroleum jelly
 pets
-petunidin
-Pew Commission
-Pfizer
 pH
-pharmacists
-pheasants
-phenolics
 Philip Morris
 PhIP
-phosgene
 phosphate additives
 phosphorus
 phthalates
-physical attraction
 Physicians Committee for Responsible Medicine
 phytates
 phytic acid
-phytochemicals
 phytoestrogens
 phytonutrients
 phytosterols
 pickled vegetables
-pie
-pine needles
 pine nuts
 pineal gland
-pineapple juice
 pineapples
 pinto beans
 piperine
-pistachio principle
 pistachios
 pizza
-Pizza Hut
 placebo effect
 placenta
 plant protein
 plant-based diets
 plantains
-plasma membrane
 plastic
-platelets
 plums
-plutonium
 pneumonia
-Pneumovax
-poisonous plants
 polonium
-polycarbonate plastic
-polychlorinated naphthalenes
 polycyclic aromatic hydrocarbons
-polycyclic hydrocarbons
-polyethylene plastic
-polymyositis
-polyoma viruses
 polyphenols
-polypropylene plastic
 polyps
-polyradiculoneuropathy
 Polysorbate 80
 pomegranate juice
 pomegranates
-Pop-Tarts
 popcorn
 popcorn lung
 poppy seeds
-porcine endogenous retroviruses
 porcini mushrooms
 pork
-pork brains
-pork rinds
 portobello mushrooms
-positive psychology
 potassium
 potassium sorbate
 potato chips
-potato milk
 potatoes
 poultry
-poultry viruses
-poultry workers
 prebiotics
-Precose
 prediabetes
 PREDIMED
 pregnancy
-prehistoric diets
 Premarin
 premature puberty
 premenstrual syndrome
 prenatal vitamins
-preservation
 preservatives
 pressure cooking
-pretzels
 Prevotella
 prion disease
 Pritikin
 probiotics
 processed foods
 processed meat
-prolactin
 Prop 65
 propionate
 Propulcid
-prostaglandin
 prostate cancer
 prostate health
 prostatectomy
@@ -1476,13 +977,9 @@ Proteus mirabilis
 Prozac
 prunes
 PSA
-pseudotumor cerebri
 psoriasis
-psychosis
 psyllium
-PTH
 puberty
-pudding
 pulmonary embolism
 pumpkin
 pumpkin seeds
@@ -1490,22 +987,16 @@ PureVia
 purines
 purple potatoes
 purslane
-pus
 putrescine
-QALY
 quercetin
-quinine
 quinoa
 Quorn
-rabbit meat
-rabies
 ractopamine
 radiation
 radicchio
 radishes
 raisins
 ranking foods
-rapamycin
 rash
 raspberries
 raw food
@@ -1513,82 +1004,51 @@ Ray Cronise
 recipes
 rectal cancer
 Red Bull
-Red Delicious apples
 red dye #3
 red meat
 red tea
 red wine
 red yeast rice
-Red Zinger
 reductionism
-Referencing the American Heart Association
 reflux
 reindeer meat
-Reiter's syndrome
 reproductive health
 resistant starch
 respiratory infections
-restaurants
 resveratrol
-reticuloendotheliosis virus
 retinopathy
 reversing chronic disease
 rhabdomyolysis
 rheumatoid arthritis
 rhubarb
-riboflavin
 rice
 rice bran
-rice bran oil
 Rice Diet
 rice milk
-Richard Dawkins
-rickets
 Ritalin
-roasting
 rooibos tea
 rose hips
 rosemary
-rosmarinic acid
 Roundup
-rowanberries
-Roy Swank
-Ruminococcus
-rutabagas
-Rutin
 rye
 saccharin
 safety limits
 safflower oil
 saffron
 salads
-salami
-salami brusher's disease
-saliva
 salmon
 Salmonella
 salsa
 salt
-Salt Institute
-sandwiches
-saoott
-Sara Lee
-sarcocystis
-sarcopenia
 sardines
 saturated fat
 sauerkraut
-sausage
-scallions
 schizophrenia
-School Lunch Program
 sciatica
 scombroid poisoning
 scurvy
 sea vegetables
 seafood
-seafood workers
-seal oil
 seaweed
 second meal effect
 seeds
@@ -1596,53 +1056,35 @@ seitan
 seizures
 selenium
 semen
-sense of smell
 serotonin
 sesame oil
 sesame seeds
 sexual dysfunction
 sexual health
-sexual selection
-sexual transmission
 shark cartilage
-shark oil
-sheep
-shelf life
 shiitake mushrooms
-shock
-shopping carts
 short-chain fatty acids
-shortening
 shrimp
 side effects
 SIDS
 sigmoidoscopy
 sinus health
 sinusitis
-sirtuins
 Sjögren’s syndrome
 skim milk
 skin cancer
 skin disease
 skin health
-SLE
 sleep
 sleeping pills
-Smithfield
 smoked foods
 smoking
 smoothies
-Snack Food Association
-snail meat
-snake oil
-snake venom
-social anxiety disorder
 soda
 sodium
 sodium benzoate
 sodium bicarbonate
 sodium lauryl sulfate
-soil health
 sorbitol
 sore throat
 soup
@@ -1652,18 +1094,13 @@ soy sauce
 soybean oil
 soybeans
 spearmint
-speech impairment
 sperm counts
-spermine
 spices
 spicy food
-spillover effect
 spinach
-spinal cord health
 spirulina
 Splenda
 split peas
-spoilage
 sports drinks
 sports medicine
 sprouting
@@ -1671,16 +1108,11 @@ sprouts
 squash
 squash seeds
 Squatty Potty
-SSRIs
 St. John's wort
 standard American diet
 staph infection
 star anise
-STARI
 statins
-STD
-steak
-steaming
 stearic acid
 stem cells
 steroids
@@ -1692,81 +1124,50 @@ stomach ulcers
 stool size
 strawberries
 stress
-stress test
 stroke
 subsidies
-substance P
 sucralose
-sudden cardiac death
 sugar
-Sugar Association
-Sugar Twin
 suicide
 sulfites
 sulforaphane
-sulfur
 sulfur dioxide
 sunburn
-sunchokes
 sunflower oil
 sunflower seeds
 sunlight
-superbugs
-supermarkets
 superoxide dismutase
 supplements
-suppositories
-Supreme Court
-Surgeon General
 surgery
 sushi
-sustainability
-Sweden
-Sweet One
 sweet potatoes
 Sweet'N Low
 sweeteners
 Swiss chard
 syncope
-synergy
-tabouli
-tacos
 tahini
-Taiwan
-talapia
 tamoxifen
-tamsulosin
-tangeretin
 tanning beds
 tapeworms
-taro
 tarragon
 tart cherries
-taste buds
 taurine
-taxes
-Taxol
 tea
 teff
-television
 telomerase
 telomeres
 tempeh
 testicular cancer
 testicular health
 testosterone
-tetrodotoxin
-TGI Friday's
 thalidomide
 The Plant Paradox
 theanine
-thermogenics
 thiamine
 thimerosal
 throat cancer
 throat health
 thyme
-thymus
 thyroid cancer
 thyroid disease
 thyroid health
@@ -1776,64 +1177,41 @@ TMAO
 tobacco
 toddler puffs
 tofu
-Tomato Effect
 tomato juice
 tomato sauce
 tomatoes
-Tonga
-tongue cancer
-tongue worm
-tonsil cancer
+tooth sensitivity
 toothpaste
 TOR
-torcetrapib
-Toxaphene
 toxic megacolon
 toxoplasma
-Trader Joe's
-trail mix
 trans fats
-transglutaminase
 treadmill
 tremors
 triglycerides
-trimethylamine
 triphala
 Tritan
-trumpet mushrooms
 Truvia
 tryptophan
-Tufts
 tulsi tea
-tumor necrosis factor
-tumor suppressor genes
-Tums
 tuna
-Tuna Council
-turbinado sugar
 turkey
 turmeric
 turnips
 TVP
+twin studies
 Twinkies
-twins
 Tylenol
 type 1 diabetes
-U.S. Department of Defense
-U.S. Dry Bean Council
+U.S. Preventative Services Task Force
 U.S. Preventive Services Task Force
 ubiquinol
 ulcerative colitis
-ultra-processed foods
-underweight
-Union of Concerned Scientists
 uric acid
 urinary tract infections
-urine
 urticaria
 USDA
 uterine cancer
-uterine health
 V8 juice
 vaccinations
 vaccines
@@ -1841,33 +1219,21 @@ vaginal cancer
 vaginal discharge
 vaginal health
 vaginosis
-Valium
 varicose veins
 Vaseline
-veal
-veal brains
 vegans
 vegetable oil
 vegetable protein
 vegetables
 vegetarians
 VEGF
-veggie bacon
 veggie burgers
-veggie chicken
-veggie dogs
-Veggiecation
 venison
-venous thrombosis
-Vesanto Melina
 Viagra
-vincristine
 vinegar
 Vioxx
 viral infections
-Virginia Messina
 vision
-visual disturbance
 vitamin A
 vitamin B1
 vitamin B12
@@ -1877,70 +1243,43 @@ vitamin D supplements
 vitamin E
 vitamin K
 vitamins
-VLDL
-voice box cancer
-voice box health
-vomiting
-vulva cancer
 waist-to-height ratio
 wakame
 walking
-walnut oil
 walnuts
 wart viruses
-wartime
 warts
 water
 watercress
 watermelon
-weakness
-weeds
 weight gain
 weight loss
-whale meat
 wheat
 wheat germ agglutinin
 wheatgrass
-whiff test
-whipped cream
 white blood cell count
+white blood cells count
 white meat
 white tea
-white wine
-Whitecoat Project
 whortleberries
-wild game
 wine
 women's health
-Women’s Health Initiative Study
-Women’s Healthy Eating and Living Study
 woodear mushrooms
-workplace intervention
-World Cancer Research Fund
 World Health Organization
-World Hypertension League
-worms
 wound healing
 wrinkles
 X-rays
 xanthan gum
-xanthones
-xeno-autoantibodies
 xenoestrogens
 xenohormesis
 xylitol
-Yale
-yams
 Yanomamo
 yeast
 yerba mate
 Yersinia
 yogurt
 zeaxanthin
-zerumbone
 zinc
-zingerone
 Zoloft
 zoonotic disease
-ZSweet
 zucchini
