@@ -5,8 +5,8 @@ gloveFile = None
 
 gloveEmbeddings = gloveEmbeddingsSize = None
 
-if gloveFile and not os.path.exists(gloveFile):
-    print(gloveFile,'embeddings not found')
+if not os.path.exists(gloveFile):
+    print(gloveFile,'embeddings not found!')
     sys.exit(0)
 
 #Load GloVe file

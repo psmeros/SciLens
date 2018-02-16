@@ -1,5 +1,5 @@
 from settings import *
-from utils import *
+from utils import initSpark
 
 
 #Resolve url
