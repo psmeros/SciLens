@@ -41,6 +41,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from urllib.parse import urlsplit
 import numpy as np
 import pandas as pd
 import spacy
