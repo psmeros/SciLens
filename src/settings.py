@@ -1,13 +1,21 @@
-#Limit retrieved documents
-limitDocuments = -1
-
-memory = '8G' #8 or 60 or 250
-
-#Pickled dataframe
+#Use cached RDDs
 useCache = True
 
-#Starting point of the pipeline
-runFromPipeline ='all' # 'all', 'extract'
+#Memory used by Spark (8, 60 or 250)
+memory = '8G'
+
+#Corpus path 
+corpusPath = '/home/psmeros/workspace/bigFiles/'
+#corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
+#corpusPath = '/home/smeros/backup_data/'
+#corpusPath = '/root/backup_data/'
+
+webCorpusFile = corpusPath + 'webFood.tsv'
+twitterCorpusFile = corpusPath + 'twitterFood.tsv'
+
+#URL settings
+urlTimout = 1
+urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
 #Topic Discovery parameters
 numOfTopics = 32
@@ -16,26 +24,13 @@ max_iter = 20
 samplingFraction = 0.2
 topicSimThreshold = 0.5
 
-#Corpus path 
-corpusPath = '/home/psmeros/workspace/bigFiles/'
-#corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
-#corpusPath = '/home/smeros/backup_data/'
-#corpusFile = '/root/backup_data/'
-
-
-corpusFile = corpusPath + 'foodArticles.tsv'
-twitterCorpusFile = corpusPath + 'twitterFood.tsv'
-urlTimout = 1
-
-
-urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
-
 #File with refined topics
 topicsFile = 'auxiliary_files/topics/topics.txt'
 
 #File with institutions metadata
 institutionsFile = 'auxiliary_files/institutions/metadata.tsv'
 
+#Imports
 import os
 import re
 import sys

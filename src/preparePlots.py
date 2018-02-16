@@ -1,5 +1,5 @@
 from settings import *
-from quoteAnalysis import quotePipeline, resolvePerson, resolveOrganization
+from quoteAnalysis import resolvePerson, resolveOrganization
 
 #Plot functions
 
