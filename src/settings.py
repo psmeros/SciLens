@@ -30,6 +30,11 @@ topicsFile = 'auxiliary_files/topics/topics.txt'
 #File with institutions metadata
 institutionsFile = 'auxiliary_files/institutions/metadata.tsv'
 
+#Predefined keyword lists
+authorityKeywords = ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']
+empiricalKeywords = ['study', 'people']
+actionsKeywords = ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']
+
 #Imports
 import os
 import re

@@ -1,7 +1,7 @@
 from settings import *
-from utils import initNLP, initSpark
+from utils import initSpark
 
-nlp, authorityKeywords, empiricalKeywords, actionsKeywords = initNLP()
+nlp = spacy.load('en')
 
 #Exract quotes from articles
 def extractQuotes():
