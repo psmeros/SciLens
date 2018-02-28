@@ -30,6 +30,9 @@ topicsFile = 'auxiliary_files/topics/topics.txt'
 #File with institutions metadata
 institutionsFile = 'auxiliary_files/institutions/metadata.tsv'
 
+#File with country codes
+countriesFile = 'auxiliary_files/countries/codes.csv'
+
 #Predefined keyword lists
 authorityKeywords = ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']
 empiricalKeywords = ['study', 'people']
