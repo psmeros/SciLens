@@ -5,8 +5,8 @@ useCache = True
 memory = '8G'
 
 #Corpus path 
-corpusPath = '/home/psmeros/workspace/bigFiles/'
-#corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
+#corpusPath = '/home/psmeros/workspace/bigFiles/'
+corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
 #corpusPath = '/home/smeros/backup_data/'
 #corpusPath = '/root/backup_data/'
 
@@ -32,6 +32,9 @@ institutionsFile = 'auxiliary_files/institutions/metadata.tsv'
 
 #File with country codes
 countriesFile = 'auxiliary_files/countries/codes.csv'
+
+#File with academic repositories
+repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
 
 #Predefined keyword lists
 authorityKeywords = ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']
