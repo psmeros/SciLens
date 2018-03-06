@@ -5,8 +5,8 @@ useCache = True
 memory = '8G'
 
 #Corpus path 
-#corpusPath = '/home/psmeros/workspace/bigFiles/'
-corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
+corpusPath = '/home/psmeros/workspace/bigFiles/'
+#corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
 #corpusPath = '/home/smeros/backup_data/'
 #corpusPath = '/root/backup_data/'
 
