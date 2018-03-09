@@ -5,13 +5,18 @@ useCache = True
 memory = '8G'
 
 #Corpus path 
-corpusPath = '/home/psmeros/workspace/bigFiles/'
-#corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
+#corpusPath = '/home/psmeros/workspace/bigFiles/'
+corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
 #corpusPath = '/home/smeros/backup_data/'
 #corpusPath = '/root/backup_data/'
 
 webCorpusFile = corpusPath + 'webFood.tsv'
 twitterCorpusFile = corpusPath + 'twitterFood.tsv'
+
+#Graph files
+first_level_graph_file = corpusPath + 'first_level_graph.tsv'
+second_level_urls_file = corpusPath + 'second_level_urls.tsv'
+second_level_graph_file = corpusPath + 'second_level_graph.tsv'
 
 #URL settings
 urlTimout = 1
@@ -24,17 +29,17 @@ max_iter = 20
 samplingFraction = 0.2
 topicSimThreshold = 0.5
 
+#Auxiliary Files
 #File with refined topics
 topicsFile = 'auxiliary_files/topics/topics.txt'
-
 #File with institutions metadata
 institutionsFile = 'auxiliary_files/institutions/metadata.tsv'
-
 #File with country codes
 countriesFile = 'auxiliary_files/countries/codes.csv'
-
 #File with academic repositories
 repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
+#blacklist URLs
+blacklistFile = 'auxiliary_files/blacklist/urls.txt'
 
 #Predefined keyword lists
 authorityKeywords = ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']
