@@ -1,18 +1,20 @@
 
 #!/bin/sh
 
-wget https://repo.continuum.io/archive/Anaconda3-5.0.1-Linux-x86_64.sh 
-chmod +x Anaconda3-5.0.1-Linux-x86_64.sh
-./Anaconda3-5.0.1-Linux-x86_64.sh
-rm Anaconda3-5.0.1-Linux-x86_64.sh
+#sudo apt-get update
+#sudo apt-get upgrade -y
+#sudo apt-get install -y openjdk-8-jre screen htop git vim
+
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+chmod +x Miniconda3-latest-Linux-x86_64.sh
+./Miniconda3-latest-Linux-x86_64.sh
+rm Miniconda3-latest-Linux-x86_64.sh
 source ~/.bashrc
-conda install -y nltk
-python -m nltk.downloader punkt
-conda install -y spacy
-python -m spacy download en
-conda install -y pyspark
+
+conda install -y pandas numpy networkx nltk spacy pyspark beautifulsoup4 scikit-learn
+conda update -n base conda -y
 conda upgrade --all -y
-sudo apt-get update
-sudo apt-get upgrade -y
-sudo apt-get install -y openjdk-8-jre screen htop git vim
+python -m nltk.downloader punkt #-d /path/to/nltk_data
+python -m spacy download en
+
 #gloVe 6B (Wikipedia - 300d) [deprecated]
