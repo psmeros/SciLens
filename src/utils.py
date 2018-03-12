@@ -28,6 +28,9 @@ def create_crawl_keywords():
         for p in actionsKeywords:
             print('"'+s, p+'"')
 
-#Find the domain of a url
+#Find the domain of an http url
 def get_url_domain(url):
-    return re.sub(r'^(http://)?(www\.)?', r'', '{0.netloc}'.format(urlsplit(url)))    
+    domain = re.sub(r'^(http(s)?://)?(www\.)?', r'', '{0.netloc}'.format(urlsplit(url)))
+    if domain.count('.') == 2:
+        domain = ('.').join(domain.split('.')[1:])
+    return domain

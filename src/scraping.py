@@ -39,12 +39,13 @@ def get_out_links(url, blacklist):
 	links = []
 	try:
 		soup = BeautifulSoup(urlopen(url, timeout=urlTimout), 'html.parser')
-		url = get_url_domain(url)
-		for link in soup.findAll('a', attrs={'href': re.compile('^http(s)?://')}):
-		    u = get_url_domain(link.get('href'))
-		    if (u != url and url not in u and u not in blacklist):
-		    	links.append(link.get('href'))
 	except:
-		pass
+		return links
+
+	url = get_url_domain(url)
+	for link in soup.findAll('a'):
+	    u = get_url_domain(link.get('href') or '')
+	    if (url not in u) and (u not in url) and (u not in ['']+blacklist):
+	    	links.append(link.get('href'))
 
 	return list(set(links))
