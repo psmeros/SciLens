@@ -38,7 +38,7 @@ def scrap_nutritionfacts():
 def get_out_links(url, blacklist):
 	links = []
 	try:
-		soup = BeautifulSoup(urlopen(url), 'html.parser')
+		soup = BeautifulSoup(urlopen(url, timeout=urlTimout), 'html.parser')
 		url = get_url_domain(url)
 		for link in soup.findAll('a', attrs={'href': re.compile('^http(s)?://')}):
 		    u = get_url_domain(link.get('href'))

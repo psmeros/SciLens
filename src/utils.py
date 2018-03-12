@@ -5,9 +5,9 @@ def initSpark():
     global spark
     conf = SparkConf()
     conf.setAppName('quoteAnalysis')
-    conf.setMaster('local[*]')
-    conf.set('spark.executor.memory', memory)
-    conf.set('spark.driver.memory', memory)
+    conf.setMaster('local['+str(cores)+']')
+    conf.set('spark.executor.memory', str(int(memory/cores))+'G')
+    conf.set('spark.driver.memory', str(int(memory/cores))+'G')
     conf.set('spark.hadoop.validateOutputSpecs', 'false')
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
     spark.sparkContext.setLogLevel('ERROR')
