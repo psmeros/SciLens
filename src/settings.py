@@ -1,16 +1,17 @@
+#Memory in GBs - cores used by Spark and corpus path
+conf = {'memory':8, 'cores':4, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
+#conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
+#conf = {'memory':64, 'cores':24, 'corpusPath': '/home/smeros/backup_data/'}
+#conf = {'memory':252, 'cores':48, 'corpusPath': '/root/'}
+
+memory = conf['memory']
+cores = conf['cores']
+corpusPath = conf['corpusPath']
+
 #Use cached RDDs
 useCache = True
 
-#Memory in GBs and cores used by Spark (8, 60 or 250) and ()
-memory = 8
-cores = 4
-
-#Corpus path 
-#corpusPath = '/home/psmeros/workspace/bigFiles/'
-corpusPath = '/Users/smeros/workspace/etc/bigFiles/'
-#corpusPath = '/home/smeros/backup_data/'
-#corpusPath = '/root/backup_data/'
-
+#Corpus files
 webCorpusFile = corpusPath + 'webFood.tsv'
 twitterCorpusFile = corpusPath + 'twitterFood.tsv'
 

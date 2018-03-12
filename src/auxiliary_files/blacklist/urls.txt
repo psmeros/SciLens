@@ -2,3 +2,4 @@ facebook.com
 twitter.com
 pinterest.com
 google.com
+linkedin.com
