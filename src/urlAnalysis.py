@@ -44,7 +44,7 @@ def second_level_graph():
 
     blacklist = [x.strip('\n') for x in open(blacklistFile).readlines()]
 
-    documents = spark.sparkContext.textFile(second_level_urls_file)
+    documents = spark.sparkContext.textFile(second_level_urls_file, minPartitions=(cores-1))
     documents = documents.map(lambda r: (lambda l=r.split('\t'): Row(url=l[0]))())
 
     documents = documents.flatMap(lambda r: [Row(url=r.url, out_url=l) for l in get_out_links(r.url, blacklist) or ['']])

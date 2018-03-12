@@ -1,8 +1,9 @@
 #Use cached RDDs
 useCache = True
 
-#Memory used by Spark (8, 60 or 250)
-memory = '8G'
+#Memory in GBs and cores used by Spark (8, 60 or 250) and ()
+memory = 8
+cores = 4
 
 #Corpus path 
 #corpusPath = '/home/psmeros/workspace/bigFiles/'
