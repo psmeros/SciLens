@@ -1,6 +1,6 @@
 #Memory in GBs - cores used by Spark and corpus path
-conf = {'memory':8, 'cores':4, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
-#conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
+#conf = {'memory':8, 'cores':4, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
+conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
 #conf = {'memory':64, 'cores':24, 'corpusPath': '/home/smeros/backup_data/'}
 #conf = {'memory':252, 'cores':48, 'corpusPath': '/root/'}
 
@@ -8,17 +8,17 @@ memory = conf['memory']
 cores = conf['cores']
 corpusPath = conf['corpusPath']
 
-#Use cached RDDs
+#Use cached files
 useCache = True
 
 #Corpus files
 webCorpusFile = corpusPath + 'webFood.tsv'
-twitterCorpusFile = corpusPath + 'twitterFood.tsv'
+twitterCorpusFile = corpusPath + 'twitterFoodSampleSample.tsv'
 
 #Graph files
-first_level_graph_file = corpusPath + 'first_level_graph.tsv'
-second_level_urls_file = corpusPath + 'second_level_urls.tsv'
-second_level_graph_file = corpusPath + 'second_level_graph.tsv'
+first_level_graph_file = 'cache/first_level_graph.tsv'
+second_level_urls_file = 'cache/second_level_urls.tsv'
+second_level_graph_file = 'cache/second_level_graph.tsv'
 
 #URL settings
 urlTimout = 1
@@ -56,18 +56,25 @@ import shutil
 import builtins
 from time import time
 from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from urllib.parse import urlsplit
+
 import numpy as np
 import pandas as pd
+import networkx as nx
+from networkx.algorithms import bipartite
+
 import spacy
 from spacy.symbols import nsubj, dobj, VERB
 from nltk.tokenize import sent_tokenize
+
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.metrics.pairwise import cosine_similarity
+
 from pyspark.sql import SparkSession
 from pyspark import SparkConf
 from pyspark.sql.types import *

@@ -28,6 +28,12 @@ def create_crawl_keywords():
         for p in actionsKeywords:
             print('"'+s, p+'"')
 
+#Write RDD to TSV file (with header)
+def rdd2tsv(rdd, file, attributes):
+    rdd.saveAsTextFile(file+'_files')
+    os.system('echo "' + '\t'.join(attributes) + '\n" > ' + file + '; cat ' + file + '_files/* >> ' + file + '; rm -r ' + file + '_files')
+
+
 #Find the domain of an http url
 def get_url_domain(url):
     domain = re.sub(r'^(http(s)?://)?(www\.)?', r'', '{0.netloc}'.format(urlsplit(url)))
