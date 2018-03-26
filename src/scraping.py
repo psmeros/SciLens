@@ -1,5 +1,4 @@
 from settings import *
-from utils import get_url_domain
 
 
 #scrap CWUR World University Rankings
@@ -32,20 +31,3 @@ def scrap_nutritionfacts():
     with open(topicsFile, 'w') as f:
     	for t in div.find_all('a', title=True):
     		f.write(t['title'] + '\n')
-
-
-#Get outgoing links from article
-def get_out_links(url, blacklist):
-	links = []
-	try:
-		soup = BeautifulSoup(urlopen(url, timeout=urlTimout), 'html.parser')
-	except:
-		return links
-
-	url = get_url_domain(url)
-	for link in soup.findAll('a'):
-	    u = get_url_domain(link.get('href') or '')
-	    if (url not in u) and (u not in url) and (u not in ['']+blacklist):
-	    	links.append(link.get('href'))
-
-	return list(set(links))

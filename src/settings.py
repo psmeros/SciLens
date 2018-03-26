@@ -1,6 +1,6 @@
 #Memory in GBs - cores used by Spark and corpus path
-#conf = {'memory':8, 'cores':4, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
-conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
+conf = {'memory':8, 'cores':4, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
+#conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
 #conf = {'memory':64, 'cores':24, 'corpusPath': '/home/smeros/backup_data/'}
 #conf = {'memory':252, 'cores':48, 'corpusPath': '/root/'}
 
@@ -13,7 +13,7 @@ useCache = True
 
 #Corpus files
 webCorpusFile = corpusPath + 'webFood.tsv'
-twitterCorpusFile = corpusPath + 'twitterFoodSampleSample.tsv'
+twitterCorpusFile = corpusPath + 'twitterFoodSample.tsv'
 
 #Graph files
 first_level_graph_file = 'cache/first_level_graph.tsv'
@@ -40,8 +40,9 @@ institutionsFile = 'auxiliary_files/institutions/metadata.tsv'
 countriesFile = 'auxiliary_files/countries/codes.csv'
 #File with academic repositories
 repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
-#blacklist URLs
-blacklistFile = 'auxiliary_files/blacklist/urls.txt'
+
+#blacklisted URLs
+blacklistURLs = ['facebook.com', 'twitter.com', 'pinterest.com', 'google.com', 'linkedin.com']
 
 #Predefined keyword lists
 authorityKeywords = ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']
