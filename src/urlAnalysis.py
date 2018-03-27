@@ -40,6 +40,14 @@ def first_level_graph():
 
     rdd2tsv(documents, first_level_graph_file, ['tweet_url','timestamp', 'popularity', 'RTs', 'user_country', 'out_url'])
 
+#Plot URL decay per year
+def plot_URL_decay():
+    df = pd.read_csv(first_level_graph_file, sep='\t')
+    df['date'] = df['timestamp'].apply(lambda s : datetime.strptime(s, '%Y-%m-%d %H:%M:%S').year)
+    df['out_url'] = df['out_url'].apply(lambda u: u if u in ['http://TweetWithoutURL.org', 'http://HTTPError.org', 'http://TimeoutError.org'] else 'http://WorkingURL.org')
+    df['Tweets with'] = df['out_url'].map(lambda n: 'HTTP error in outgoing URL' if n == 'http://HTTPError.org' else 'timeout error in outgoing URL' if n == 'http://TimeoutError.org' else 'no URL' if n == 'http://TweetWithoutURL.org' else 'working URL')
+    ax = df[['tweet_url', 'date','Tweets with']].pivot_table(index='date', columns='Tweets with',aggfunc='count').T.reset_index(level=0, drop=True).T.fillna(1).plot(logy=True, figsize=(10,10), sort_columns=True)
+
 #Get outgoing links from article
 def get_out_links(url):
     links = []
@@ -79,14 +87,13 @@ def create_graph():
 
     G = nx.from_pandas_edgelist(df, source='tweet_url', target='out_url', create_using=nx.DiGraph())
 
-    df = df.drop_duplicates('tweet_url').set_index('tweet_url')
-
     for attr in ['timestamp', 'popularity', 'RTs', 'user_country']:
         nx.set_node_attributes(G, df[attr].to_dict(), attr)
 
-    print(nx.number_connected_components(G.to_undirected()))
 
-    # print(G.in_degree('http://HTTPError.org'))
-    # for x in G.nodes(): 
-    #     if G.out_degree(x) == 0:
-    #         print(x)
+    print(nx.number_connected_components(G.to_undirected()))
+    print(G.in_degree('http://TweetWithoutURL.org'))
+    print(G.in_degree('http://HTTPError.org'))
+    for x in G.nodes(): 
+        if G.out_degree(x) == 0:
+            print(x)
