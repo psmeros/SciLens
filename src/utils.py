@@ -41,3 +41,7 @@ def analyze_url(url):
     if domain.count('.') == 2:
         domain = ('.').join(domain.split('.')[1:])
     return domain, url.path
+
+#diffusion graph filename
+def get_graph_filename(epoch):
+    return ('_epoch_'+str(epoch)+'.').join(diffusion_graph_file.split('.'))

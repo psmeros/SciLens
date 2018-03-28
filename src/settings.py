@@ -1,6 +1,6 @@
 #Memory in GBs - cores used by Spark and corpus path
-conf = {'memory':8, 'cores':4, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
-#conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
+#conf = {'memory':8, 'cores':4, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
+conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
 #conf = {'memory':64, 'cores':24, 'corpusPath': '/home/smeros/backup_data/'}
 #conf = {'memory':252, 'cores':48, 'corpusPath': '/root/'}
 
@@ -16,9 +16,9 @@ webCorpusFile = corpusPath + 'webFood.tsv'
 twitterCorpusFile = corpusPath + 'twitterFoodSample.tsv'
 
 #Graph files
-first_level_graph_file = 'cache/first_level_graph.tsv'
-second_level_urls_file = 'cache/second_level_urls.tsv'
-second_level_graph_file = 'cache/second_level_graph.tsv'
+diffusion_graph_file = 'cache/diffusion_graph.tsv'
+#second_level_urls_file = 'cache/second_level_urls.tsv'
+#second_level_graph_file = 'cache/second_level_graph.tsv'
 
 #URL settings
 urlTimout = 1
@@ -42,7 +42,7 @@ countriesFile = 'auxiliary_files/countries/codes.csv'
 repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
 
 #blacklisted URLs
-blacklistURLs = ['facebook.com', 'twitter.com', 'pinterest.com', 'google.com', 'linkedin.com']
+blacklistURLs = ['facebook.com', 'twitter.com', 'pinterest.com', 'google.com', 'linkedin.com', 'vimeo.com', 'youtube.com', 'linkis.com']
 
 #Predefined keyword lists
 authorityKeywords = ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']
