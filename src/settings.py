@@ -45,9 +45,9 @@ repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
 blacklistURLs = ['facebook.com', 'twitter.com', 'pinterest.com', 'google.com', 'linkedin.com']
 
 #Predefined keyword lists
-authorityKeywords = ['expert', 'scientist', 'researcher', 'professor', 'author', 'paper', 'report', 'study', 'analysis', 'research', 'survey', 'release']
-empiricalKeywords = ['study', 'people']
-actionsKeywords = ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think']
+personKeywords = ['expert', 'specialist', 'doctor', 'guru', 'professional', 'professor', 'principal', 'chief', 'dean', 'director', 'head', 'leader', 'boss', 'supervisor', 'scientist', 'analyst', 'researcher', 'investigator', 'author']
+studyKeywords = ['study', 'examination', 'inspection', 'investigation', 'test', 'experiment', 'evaluation', 'paper', 'article', 'report', 'analysis', 'research', 'survey', 'release', 'publication', 'journal', 'review', 'finding', 'discovery', 'result']
+actionsKeywords = ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think', 'find']
 
 #Imports
 import os

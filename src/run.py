@@ -2,6 +2,7 @@ from urlAnalysis import first_level_graph, second_level_graph, create_graph
 from quoteAnalysis import extractQuotes
 from topicAnalysis import discoverTopics
 from preparePlots import *
+from utils import create_crawl_keywords
 
 
 t0 = time()
@@ -18,8 +19,8 @@ t0 = time()
 
 #second_level_graph()
 
-create_graph()
-
+#create_graph()
+create_crawl_keywords()
 
 
 print("Total time: %0.3fs." % (time() - t0))

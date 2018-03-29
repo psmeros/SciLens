@@ -24,9 +24,9 @@ def human_format(num):
 
 #SEMPI keywords
 def create_crawl_keywords():
-    for s in authorityKeywords + empiricalKeywords:
-        for p in actionsKeywords:
-            print('"'+s, p+'"')
+    for s in sorted(personKeywords + studyKeywords):
+        for p in sorted(actionsKeywords):
+            print(s, p)
 
 #Write RDD to TSV file (with header)
 def rdd2tsv(rdd, file, attributes):
