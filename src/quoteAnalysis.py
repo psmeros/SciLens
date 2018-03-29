@@ -148,10 +148,10 @@ def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEnti
     except:    
         return (q, qtype, qaff)
     
-    if noun in authorityKeywords:
-        q = qtype = qaff = 'authority'
-    elif noun in empiricalKeywords:
-        q = qtype = qaff = 'empirical observation'
+    if noun in personKeywords:
+        q = qtype = qaff = 'unnamed person'
+    elif noun in studyKeywords:
+        q = qtype = qaff = 'unnamed study'
     return (q, qtype, qaff)
 
 #Resolve cases where PERSON is referred to with his/her first or last name       
