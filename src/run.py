@@ -1,4 +1,4 @@
-from urlAnalysis import first_level_graph, second_level_graph, create_graph
+from urlAnalysis import create_graph
 from quoteAnalysis import extractQuotes
 from topicAnalysis import discoverTopics
 from preparePlots import *
@@ -14,10 +14,6 @@ t0 = time()
 #plotQuotesAndTopicsDF(quotes, topics)
 #plotHeatMapDF(topics)
 #plotTopQuoteesDF(quotes, topics)
-
-#first_level_graph()
-
-#second_level_graph()
 
 #create_graph()
 create_crawl_keywords()
