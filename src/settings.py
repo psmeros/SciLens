@@ -42,12 +42,12 @@ countriesFile = 'auxiliary_files/countries/codes.csv'
 repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
 
 #blacklisted URLs
-blacklistURLs = ['facebook.com', 'twitter.com', 'pinterest.com', 'google.com', 'linkedin.com', 'vimeo.com', 'youtube.com', 'linkis.com']
+blacklistURLs = open('auxiliary_files/blacklist/urls.txt').read().splitlines()
 
 #Predefined keyword lists
-personKeywords = ['expert', 'specialist', 'doctor', 'guru', 'professional', 'professor', 'principal', 'chief', 'dean', 'director', 'head', 'leader', 'boss', 'supervisor', 'scientist', 'analyst', 'researcher', 'investigator', 'author']
-studyKeywords = ['study', 'examination', 'inspection', 'investigation', 'test', 'experiment', 'evaluation', 'paper', 'article', 'report', 'analysis', 'research', 'survey', 'release', 'publication', 'journal', 'review', 'finding', 'discovery', 'result']
-actionsKeywords = ['prove', 'demonstrate', 'reveal', 'state', 'mention', 'report', 'say', 'show', 'announce', 'claim', 'suggest', 'argue', 'predict', 'believe', 'think', 'find']
+personKeywords = open('auxiliary_files/keywords/person.txt').read().splitlines()
+studyKeywords = open('auxiliary_files/keywords/study.txt').read().splitlines()
+actionsKeywords = open('auxiliary_files/keywords/action.txt').read().splitlines()
 
 #Imports
 import os
