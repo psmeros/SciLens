@@ -8,7 +8,8 @@ repositories['URL'] = repositories['URL'].apply(lambda u: re.sub(r'^http://(www\
 blacklistURLs = open(blacklistURLsFile).read().splitlines()
 
 url = 'http://sci-lens.github.io'
-graph_nodes = {'tweetWithoutURL':url+'#tweetWithoutURL', 'HTTPError':url+'#HTTPError', 'TimeoutError':url+'#TimeoutError', 'TimeoutError':url+'#TimeoutError'}
+graph_nodes = {'tweetWithoutURL':url+'#tweetWithoutURL', 'HTTPError':url+'#HTTPError', 'TimeoutError':url+'#TimeoutError', 'institution':url+'#institution', 'repository':url+'#repository', 'source':url+'#source'}
+sources = institutions['URL'].tolist() + repositories['URL'].tolist()
 
 #Resolve url
 def resolveURL(url):
@@ -60,17 +61,23 @@ def plot_URL_decay():
 
 #Get outgoing links from article
 def get_out_links(url):
-    links = []
-    # try:
-    #     soup = BeautifulSoup(urlopen(url, timeout=urlTimout), 'html.parser')
-    # except:
-    #     return links
+    
+    domain, _ = analyze_url(url)
 
-    # url = get_url_domain(url)
-    # for link in soup.findAll('a'):
-    #     u = get_url_domain(link.get('href') or '')
-    #     if (url not in u) and (u not in url) and (u not in ['']+blacklistURLs):
-    #         links.append(link.get('href'))
+    for s in sources:
+        if s == domain or s in domain or domain in s:
+            return [s]
+    try:
+        soup = BeautifulSoup(urlopen(url, timeout=urlTimout), 'html.parser')
+    except:
+        return []
+
+    links = []
+    for link in soup.findAll('a'):
+        link = link.get('href')
+        link_domain, link_path = analyze_url(link or '')
+        if domain not in link_domain and link_domain not in domain and link_domain not in ['']+blacklistURLs and link_path not in ['', '/']:
+            links.append(link)
 
     return list(set(links))
 
@@ -103,6 +110,16 @@ def create_graph():
 
     epochs = 1
     G=nx.DiGraph()
+
+    for v in institutions['URL'].tolist():
+        G.add_edge(v, graph_nodes['institution'])
+
+    for v in repositories['URL'].tolist():
+        G.add_edge(v, graph_nodes['repository'])
+
+    G.add_edge(graph_nodes['institution'], graph_nodes['source'])
+    G.add_edge(graph_nodes['repository'], graph_nodes['source'])
+
     for epoch in range(0, epochs):
 
         df = pd.read_csv(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', sep='\t').dropna()
@@ -116,5 +133,6 @@ def create_graph():
         print('Frontier Size:', len(frontier))
     
 
-    print(G.in_degree(graph_nodes['tweetWithoutURL']))
-    print(G.in_degree(graph_nodes['HTTPError']))
+    #print(G.in_degree(graph_nodes['tweetWithoutURL']))
+    print(G.in_degree(graph_nodes['institution']))
+    print(G.out_degree(graph_nodes['institution']))
