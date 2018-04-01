@@ -3,13 +3,13 @@ from settings import *
 #Spark setup
 def initSpark():
     global spark
-    conf = SparkConf()
-    conf.setAppName('quoteAnalysis')
-    conf.setMaster('local['+str(cores)+']')
-    conf.set('spark.executor.memory', str(int(memory/cores))+'G')
-    conf.set('spark.driver.memory', str(int(memory/cores))+'G')
-    conf.set('spark.hadoop.validateOutputSpecs', 'false')
-    spark = SparkSession.builder.config(conf=conf).getOrCreate()
+    spark_conf = SparkConf()
+    spark_conf.setAppName('quoteAnalysis')
+    spark_conf.setMaster('local['+str(conf['cores'])+']')
+    spark_conf.set('spark.executor.memory', str(int(conf['memory']/conf['cores']))+'G')
+    spark_conf.set('spark.driver.memory', str(int(conf['memory']/conf['cores']))+'G')
+    spark_conf.set('spark.hadoop.validateOutputSpecs', 'false')
+    spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
     spark.sparkContext.setLogLevel('ERROR')
     return spark
 
@@ -24,6 +24,9 @@ def human_format(num):
 
 #SEMPI keywords
 def create_crawl_keywords():
+    personKeywords = open(personKeywordsFile).read().splitlines()
+    studyKeywords = open(studyKeywordsFile).read().splitlines()
+    actionsKeywords = open(actionsKeywordsFile).read().splitlines()
     for s in sorted(personKeywords + studyKeywords):
         for p in sorted(actionsKeywords):
             print(s, p)
@@ -41,7 +44,3 @@ def analyze_url(url):
     if domain.count('.') == 2:
         domain = ('.').join(domain.split('.')[1:])
     return domain, url.path
-
-#diffusion graph filename
-def get_graph_filename(epoch):
-    return ('_epoch_'+str(epoch)+'.').join(diffusion_graph_file.split('.'))

@@ -47,7 +47,7 @@ figure
 find
 fix
 forecast
-forsee
+foresee
 identify
 illustrate
 indicate
