@@ -41,6 +41,4 @@ def rdd2tsv(rdd, file, attributes):
 def analyze_url(url):
     url=urlsplit(url)
     domain = re.sub(r'^(http(s)?://)?(www\.)?', r'', url.netloc)
-    if domain.count('.') == 2:
-        domain = ('.').join(domain.split('.')[1:])
     return domain, url.path
