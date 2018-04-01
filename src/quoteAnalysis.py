@@ -2,6 +2,9 @@ from settings import *
 from utils import initSpark
 
 nlp = spacy.load('en')
+personKeywords = open(personKeywordsFile).read().splitlines()
+studyKeywords = open(studyKeywordsFile).read().splitlines()
+actionsKeywords = open(actionsKeywordsFile).read().splitlines()
 
 #Exract quotes from articles
 def extractQuotes():

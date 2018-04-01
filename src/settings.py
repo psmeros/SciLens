@@ -4,25 +4,18 @@ conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
 #conf = {'memory':64, 'cores':24, 'corpusPath': '/home/smeros/backup_data/'}
 #conf = {'memory':252, 'cores':48, 'corpusPath': '/root/'}
 
-memory = conf['memory']
-cores = conf['cores']
-corpusPath = conf['corpusPath']
-
 #Use cached files
 useCache = True
 
 #Corpus files
-webCorpusFile = corpusPath + 'webFood.tsv'
-twitterCorpusFile = corpusPath + 'twitterFoodSample.tsv'
+webCorpusFile = conf['corpusPath'] + 'webFood.tsv'
+twitterCorpusFile = conf['corpusPath'] + 'twitterFoodSample.tsv'
 
 #Graph files
-diffusion_graph_file = 'cache/diffusion_graph.tsv'
-#second_level_urls_file = 'cache/second_level_urls.tsv'
-#second_level_graph_file = 'cache/second_level_graph.tsv'
+diffusion_graph_dir = 'cache/diffusion_graph/'
 
-#URL settings
+#URL redirection settings
 urlTimout = 1
-urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
 #Topic Discovery parameters
 numOfTopics = 32
@@ -40,14 +33,12 @@ institutionsFile = 'auxiliary_files/institutions/metadata.tsv'
 countriesFile = 'auxiliary_files/countries/codes.csv'
 #File with academic repositories
 repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
-
 #blacklisted URLs
-blacklistURLs = open('auxiliary_files/blacklist/urls.txt').read().splitlines()
-
+blacklistURLsFile = 'auxiliary_files/blacklist/urls.txt'
 #Predefined keyword lists
-personKeywords = open('auxiliary_files/keywords/person.txt').read().splitlines()
-studyKeywords = open('auxiliary_files/keywords/study.txt').read().splitlines()
-actionsKeywords = open('auxiliary_files/keywords/action.txt').read().splitlines()
+personKeywordsFile = 'auxiliary_files/keywords/person.txt'
+studyKeywordsFile = 'auxiliary_files/keywords/study.txt'
+actionsKeywordsFile = 'auxiliary_files/keywords/action.txt'
 
 #Imports
 import os
@@ -78,12 +69,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from pyspark.sql import SparkSession
 from pyspark import SparkConf
-from pyspark.sql.types import *
-from pyspark.sql.functions import *
 from pyspark.sql import Row
 
-#Cache directory
+#Cache directories
 os.makedirs('cache', exist_ok=True)
+os.makedirs(diffusion_graph_dir, exist_ok=True)
 
 #Pandas settings
 pd.set_option('display.max_colwidth', -1)

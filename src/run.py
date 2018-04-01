@@ -15,8 +15,8 @@ t0 = time()
 #plotHeatMapDF(topics)
 #plotTopQuoteesDF(quotes, topics)
 
-#create_graph()
-create_crawl_keywords()
+create_graph()
+#create_crawl_keywords()
 
 
 print("Total time: %0.3fs." % (time() - t0))
