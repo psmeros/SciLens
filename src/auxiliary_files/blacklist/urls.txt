@@ -6,3 +6,11 @@ pinterest.com
 twitter.com
 vimeo.com
 youtube.com
+plus.google.com
+instagram.com
+apple.com
+itunes.apple.com
+reddit.com
+weibo.com
+snapchat.com
+amazon.com

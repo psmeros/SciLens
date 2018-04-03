@@ -1,3 +1,6 @@
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+
 from settings import *
 from utils import initSpark
 

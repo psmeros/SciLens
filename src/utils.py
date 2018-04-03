@@ -1,3 +1,6 @@
+from pyspark.sql import SparkSession
+from pyspark import SparkConf
+
 from settings import *
 
 #Spark setup
@@ -41,4 +44,17 @@ def rdd2tsv(rdd, file, attributes):
 def analyze_url(url):
     url=urlsplit(url)
     domain = re.sub(r'^(http(s)?://)?(www\.)?', r'', url.netloc)
-    return domain, url.path
+    path = '' if domain == '' else url.path
+
+    return domain, path
+
+#Compare two domains
+def same_domains(domain_1, domain_2):
+    if domain_1.count('.') == 2:
+        domain_1 = ('.').join(domain_1.split('.')[1:])
+    if domain_2.count('.') == 2:
+        domain_2 = ('.').join(domain_2.split('.')[1:])
+    
+    if domain_1 in domain_2 or domain_2 in domain_1:
+        return True
+    return False
