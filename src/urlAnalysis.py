@@ -1,5 +1,8 @@
+from pyspark.sql import Row
+
 from settings import *
-from utils import initSpark, rdd2tsv, analyze_url
+from utils import initSpark, rdd2tsv, analyze_url, same_domains
+
 
 institutions = pd.read_csv(institutionsFile, sep='\t')
 institutions['URL'] = institutions['URL'].apply(lambda u: re.sub(r'^(www[0-9]?\.)|(web\.)', r'', u))
@@ -7,8 +10,8 @@ repositories = pd.read_csv(repositoriesFile)
 repositories['URL'] = repositories['URL'].apply(lambda u: re.sub(r'^http://(www\.)?', r'', u))
 blacklistURLs = open(blacklistURLsFile).read().splitlines()
 
-url = 'http://sci-lens.github.io'
-graph_nodes = {'tweetWithoutURL':url+'#tweetWithoutURL', 'HTTPError':url+'#HTTPError', 'TimeoutError':url+'#TimeoutError', 'institution':url+'#institution', 'repository':url+'#repository', 'source':url+'#source'}
+project_url = 'http://sci-lens.github.io'
+graph_nodes = {'tweetWithoutURL':project_url+'#tweetWithoutURL', 'HTTPError':project_url+'#HTTPError', 'TimeoutError':project_url+'#TimeoutError', 'institution':project_url+'#institution', 'repository':project_url+'#repository', 'source':project_url+'#source'}
 sources = institutions['URL'].tolist() + repositories['URL'].tolist()
 
 #Resolve url
@@ -19,7 +22,7 @@ def resolveURL(url):
     try:
         #Follow the redirections of a URL
         r = requests.head(url, allow_redirects='HEAD', timeout=urlTimout)
-        if r.status_code != 403:
+        if r.status_code != 403:            
             r.raise_for_status()
 
         #Avoid blacklisted and flat URLs
@@ -62,21 +65,37 @@ def plot_URL_decay():
 #Get outgoing links from article
 def get_out_links(url):
     
-    domain, _ = analyze_url(url)
+    #custom urls for special nodes
+    if url.startswith(project_url):
+        return []
 
+    domain, path = analyze_url(url)
+
+    #predefined sources
     for s in sources:
-        if s == domain or s in domain or domain in s:
+        if s == domain or s in domain:
             return [s]
+
+
+    #other sources
+    if any(suffix in domain for suffix in ['.edu', '.ac.uk', '.gov']):
+        if path in ['', '/']:
+            return[graph_nodes['repository']]
+        else:
+            return[domain]
+
     try:
-        soup = BeautifulSoup(urlopen(url, timeout=urlTimout), 'html.parser')
+        headers = {"User-Agent":"Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"}
+        r = requests.get(url, allow_redirects='HEAD', timeout=urlTimout, headers=headers)
+        soup = BeautifulSoup(r.content, 'html.parser')
     except:
         return []
 
     links = []
     for link in soup.findAll('a'):
-        link = link.get('href')
-        link_domain, link_path = analyze_url(link or '')
-        if domain not in link_domain and link_domain not in domain and link_domain not in ['']+blacklistURLs and link_path not in ['', '/']:
+        link = link.get('href') or ''
+        link_domain, link_path = analyze_url(link)
+        if not same_domains(domain, link_domain) and link_domain not in blacklistURLs and link_path not in ['', '/']:
             links.append(link)
 
     return list(set(links))
@@ -108,7 +127,6 @@ def create_graph():
     tweets.loc[tweets['Country'] == 'United States', 'Country'] = 'USA'
     print('Initial Tweets:', len(tweets))
 
-    epochs = 1
     G=nx.DiGraph()
 
     for v in institutions['URL'].tolist():
@@ -120,7 +138,7 @@ def create_graph():
     G.add_edge(graph_nodes['institution'], graph_nodes['source'])
     G.add_edge(graph_nodes['repository'], graph_nodes['source'])
 
-    for epoch in range(0, epochs):
+    for epoch in range(0, graph_epochs):
 
         df = pd.read_csv(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', sep='\t').dropna()
         G =  nx.compose(G, nx.from_pandas_edgelist(df, source='source_url', target='target_url', create_using=nx.DiGraph()))

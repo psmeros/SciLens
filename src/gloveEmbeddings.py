@@ -1,4 +1,9 @@
+import spacy
+from sklearn.metrics.pairwise import cosine_similarity
+
 from settings import *
+
+nlp = spacy.load('en')
 
 #GloVe Embeddings file
 gloveFile = None

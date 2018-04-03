@@ -1,3 +1,9 @@
+import spacy
+from spacy.symbols import nsubj, dobj, VERB
+from nltk.tokenize import sent_tokenize
+
+from pyspark.sql import Row
+
 from settings import *
 from utils import initSpark
 

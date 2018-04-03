@@ -17,6 +17,9 @@ diffusion_graph_dir = 'cache/diffusion_graph/'
 #URL redirection settings
 urlTimout = 1
 
+#Epochs in graph construction
+graph_epochs = 2
+
 #Topic Discovery parameters
 numOfTopics = 32
 topicTopfeatures = 1
@@ -57,19 +60,7 @@ from urllib.parse import urlsplit
 import numpy as np
 import pandas as pd
 import networkx as nx
-from networkx.algorithms import bipartite
-
-import spacy
-from spacy.symbols import nsubj, dobj, VERB
-from nltk.tokenize import sent_tokenize
-
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.metrics.pairwise import cosine_similarity
-
-from pyspark.sql import SparkSession
-from pyspark import SparkConf
-from pyspark.sql import Row
+#from networkx.algorithms import bipartite
 
 #Cache directories
 os.makedirs('cache', exist_ok=True)
