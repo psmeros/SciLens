@@ -17,8 +17,8 @@ diffusion_graph_dir = 'cache/diffusion_graph/'
 #URL redirection settings
 urlTimout = 1
 
-#Epochs in graph construction
-graph_epochs = 2
+#Components ratio for graph construction
+components_ratio = 0.1
 
 #Topic Discovery parameters
 numOfTopics = 32

@@ -1,5 +1,5 @@
 from pyspark.sql import Row
-
+import random
 from settings import *
 from utils import initSpark, rdd2tsv, analyze_url, same_domains
 
@@ -10,7 +10,7 @@ repositories = pd.read_csv(repositoriesFile)
 repositories['URL'] = repositories['URL'].apply(lambda u: re.sub(r'^http://(www\.)?', r'', u))
 blacklistURLs = open(blacklistURLsFile).read().splitlines()
 
-project_url = 'http://sci-lens.github.io'
+project_url = 'http://sci-lens.org'
 graph_nodes = {'tweetWithoutURL':project_url+'#tweetWithoutURL', 'HTTPError':project_url+'#HTTPError', 'TimeoutError':project_url+'#TimeoutError', 'institution':project_url+'#institution', 'repository':project_url+'#repository', 'source':project_url+'#source'}
 sources = institutions['URL'].tolist() + repositories['URL'].tolist()
 
@@ -60,7 +60,7 @@ def plot_URL_decay():
     df['date'] = df['timestamp'].apply(lambda s : datetime.strptime(s, '%Y-%m-%d %H:%M:%S').year)
     df['target_url'] = df['target_url'].apply(lambda u: u if u in [graph_nodes['tweetWithoutURL'], graph_nodes['HTTPError'], graph_nodes['TimeoutError']] else 'working URL')
     df['Tweets with'] = df['target_url'].map(lambda n: 'HTTP error in outgoing URL' if n == graph_nodes['HTTPError'] else 'timeout error in outgoing URL' if n == graph_nodes['TimeoutError'] else 'no URL' if n == graph_nodes['tweetWithoutURL'] else 'working URL')
-    ax = df[['source_url', 'date','Tweets with']].pivot_table(index='date', columns='Tweets with',aggfunc='count').T.reset_index(level=0, drop=True).T.fillna(1).plot(logy=True, figsize=(10,10), sort_columns=True)
+    df[['source_url', 'date','Tweets with']].pivot_table(index='date', columns='Tweets with',aggfunc='count').T.reset_index(level=0, drop=True).T.fillna(1).plot(logy=True, figsize=(10,10), sort_columns=True)
 
 #Get outgoing links from article
 def get_out_links(url):
@@ -73,7 +73,7 @@ def get_out_links(url):
 
     #predefined sources
     for s in sources:
-        if s == domain or s in domain:
+        if s in domain:
             return [s]
 
 
@@ -91,14 +91,28 @@ def get_out_links(url):
     except:
         return []
 
+    #get all links except for self and blacklisted links
     links = []
+    source_links = []
     for link in soup.findAll('a'):
         link = link.get('href') or ''
         link_domain, link_path = analyze_url(link)
         if not same_domains(domain, link_domain) and link_domain not in blacklistURLs and link_path not in ['', '/']:
             links.append(link)
+            for s in sources:
+                if s in link_domain:
+                    source_links.append(link)
 
-    return list(set(links))
+    #if there are links to the predefined sources, return only them
+    if source_links:
+        return list(set(source_links))    
+
+    #otherwise return with probability 1/k the k outgoing links
+    pruned_links = []
+    for link in links:
+        if random.random() < 1/len(links):
+            pruned_links.append(link)
+    return list(set(pruned_links))
 
 #Create the nth level of the diffusion graph
 def graph_epoch_n(frontier, file):
@@ -117,16 +131,7 @@ def graph_epoch_n(frontier, file):
 #Create diffusion graph
 def create_graph():
 
-    if not useCache or not os.path.exists(diffusion_graph_dir+'epoch_0.tsv'):
-        graph_epoch_0()
-
-    df = pd.read_csv(diffusion_graph_dir+'epoch_0.tsv', sep='\t').dropna()    
-    tweets = df.copy().drop('target_url', axis=1).drop_duplicates('source_url')
-    #beutify country names
-    tweets = tweets.merge(pd.read_csv(countriesFile).rename(columns={'Name':'Country'}), left_on='user_country', right_on='Code').drop(['user_country', 'Code'], axis=1).set_index('source_url')
-    tweets.loc[tweets['Country'] == 'United States', 'Country'] = 'USA'
-    print('Initial Tweets:', len(tweets))
-
+    #initialize graph
     G=nx.DiGraph()
 
     for v in institutions['URL'].tolist():
@@ -138,19 +143,32 @@ def create_graph():
     G.add_edge(graph_nodes['institution'], graph_nodes['source'])
     G.add_edge(graph_nodes['repository'], graph_nodes['source'])
 
-    for epoch in range(0, graph_epochs):
+    epoch = 0
+    frontier = []
+    connected_components = 0
+    while True:
+
+        if not useCache or not os.path.exists(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv'):
+            if(epoch == 0):
+                graph_epoch_0()
+            else:
+                graph_epoch_n(frontier, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv')
 
         df = pd.read_csv(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', sep='\t').dropna()
         G =  nx.compose(G, nx.from_pandas_edgelist(df, source='source_url', target='target_url', create_using=nx.DiGraph()))
         frontier = [x for x in G.nodes() if G.out_degree(x) == 0]
 
-        if not useCache or not os.path.exists(diffusion_graph_dir+'epoch_'+str(epoch+1)+'.tsv'):
-            graph_epoch_n(frontier, diffusion_graph_dir+'epoch_'+str(epoch+1)+'.tsv')
-
+        print('Epoch:', epoch)
         print('Connected Components:', nx.number_connected_components(G.to_undirected()))
         print('Frontier Size:', len(frontier))
+
+        #finish condition
+        if epoch != 0 and (connected_components - nx.number_connected_components(G.to_undirected())) / connected_components < components_ratio:
+            break
+        connected_components = nx.number_connected_components(G.to_undirected())
+        epoch +=1
     
 
     #print(G.in_degree(graph_nodes['tweetWithoutURL']))
-    print(G.in_degree(graph_nodes['institution']))
+    print(G.in_degree('nih.gov'))
     print(G.out_degree(graph_nodes['institution']))

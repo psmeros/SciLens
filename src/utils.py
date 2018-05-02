@@ -58,3 +58,32 @@ def same_domains(domain_1, domain_2):
     if domain_1 in domain_2 or domain_2 in domain_1:
         return True
     return False
+
+#Plot helpers (not working)
+def plot_helper():
+    df = pd.read_csv(diffusion_graph_dir+'epoch_0.tsv', sep='\t').dropna()    
+    tweets = df.copy().drop('target_url', axis=1).drop_duplicates('source_url')
+    #beutify country names
+    tweets = tweets.merge(pd.read_csv(countriesFile).rename(columns={'Name':'Country'}), left_on='user_country', right_on='Code').drop(['user_country', 'Code'], axis=1).set_index('source_url')
+    tweets.loc[tweets['Country'] == 'United States', 'Country'] = 'USA'
+    print('Initial Tweets:', len(tweets))
+
+    #Popularity
+    inst.groupby('Institution').mean()['popularity'].sort_values(ascending=False)[:20]
+    repos.groupby('Field').size().sort_values(ascending=False)
+    inst.groupby('Institution').mean().plot.scatter(x='Score', y='popularity')
+    corr = inst.groupby('Institution').mean()[['popularity', 'World Rank', 'National Rank', 'Alumni Employment', 'Publications', 'Influence', 'Citations', 'Broad Impact', 'Patents', 'Score']].corr()
+    #sns.heatmap(corr, xticklabels=corr.columns.values, yticklabels=corr.columns.values)
+    corr.iloc[0]
+
+    #bipartite graph
+    countries['Name'] = countries['Name'].map(lambda n: n+'_user')
+    countries['Location'] = countries['Location'].map(lambda n: n+'_inst')
+    B = nx.Graph()
+    B.add_edges_from([(row['Name'], row['Location']) for _, row in countries.iterrows()])
+    plt.figure(figsize=(10,10))
+    X, Y = bipartite.sets(B)
+    pos = dict()
+    pos.update( (n, (1, i)) for i, n in enumerate(X) ) # put nodes from X at x=1
+    pos.update( (n, (2, i*4)) for i, n in enumerate(Y) ) # put nodes from Y at x=2
+    nx.draw(B, pos=pos, with_labels = True)
