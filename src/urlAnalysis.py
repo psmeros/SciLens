@@ -39,36 +39,12 @@ def resolveURL(url):
     except:
         return graph_nodes['TimeoutError']
 
-#Create the first level of the diffusion graph from tweets
-def graph_epoch_0():
-
-    urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
-    spark = initSpark()
-
-    documents = spark.sparkContext.textFile(twitterCorpusFile, minPartitions=(conf['cores']-1)) 
-
-    documents = documents.map(lambda r: (lambda l=r.split('\t'): Row(source_url=l[0], tweet=l[1], timestamp=datetime.strptime(l[2], '%Y-%m-%d %H:%M:%S'), popularity=int(l[3]), RTs=int(l[4]), user_country=l[5]))())
-
-    documents = documents.flatMap(lambda r: [Row(source_url=r.source_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, user_country=r.user_country, target_url=resolveURL(u)) for u in re.findall(urlRegex, r.tweet) or ['']])
-
-    documents = documents.map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.timestamp, r.popularity, r.RTs, r.user_country, r.target_url]))
-
-    rdd2tsv(documents, diffusion_graph_dir+'epoch_0.tsv', ['source_url','timestamp', 'popularity', 'RTs', 'user_country', 'target_url'])
-
-#Plot URL decay per year
-def plot_URL_decay():
-    df = pd.read_csv(diffusion_graph_dir+'epoch_0.tsv', sep='\t')
-    df['date'] = df['timestamp'].apply(lambda s : datetime.strptime(s, '%Y-%m-%d %H:%M:%S').year)
-    df['target_url'] = df['target_url'].apply(lambda u: u if u in [graph_nodes['tweetWithoutURL'], graph_nodes['HTTPError'], graph_nodes['TimeoutError']] else 'working URL')
-    df['Tweets with'] = df['target_url'].map(lambda n: 'HTTP error in outgoing URL' if n == graph_nodes['HTTPError'] else 'timeout error in outgoing URL' if n == graph_nodes['TimeoutError'] else 'no URL' if n == graph_nodes['tweetWithoutURL'] else 'working URL')
-    df[['source_url', 'date','Tweets with']].pivot_table(index='date', columns='Tweets with',aggfunc='count').T.reset_index(level=0, drop=True).T.fillna(1).plot(logy=True, figsize=(10,10), sort_columns=True)
-
 #Get outgoing links from article
-def get_out_links(url, epoch_decay):
+def get_out_links(url, epoch_decay, last_pass):
     
     #custom urls for special nodes
     if url.startswith(project_url):
-        return []
+        return ['']
 
     domain, path = analyze_url(url)
 
@@ -77,7 +53,6 @@ def get_out_links(url, epoch_decay):
         if s in domain:
             return [s]
 
-
     #other sources
     if any(suffix in domain for suffix in ['.edu', '.ac.uk', '.gov']):
         if path in ['', '/']:
@@ -85,12 +60,16 @@ def get_out_links(url, epoch_decay):
         else:
             return[domain]
 
+    #Do not expand links over the last pass
+    if last_pass:
+        return ['']
+
     try:
         headers = {"User-Agent":"Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"}
         r = requests.get(url, allow_redirects='HEAD', timeout=urlTimout, headers=headers)
         soup = BeautifulSoup(r.content, 'html.parser')
     except:
-        return []
+        return ['']
 
     #get all links except for self and blacklisted links
     links = []
@@ -118,17 +97,22 @@ def get_out_links(url, epoch_decay):
     return list(set(pruned_links))
 
 #Create the nth level of the diffusion graph
-def graph_epoch_n(frontier, epoch):
+def graph_epoch_n(frontier, epoch, last_pass):
 
     spark = initSpark()
-    
-    documents = spark.sparkContext.parallelize(frontier, numSlices=(conf['cores']-1))
 
-    documents = documents.flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch)) or ['']])
-
-    documents = documents.map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.target_url]))
-    
-    rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url', 'target_url'])
+    if epoch == 0:
+        urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+        documents = spark.sparkContext.textFile(twitterCorpusFile, minPartitions=(conf['cores']-1)) 
+        documents = documents.map(lambda r: (lambda l=r.split('\t'): Row(source_url=l[0], tweet=l[1], timestamp=datetime.strptime(l[2], '%Y-%m-%d %H:%M:%S'), popularity=int(l[3]), RTs=int(l[4]), user_country=l[5]))())
+        documents = documents.flatMap(lambda r: [Row(source_url=r.source_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, user_country=r.user_country, target_url=resolveURL(u)) for u in re.findall(urlRegex, r.tweet) or ['']])
+        documents = documents.map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.timestamp, r.popularity, r.RTs, r.user_country, r.target_url]))
+        rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url','timestamp', 'popularity', 'RTs', 'user_country', 'target_url'])
+    else:
+        documents = spark.sparkContext.parallelize(frontier, numSlices=(conf['cores']-1))
+        documents = documents.flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch), last_pass=last_pass) or ['']])
+        documents = documents.map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.target_url]))
+        rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url', 'target_url'])
 
 
 #Create diffusion graph
@@ -149,13 +133,12 @@ def create_graph():
     epoch = 0
     frontier = []
     connected_components = 0
+    last_pass = False
     while True:
 
+        #Expand graph
         if not useCache or not os.path.exists(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv'):
-            if(epoch == 0):
-                graph_epoch_0()
-            else:
-                graph_epoch_n(frontier, epoch)
+            graph_epoch_n(frontier, epoch, last_pass)
 
         df = pd.read_csv(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', sep='\t').dropna()
         G =  nx.compose(G, nx.from_pandas_edgelist(df, source='source_url', target='target_url', create_using=nx.DiGraph()))
@@ -165,9 +148,13 @@ def create_graph():
         print('Connected Components:', nx.number_connected_components(G.to_undirected()))
         print('Frontier Size:', len(frontier))
 
-        #finish condition
-        if epoch != 0 and (connected_components - nx.number_connected_components(G.to_undirected())) / connected_components < components_ratio:
+        
+        if last_pass:
             break
+        
+        #last pass condition
+        if epoch != 0 and (connected_components - nx.number_connected_components(G.to_undirected())) / connected_components < components_ratio:
+            last_pass = True
         connected_components = nx.number_connected_components(G.to_undirected())
         epoch +=1
     
@@ -175,3 +162,6 @@ def create_graph():
     #print(G.in_degree(graph_nodes['tweetWithoutURL']))
     print(G.in_degree('nih.gov'))
     print(G.out_degree(graph_nodes['institution']))
+
+    G = sorted(G.in_degree, key=lambda x: x[1], reverse=True)    
+    print(G[:20])
