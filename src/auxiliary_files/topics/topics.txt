@@ -10,7 +10,8 @@ acesulfame K
 acetaldehyde
 acetaminophen
 acetate
-acid/base balance
+acid balance
+base balance
 acne
 acromegaly
 acrylamide
@@ -582,7 +583,8 @@ high fructose corn syrup
 hijiki
 hirsutism
 histones
-HIV/AIDS
+HIV
+AIDS
 hives
 holy basil tea
 homeopathy

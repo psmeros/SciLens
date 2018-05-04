@@ -42,11 +42,14 @@ def rdd2tsv(rdd, file, attributes):
 
 #Find the domain and the path of an http url
 def analyze_url(url):
-    url=urlsplit(url)
-    domain = re.sub(r'^(http(s)?://)?(www\.)?', r'', url.netloc)
-    path = '' if domain == '' else url.path
+    try:
+        url=urlsplit(url)
+        domain = re.sub(r'^(http(s)?://)?(www\.)?', r'', url.netloc)
+        path = '' if domain == '' else url.path
 
-    return domain, path
+        return domain, path
+    except:
+        return url, ''
 
 #Compare two domains
 def same_domains(domain_1, domain_2):
@@ -87,3 +90,11 @@ def plot_helper():
     pos.update( (n, (1, i)) for i, n in enumerate(X) ) # put nodes from X at x=1
     pos.update( (n, (2, i*4)) for i, n in enumerate(Y) ) # put nodes from Y at x=2
     nx.draw(B, pos=pos, with_labels = True)
+
+#Plot URL decay per year
+def plot_URL_decay():
+    df = pd.read_csv(diffusion_graph_dir+'epoch_0.tsv', sep='\t')
+    df['date'] = df['timestamp'].apply(lambda s : datetime.strptime(s, '%Y-%m-%d %H:%M:%S').year)
+    df['target_url'] = df['target_url'].apply(lambda u: u if u in [graph_nodes['tweetWithoutURL'], graph_nodes['HTTPError'], graph_nodes['TimeoutError']] else 'working URL')
+    df['Tweets with'] = df['target_url'].map(lambda n: 'HTTP error in outgoing URL' if n == graph_nodes['HTTPError'] else 'timeout error in outgoing URL' if n == graph_nodes['TimeoutError'] else 'no URL' if n == graph_nodes['tweetWithoutURL'] else 'working URL')
+    df[['source_url', 'date','Tweets with']].pivot_table(index='date', columns='Tweets with',aggfunc='count').T.reset_index(level=0, drop=True).T.fillna(1).plot(logy=True, figsize=(10,10), sort_columns=True)
