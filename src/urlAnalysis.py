@@ -1,5 +1,6 @@
 from pyspark.sql import Row
 import random
+from math import exp
 from settings import *
 from utils import initSpark, rdd2tsv, analyze_url, same_domains
 
@@ -63,7 +64,7 @@ def plot_URL_decay():
     df[['source_url', 'date','Tweets with']].pivot_table(index='date', columns='Tweets with',aggfunc='count').T.reset_index(level=0, drop=True).T.fillna(1).plot(logy=True, figsize=(10,10), sort_columns=True)
 
 #Get outgoing links from article
-def get_out_links(url):
+def get_out_links(url, epoch_decay):
     
     #custom urls for special nodes
     if url.startswith(project_url):
@@ -107,25 +108,27 @@ def get_out_links(url):
     if source_links:
         return list(set(source_links))    
 
-    #otherwise return with probability 1/k the k outgoing links
+    #otherwise return with probability 1/k*epoch_decay the k outgoing links
     pruned_links = []
+    if len(links) != 0:
+        link_prob = (1/len(links)) * epoch_decay
     for link in links:
-        if random.random() < 1/len(links):
+        if random.random() < link_prob:
             pruned_links.append(link)
     return list(set(pruned_links))
 
 #Create the nth level of the diffusion graph
-def graph_epoch_n(frontier, file):
+def graph_epoch_n(frontier, epoch):
 
     spark = initSpark()
     
     documents = spark.sparkContext.parallelize(frontier, numSlices=(conf['cores']-1))
 
-    documents = documents.flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r) or ['']])
+    documents = documents.flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch)) or ['']])
 
     documents = documents.map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.target_url]))
     
-    rdd2tsv(documents, file, ['source_url', 'target_url'])
+    rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url', 'target_url'])
 
 
 #Create diffusion graph
@@ -152,7 +155,7 @@ def create_graph():
             if(epoch == 0):
                 graph_epoch_0()
             else:
-                graph_epoch_n(frontier, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv')
+                graph_epoch_n(frontier, epoch)
 
         df = pd.read_csv(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', sep='\t').dropna()
         G =  nx.compose(G, nx.from_pandas_edgelist(df, source='source_url', target='target_url', create_using=nx.DiGraph()))
