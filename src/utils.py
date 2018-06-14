@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark import SparkConf
+from math import floor, ceil
 
 from settings import *
 
@@ -7,10 +8,10 @@ from settings import *
 def initSpark():
     global spark
     spark_conf = SparkConf()
-    spark_conf.setAppName('quoteAnalysis')
-    spark_conf.setMaster('local['+str(conf['cores'])+']')
-    spark_conf.set('spark.executor.memory', str(int(conf['memory']/conf['cores']))+'G')
-    spark_conf.set('spark.driver.memory', str(int(conf['memory']/conf['cores']))+'G')
+    spark_conf.setAppName('diffusion graph')
+    spark_conf.setMaster('local['+str(conf['partitions'])+']')
+    spark_conf.set('spark.executor.memory', str(floor(conf['memory']*0.9))+'G')
+    spark_conf.set('spark.driver.memory', str(ceil(conf['memory']*0.1))+'G')
     spark_conf.set('spark.hadoop.validateOutputSpecs', 'false')
     spark = SparkSession.builder.config(conf=spark_conf).getOrCreate()
     spark.sparkContext.setLogLevel('ERROR')

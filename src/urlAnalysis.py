@@ -1,9 +1,9 @@
 from pyspark.sql import Row
 import random
 from math import exp
+
 from settings import *
 from utils import initSpark, rdd2tsv, analyze_url, same_domains
-
 
 institutions = pd.read_csv(institutionsFile, sep='\t')
 institutions['URL'] = institutions['URL'].apply(lambda u: re.sub(r'^(www[0-9]?\.)|(web\.)', r'', u))
@@ -67,7 +67,8 @@ def get_out_links(url, epoch_decay, last_pass):
     try:
         headers = {"User-Agent":"Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"}
         r = requests.get(url, allow_redirects='HEAD', timeout=urlTimout, headers=headers)
-        soup = BeautifulSoup(r.content, 'html.parser')
+        
+        soup = BeautifulSoup(r.content, 'html.parser', from_encoding="iso-8859-1")
     except:
         return ['']
 
@@ -88,9 +89,10 @@ def get_out_links(url, epoch_decay, last_pass):
         return list(set(source_links))    
 
     #otherwise return with probability 1/k*epoch_decay the k outgoing links
+    MAX_LINKS = 10
     pruned_links = []
     if len(links) != 0:
-        link_prob = (1/len(links)) * epoch_decay
+        link_prob = (1/max(len(links), MAX_LINKS)) * epoch_decay
     for link in links:
         if random.random() < link_prob:
             pruned_links.append(link)
@@ -103,15 +105,15 @@ def graph_epoch_n(frontier, epoch, last_pass):
 
     if epoch == 0:
         urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
-        documents = spark.sparkContext.textFile(twitterCorpusFile, minPartitions=(conf['cores']-1)) 
-        documents = documents.map(lambda r: (lambda l=r.split('\t'): Row(source_url=l[0], tweet=l[1], timestamp=datetime.strptime(l[2], '%Y-%m-%d %H:%M:%S'), popularity=int(l[3]), RTs=int(l[4]), user_country=l[5]))())
-        documents = documents.flatMap(lambda r: [Row(source_url=r.source_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, user_country=r.user_country, target_url=resolveURL(u)) for u in re.findall(urlRegex, r.tweet) or ['']])
-        documents = documents.map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.timestamp, r.popularity, r.RTs, r.user_country, r.target_url]))
+        documents = spark.sparkContext.textFile(twitterCorpusFile, minPartitions=(conf['partitions']), use_unicode=False) \
+        .map(lambda r: (lambda l=r.split('\t'): Row(source_url=l[0], tweet=l[1], timestamp=datetime.strptime(l[2], '%Y-%m-%d %H:%M:%S'), popularity=int(l[3]), RTs=int(l[4]), user_country=l[5]))()) \
+        .flatMap(lambda r: [Row(source_url=r.source_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, user_country=r.user_country, target_url=resolveURL(u, session)) for u in re.findall(urlRegex, r.tweet) or ['']]) \
+        .map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.timestamp, r.popularity, r.RTs, r.user_country, r.target_url]))
         rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url','timestamp', 'popularity', 'RTs', 'user_country', 'target_url'])
     else:
-        documents = spark.sparkContext.parallelize(frontier, numSlices=(conf['cores']-1))
-        documents = documents.flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch), last_pass=last_pass) or ['']])
-        documents = documents.map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.target_url]))
+        documents = spark.sparkContext.parallelize(frontier, numSlices=(conf['partitions'])) \
+        .flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch), last_pass=last_pass) or ['']]) \
+        .map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.target_url]))
         rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url', 'target_url'])
 
 
