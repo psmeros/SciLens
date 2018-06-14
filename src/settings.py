@@ -1,15 +1,15 @@
 #Memory in GBs - cores used by Spark and corpus path
-conf = {'memory':8, 'cores':4, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
-#conf = {'memory':8, 'cores':4, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
-#conf = {'memory':64, 'cores':24, 'corpusPath': '/home/smeros/backup_data/'}
-#conf = {'memory':252, 'cores':48, 'corpusPath': '/root/'}
+#conf = {'memory':8, 'cores':4, 'partitions':4*20, 'corpusPath':'/Users/smeros/workspace/etc/bigFiles/'}
+conf = {'memory':8, 'cores':4, 'partitions':4*20, 'corpusPath':'/home/psmeros/workspace/bigFiles/'}
+#conf = {'memory':64, 'cores':24, 'partitions':24*20, 'corpusPath': '/home/smeros/backup_data/'}
+#conf = {'memory':252, 'cores':48, 'partitions':48*20, 'corpusPath': '/root/'}
 
 #Use cached files
 useCache = True
 
 #Corpus files
-webCorpusFile = conf['corpusPath'] + 'webFood.tsv'
-twitterCorpusFile = conf['corpusPath'] + 'twitterFoodSample.tsv'
+#webCorpusFile = conf['corpusPath'] + 'webFood.tsv'
+twitterCorpusFile = conf['corpusPath'] + 'scilens_3M.tsv'
 
 #Graph files
 diffusion_graph_dir = 'cache/diffusion_graph/'
@@ -18,7 +18,7 @@ diffusion_graph_dir = 'cache/diffusion_graph/'
 urlTimout = 1
 
 #Components ratio for graph construction
-components_ratio = 0.1
+components_ratio = 0.05
 
 #Topic Discovery parameters
 numOfTopics = 32
