@@ -165,5 +165,6 @@ def create_graph():
     print(G.in_degree('nih.gov'))
     print(G.out_degree(graph_nodes['institution']))
 
-    G = sorted(G.in_degree, key=lambda x: x[1], reverse=True)    
-    print(G[:20])
+    #G = sorted(G.in_degree, key=lambda x: x[1], reverse=True)    
+    #print(G[:20])
+    return G
