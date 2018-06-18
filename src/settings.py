@@ -18,7 +18,7 @@ diffusion_graph_dir = 'cache/diffusion_graph/'
 urlTimout = 1
 
 #Components ratio for graph construction
-components_ratio = 0.05
+components_ratio = 0.10
 
 #Topic Discovery parameters
 numOfTopics = 32
