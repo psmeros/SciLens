@@ -160,11 +160,27 @@ def create_graph():
         connected_components = nx.number_connected_components(G.to_undirected())
         epoch +=1
     
-
-    #print(G.in_degree(graph_nodes['tweetWithoutURL']))
-    print(G.in_degree('nih.gov'))
-    print(G.out_degree(graph_nodes['institution']))
-
-    #G = sorted(G.in_degree, key=lambda x: x[1], reverse=True)    
-    #print(G[:20])
     return G
+
+
+def get_most_popular_publications():
+    G = create_graph()
+    
+    df = pd.read_csv(diffusion_graph_dir+'epoch_0.tsv', sep='\t').dropna()
+    df['social'] = project_url+'#twitter'
+    G =  nx.compose(G, nx.from_pandas_edgelist(df, source='social', target='source_url', create_using=nx.DiGraph()))
+
+    for index, row in df.iterrows():
+        G.add_node(row['source_url'], popularity=row['popularity'], timestamp=row['timestamp'], user_country=row['user_country'])
+
+    pubs = []
+    for r in G.predecessors('http://sci-lens.org#repository'):
+        for n in G.predecessors(r):
+            popularity = 0
+            for path in nx.all_simple_paths(G, source='http://sci-lens.org#twitter', target=n):
+                popularity += G.node[path[1]]['popularity']
+            pubs.append([n , popularity])
+
+    pubs = pd.DataFrame(pubs)
+    pubs = pubs.set_index(0).sort_values(1, ascending=False)
+    return pubs
