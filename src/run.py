@@ -1,7 +1,8 @@
-from urlAnalysis import create_graph
+from time import time
+from diffusion_graph import create_graph
 from quoteAnalysis import extractQuotes
 from topicAnalysis import discoverTopics
-from preparePlots import *
+from plots import *
 from utils import create_crawl_keywords
 
 

@@ -1,9 +1,14 @@
+import pandas as pd
+import re
+from datetime import datetime
+import networkx as nx
 from pyspark.sql import Row
 import random
 from math import exp
 
 from settings import *
-from utils import initSpark, rdd2tsv, analyze_url, same_domains
+from utils import initSpark, rdd2tsv
+from url_helpers import analyze_url, same_domains, resolve_short_url, get_html
 
 institutions = pd.read_csv(institutionsFile, sep='\t')
 institutions['URL'] = institutions['URL'].apply(lambda u: re.sub(r'^(www[0-9]?\.)|(web\.)', r'', u))
@@ -15,29 +20,6 @@ project_url = 'http://sci-lens.org'
 graph_nodes = {'tweetWithoutURL':project_url+'#tweetWithoutURL', 'HTTPError':project_url+'#HTTPError', 'TimeoutError':project_url+'#TimeoutError', 'institution':project_url+'#institution', 'repository':project_url+'#repository', 'source':project_url+'#source'}
 sources = institutions['URL'].tolist() + repositories['URL'].tolist()
 
-#Resolve url
-def resolveURL(url):
-    if url=='':
-        return graph_nodes['tweetWithoutURL']
-        
-    try:
-        #Follow the redirections of a URL
-        r = requests.head(url, allow_redirects='HEAD', timeout=urlTimout)
-        if r.status_code != 403:            
-            r.raise_for_status()
-
-        #Avoid blacklisted and flat URLs
-        domain, path = analyze_url(r.url)
-        if domain in blacklistURLs or path in ['', '/']:
-            r.url = ''
-
-        return r.url
-
-    #Catch the different errors       
-    except requests.HTTPError as e:
-        return graph_nodes['HTTPError']
-    except:
-        return graph_nodes['TimeoutError']
 
 #Get outgoing links from article
 def get_out_links(url, epoch_decay, last_pass):
@@ -65,17 +47,14 @@ def get_out_links(url, epoch_decay, last_pass):
         return ['']
 
     try:
-        headers = {"User-Agent":"Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"}
-        r = requests.get(url, allow_redirects='HEAD', timeout=urlTimout, headers=headers)
-        
-        soup = BeautifulSoup(r.content, 'html.parser', from_encoding="iso-8859-1")
+        html = get_html(url)
     except:
         return ['']
 
     #get all links except for self and blacklisted links
     links = []
     source_links = []
-    for link in soup.findAll('a'):
+    for link in html.findAll('a'):
         link = link.get('href') or ''
         link_domain, link_path = analyze_url(link)
         if not same_domains(domain, link_domain) and link_domain not in blacklistURLs and link_path not in ['', '/']:
@@ -106,8 +85,8 @@ def graph_epoch_n(frontier, epoch, last_pass):
     if epoch == 0:
         urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
         documents = spark.sparkContext.textFile(twitterCorpusFile, minPartitions=(conf['partitions']), use_unicode=False) \
-        .map(lambda r: (lambda l=r.split('\t'): Row(source_url=l[0], tweet=l[1], timestamp=datetime.strptime(l[2], '%Y-%m-%d %H:%M:%S'), popularity=int(l[3]), RTs=int(l[4]), user_country=l[5]))()) \
-        .flatMap(lambda r: [Row(source_url=r.source_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, user_country=r.user_country, target_url=resolveURL(u, session)) for u in re.findall(urlRegex, r.tweet) or ['']]) \
+        .map(lambda r: (lambda r: Row(source_url=r[0], tweet=r[1], timestamp=datetime.strptime(r[2], '%Y-%m-%d %H:%M:%S'), popularity=int(r[3]), RTs=int(r[4]), user_country=r[5]))(r.split('\t'))) \
+        .flatMap(lambda r: [Row(source_url=r.source_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, user_country=r.user_country, target_url=resolve_short_url(u, graph_nodes, blacklistURLs)) for u in re.findall(urlRegex, r.tweet) or ['']]) \
         .map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.timestamp, r.popularity, r.RTs, r.user_country, r.target_url]))
         rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url','timestamp', 'popularity', 'RTs', 'user_country', 'target_url'])
     else:
@@ -163,24 +142,40 @@ def create_graph():
     return G
 
 
-def get_most_popular_publications():
+def get_most_popular_publications(filename):
     G = create_graph()
     
     df = pd.read_csv(diffusion_graph_dir+'epoch_0.tsv', sep='\t').dropna()
     df['social'] = project_url+'#twitter'
     G =  nx.compose(G, nx.from_pandas_edgelist(df, source='social', target='source_url', create_using=nx.DiGraph()))
 
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         G.add_node(row['source_url'], popularity=row['popularity'], timestamp=row['timestamp'], user_country=row['user_country'])
 
     pubs = []
-    for r in G.predecessors('http://sci-lens.org#repository'):
+    for r in G.predecessors(project_url+'#repository'):
         for n in G.predecessors(r):
             popularity = 0
-            for path in nx.all_simple_paths(G, source='http://sci-lens.org#twitter', target=n):
+            for path in nx.all_simple_paths(G, source=project_url+'#twitter', target=n):
                 popularity += G.node[path[1]]['popularity']
             pubs.append([n , popularity])
 
     pubs = pd.DataFrame(pubs)
-    pubs = pubs.set_index(0).sort_values(1, ascending=False)
-    return pubs
+    pubs = pubs.sort_values(1, ascending=False)
+    pubs[0].to_csv(filename, index=False)
+
+def get_most_widely_referenced_publications(different_domains, filename):
+    G = create_graph()
+
+    pubs = []
+    for r in G.predecessors(project_url+'#repository'):
+        for n in G.predecessors(r):
+            domains = set()
+            for w in G.predecessors(n):
+                domain, _ = analyze_url(w)
+                domains.add(domain)
+            pubs.append([n, len(domains)])
+    pubs = pd.DataFrame(pubs)
+    pubs = pubs.sort_values(1, ascending=False)
+
+    pubs[pubs[1]>different_domains][0].to_csv(filename, index=False)

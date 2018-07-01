@@ -1,3 +1,7 @@
+import os
+import sys
+import numpy as np
+
 import spacy
 from sklearn.metrics.pairwise import cosine_similarity
 
