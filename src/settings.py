@@ -15,7 +15,7 @@ twitterCorpusFile = conf['corpusPath'] + 'scilens_3M.tsv'
 diffusion_graph_dir = 'cache/diffusion_graph/'
 
 #URL redirection settings
-urlTimout = 1
+url_timeout = 1
 
 #Components ratio for graph construction
 components_ratio = 0.10
@@ -43,28 +43,8 @@ personKeywordsFile = 'auxiliary_files/keywords/person.txt'
 studyKeywordsFile = 'auxiliary_files/keywords/study.txt'
 actionsKeywordsFile = 'auxiliary_files/keywords/action.txt'
 
-#Imports
-import os
-import re
-import sys
-import shutil
-import builtins
-from time import time
-from datetime import datetime
-
-import requests
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-from urllib.parse import urlsplit
-
-import numpy as np
-import pandas as pd
-import networkx as nx
-#from networkx.algorithms import bipartite
-
 #Cache directories
+import os
 os.makedirs('cache', exist_ok=True)
 os.makedirs(diffusion_graph_dir, exist_ok=True)
 
-#Pandas settings
-pd.set_option('display.max_colwidth', -1)

@@ -1,5 +1,10 @@
+import os
+import sys
+import shutil
+from time import time
+from datetime import datetime
+
 import spacy
-from spacy.symbols import nsubj, dobj, VERB
 from nltk.tokenize import sent_tokenize
 
 from pyspark.sql import Row
@@ -13,7 +18,7 @@ studyKeywords = open(studyKeywordsFile).read().splitlines()
 actionsKeywords = open(actionsKeywordsFile).read().splitlines()
 
 #Exract quotes from articles
-def extractQuotes():
+def extractQuotes(webCorpusFile):
 
     spark = initSpark()
 
@@ -30,7 +35,7 @@ def extractQuotes():
         t0 = time()
 
         documents = spark.sparkContext.textFile(webCorpusFile) 
-        documents = documents.map(lambda r: (lambda l=r.split('\t'): Row(url=l[0], article=l[1], timestamp=datetime.strptime(l[2], '%Y-%m-%d %H:%M:%S')))())
+        documents = documents.map(lambda r: (lambda r: Row(url=r[0], article=r[1], timestamp=datetime.strptime(r[2], '%Y-%m-%d %H:%M:%S')))(r.split('\t')))
 
         #process articles to extract quotes
         documents = documents.map(lambda r: Row(article=r.article, quotes=dependencyGraphSearch(r.article)))
@@ -81,7 +86,7 @@ def dependencyGraphSearch(article):
         #find all verbs of the sentence.
         verbs = set()
         for v in s:
-            if v.head.pos == VERB:
+            if v.head.pos_ == 'VERB':
                 verbs.add(v.head)
 
         if not verbs:
@@ -98,7 +103,7 @@ def dependencyGraphSearch(article):
                 quoteFound = True
                 
                 for np in v.children:
-                    if np.dep == nsubj:
+                    if np.dep_ == 'nsubj':
                         quotee = s[np.left_edge.i : np.right_edge.i+1].text
                         break
 
