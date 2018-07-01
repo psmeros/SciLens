@@ -20,6 +20,9 @@ url_timeout = 1
 #Components ratio for graph construction
 components_ratio = 0.10
 
+#selected papers
+selected_papers_file = 'cache/selected_papers.txt'
+
 #Topic Discovery parameters
 numOfTopics = 32
 topicTopfeatures = 1
