@@ -8,6 +8,31 @@ import pandas as pd
 from settings import *
 
 
+#Download papers
+def download_selected_papers():
+    with open(selected_papers_file) as f:
+        selected_papers = f.readlines()
+    
+    for id, p in enumerate(selected_papers):
+        try:
+            print(requests.get(p))
+            links = BeautifulSoup(requests.get(p).content).findAll('a')
+        except:
+            print('Manual checking:', p)
+
+        pdfs = []
+        for l in links:
+            if l['href'][-4:]=='.pdf':
+                pdfs.append(l)
+
+        if len(pdfs)==0 or len(pdfs)>1:
+            print('Manual checking:', p)
+        
+        else:        
+            with open(id+'pdf','wb') as output:
+                output.write(urlopen(pdfs[0]).read())
+
+
 #Find the domain and the path of an http url
 def analyze_url(url):
     try:
