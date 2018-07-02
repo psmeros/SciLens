@@ -7,7 +7,17 @@ from networkx.algorithms import bipartite
 
 from settings import *
 from quoteAnalysis import resolvePerson, resolveOrganization
+from url_helpers import analyze_url
 
+
+def plot_selected_papers():
+    df = pd.read_csv('cache/selected_papers.txt',header=None)
+    df['domain'] = df.apply(lambda x: analyze_url(x[0])[0], axis=1)
+    ax = df.groupby('domain').count().sort_values(by=0, ascending=False).rename(columns={0:'#papers'}).plot(kind='barh', figsize=(5,10))
+    ax.set_xscale('log')
+    ax.set_xticks([1, 5, 10, 20, 60])
+    ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    plt.show()
 
 #Plot helpers
 def plot_helper(inst, repos, countries):
