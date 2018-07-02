@@ -14,23 +14,30 @@ def download_selected_papers():
         selected_papers = f.readlines()
     
     for id, p in enumerate(selected_papers):
-        try:
-            print(requests.get(p))
-            links = BeautifulSoup(requests.get(p).content).findAll('a')
+        try:  
+            links = get_html(p).findAll('a')
         except:
             print('Manual checking:', p)
+            continue
 
         pdfs = []
         for l in links:
-            if l['href'][-4:]=='.pdf':
-                pdfs.append(l)
+            try:
+                if l['href'][-4:]=='.pdf':
+                    pdfs.append(l)
+            except:
+                continue
 
-        if len(pdfs)==0 or len(pdfs)>1:
-            print('Manual checking:', p)
-        
-        else:        
-            with open(id+'pdf','wb') as output:
-                output.write(urlopen(pdfs[0]).read())
+        if len(pdfs)==0:
+            print('[no pdfs] Manual checking:', p)
+            continue
+
+        if len(pdfs)>1:
+            print('[many pdfs] Manual checking:', p)
+            continue
+                
+        with open('cache/'+str(id)+'.pdf','wb') as output:
+            output.write(urlopen(pdfs[0]).read())
 
 
 #Find the domain and the path of an http url
