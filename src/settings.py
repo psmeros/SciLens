@@ -13,6 +13,9 @@ twitterCorpusFile = conf['corpusPath'] + 'scilens_3M.tsv'
 
 #Graph files
 diffusion_graph_dir = 'cache/diffusion_graph/'
+project_url = 'http://sci-lens.org'
+graph_nodes = {'tweetWithoutURL':project_url+'#tweetWithoutURL', 'HTTPError':project_url+'#HTTPError', 'TimeoutError':project_url+'#TimeoutError', 'institution':project_url+'#institution', 'repository':project_url+'#repository', 'source':project_url+'#source'}
+
 
 #URL redirection settings
 url_timeout = 1
@@ -40,7 +43,7 @@ countriesFile = 'auxiliary_files/countries/codes.csv'
 #File with academic repositories
 repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
 #blacklisted URLs
-blacklistURLsFile = 'auxiliary_files/blacklist/urls.txt'
+blacklistURLs = open('auxiliary_files/blacklist/urls.txt').read().splitlines()
 #Predefined keyword lists
 personKeywordsFile = 'auxiliary_files/keywords/person.txt'
 studyKeywordsFile = 'auxiliary_files/keywords/study.txt'

@@ -1,9 +1,10 @@
 import re
 from urllib.parse import urlsplit
 from urllib.request import urlopen
+
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 
 from settings import *
 
@@ -63,7 +64,7 @@ def same_domains(domain_1, domain_2):
     return False
 
 #Resolve short url
-def resolve_short_url(url, graph_nodes, blacklistURLs):
+def resolve_short_url(url):
     if url=='':
         return graph_nodes['tweetWithoutURL']
         
