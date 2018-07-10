@@ -1,7 +1,6 @@
 import sys
 from datetime import datetime
 import matplotlib.pyplot as plt
-import matplotlib.ticker
 import pandas as pd
 import networkx as nx
 from networkx.algorithms import bipartite
@@ -10,6 +9,8 @@ from settings import *
 from quoteAnalysis import resolvePerson, resolveOrganization
 from url_helpers import analyze_url
 
+
+#Grey vs Scientific Literature
 def plot_papers_info():
     df = pd.read_csv('cache/selected_papers_3.txt',header=None)
     df['domain'] = df.apply(lambda x: analyze_url(x[0])[0], axis=1)
@@ -21,15 +22,6 @@ def plot_papers_info():
     tmp = pd.DataFrame(df[~df['domain'].str.contains('.gov')]['domain'].apply(lambda x:(lambda x: x[-2]+'.'+x[-1])(x.split(".")))).groupby('domain').size().sort_values(ascending=False)
     tmp[tmp>1].plot('barh', colormap='RdBu', ax=axarr[2], figsize=(10,10))
     plt.draw()
-
-def plot_selected_papers():
-    df = pd.read_csv('cache/selected_papers_5.txt',header=None)
-    df['domain'] = df.apply(lambda x: analyze_url(x[0])[0], axis=1)
-    ax = df.groupby('domain').count().sort_values(by=0, ascending=False).rename(columns={0:'#papers'}).plot(kind='barh', figsize=(5,10))
-    ax.set_xscale('log')
-    ax.set_xticks([1, 5, 10, 20, 60])
-    ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
-    plt.show()
 
 #Plot helpers
 def plot_helper(inst, repos, countries):
