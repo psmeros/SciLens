@@ -97,46 +97,57 @@ def graph_epoch_n(frontier, epoch, last_pass):
 #Create diffusion graph
 def create_graph():
 
-    #initialize graph
-    G=nx.DiGraph()
+    if not useCache or not os.path.exists(diffusion_graph_dir+'full_graph.tsv'):
+        #initialize graph
+        G=nx.DiGraph()
 
-    for v in institutions['URL'].tolist():
-        G.add_edge(v, graph_nodes['institution'])
+        for v in institutions['URL'].tolist():
+            G.add_edge(v, graph_nodes['institution'])
 
-    for v in repositories['URL'].tolist():
-        G.add_edge(v, graph_nodes['repository'])
+        for v in repositories['URL'].tolist():
+            G.add_edge(v, graph_nodes['repository'])
 
-    G.add_edge(graph_nodes['institution'], graph_nodes['source'])
-    G.add_edge(graph_nodes['repository'], graph_nodes['source'])
+        G.add_edge(graph_nodes['institution'], graph_nodes['source'])
+        G.add_edge(graph_nodes['repository'], graph_nodes['source'])
 
-    epoch = 0
-    frontier = []
-    connected_components = 0
-    last_pass = False
-    while True:
+        epoch = 0
+        frontier = []
+        connected_components = 0
+        last_pass = False
+        while True:
 
-        #Expand graph
-        if not useCache or not os.path.exists(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv'):
-            graph_epoch_n(frontier, epoch, last_pass)
+            #Expand graph
+            if not useCache or not os.path.exists(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv'):
+                graph_epoch_n(frontier, epoch, last_pass)
 
-        df = pd.read_csv(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', sep='\t').dropna()
-        G =  nx.compose(G, nx.from_pandas_edgelist(df, source='source_url', target='target_url', create_using=nx.DiGraph()))
-        frontier = [x for x in G.nodes() if G.out_degree(x) == 0]
+            df = pd.read_csv(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', sep='\t').dropna()
+            G =  nx.compose(G, nx.from_pandas_edgelist(df, source='source_url', target='target_url', create_using=nx.DiGraph()))
+            frontier = [x for x in G.nodes() if G.out_degree(x) == 0]
 
-        print('Epoch:', epoch)
-        print('Connected Components:', nx.number_connected_components(G.to_undirected()))
-        print('Frontier Size:', len(frontier))
+            print('Epoch:', epoch)
+            print('Connected Components:', nx.number_connected_components(G.to_undirected()))
+            print('Frontier Size:', len(frontier))
 
+            
+            if last_pass:
+                break
+            
+            #last pass condition
+            if epoch != 0 and (connected_components - nx.number_connected_components(G.to_undirected())) / connected_components < components_ratio:
+                last_pass = True
+            connected_components = nx.number_connected_components(G.to_undirected())
+            epoch +=1
         
-        if last_pass:
-            break
-        
-        #last pass condition
-        if epoch != 0 and (connected_components - nx.number_connected_components(G.to_undirected())) / connected_components < components_ratio:
-            last_pass = True
-        connected_components = nx.number_connected_components(G.to_undirected())
-        epoch +=1
-    
+        with open(diffusion_graph_dir+'full_graph.tsv', 'w') as f:
+            for edge in G.edges:
+                    f.write(edge[0] + '\t' + edge[1] + '\n')
+
+    G = nx.DiGraph()
+    edges = open(diffusion_graph_dir+'full_graph.tsv').read().splitlines()
+    for e in edges:
+        [e0, e1] = e.split()
+        G.add_edge(e0, e1)
+
     return G
 
 
