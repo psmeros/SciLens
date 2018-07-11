@@ -4,7 +4,6 @@ from url_helpers import download_selected_papers
 
 t0 = time()
 
-#create_graph()
-download_selected_papers()
+create_graph()
 
 print("Total time: %0.3fs." % (time() - t0))
