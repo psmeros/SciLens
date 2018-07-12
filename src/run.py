@@ -1,9 +1,9 @@
 from time import time
 from diffusion_graph import create_graph
-from url_helpers import download_selected_papers
+from graph_ops import download_papers
 
 t0 = time()
 
-create_graph()
+download_papers('cache/top_papers_3.txt', 'out.txt')
 
 print("Total time: %0.3fs." % (time() - t0))
