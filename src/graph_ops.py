@@ -1,9 +1,33 @@
+import time
+
 import networkx as nx
 import pandas as pd
+from newspaper import Article
 
 from diffusion_graph import read_graph
 from settings import *
 from url_helpers import analyze_url
+
+
+#download paper details
+def download_papers(papers_file, out_file):
+    papers = open(papers_file).read().splitlines()
+
+    paper_details=[]
+    for i, p in enumerate(papers):
+        print('\r %s%%' % ("{0:.2f}").format(100 * (i / float(len(papers)))), end = '\r')
+        try:
+            article = Article(p)
+            article.download()
+            article.parse()
+            article.nlp()
+            paper_details.append([p, article.title, article.authors, article.keywords, article.publish_date, article.text])
+            time.sleep(3)
+        except:
+            continue
+
+    paper_details = pd.DataFrame(paper_details, columns=['url','title','authors','keywords','publish_date','full_text'])
+    paper_details.to_csv(out_file, sep='\t', index=None)
 
 #prune the initial diffusion graph by keeping only the paths that contain the selected papers
 def prune_graph(graph_in_file, graph_out_file, papers_file):
