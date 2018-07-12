@@ -145,7 +145,7 @@ def create_graph():
     G = nx.DiGraph()
     edges = open(diffusion_graph_dir+'full_graph.tsv').read().splitlines()
     for e in edges:
-        [e0, e1] = e.split()
+        [e0, e1] = e.split('\t')
         G.add_edge(e0, e1)
 
     return G
