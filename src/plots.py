@@ -11,16 +11,18 @@ from url_helpers import analyze_url
 
 
 #Grey vs Scientific Literature
-def plot_papers_info():
-    df = pd.read_csv('cache/selected_papers_3.txt',header=None)
+def plot_papers_info(papers_file):
+    df = pd.read_csv(papers_file,header=None)
     df['domain'] = df.apply(lambda x: analyze_url(x[0])[0], axis=1)
-    df['grey'] = df['domain'].apply(lambda x: 'grey' if '.gov' in x else 'non-grey')
-    _, axarr = plt.subplots(3)
-    df.groupby('grey').size().plot('pie', autopct='%1.0f%%', ax=axarr[0], figsize=(10,10))
+    df['grey?'] = df['domain'].apply(lambda x: 'grey' if '.gov' in x else 'non-grey')
+    df['pdf?'] = df[0].apply(lambda x: 'pdf' if '.pdf' in x else 'html')
+    print(df.groupby('grey?').size().div(df.shape[0]))
+    print(df.groupby('pdf?').size().div(df.shape[0]))
+    _, axarr = plt.subplots(2)
     tmp = pd.DataFrame(df[df['domain'].str.contains('.gov')]['domain'].apply(lambda x:(lambda x: x[-2]+'.'+x[-1])(x.split(".")))).groupby('domain').size().sort_values(ascending=False)
-    tmp[tmp>4].plot('barh' , colormap='RdBu', ax=axarr[1], figsize=(10,10))
+    tmp[tmp>4].plot('barh' , colormap='RdBu', ax=axarr[0], figsize=(10,10))
     tmp = pd.DataFrame(df[~df['domain'].str.contains('.gov')]['domain'].apply(lambda x:(lambda x: x[-2]+'.'+x[-1])(x.split(".")))).groupby('domain').size().sort_values(ascending=False)
-    tmp[tmp>1].plot('barh', colormap='RdBu', ax=axarr[2], figsize=(10,10))
+    tmp[tmp>1].plot('barh', colormap='RdBu', ax=axarr[1], figsize=(10,10))
     plt.draw()
 
 #Plot helpers
