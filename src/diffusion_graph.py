@@ -95,9 +95,9 @@ def graph_epoch_n(frontier, epoch, last_pass):
 
 
 #Create diffusion graph
-def create_graph():
+def create_graph(filename):
 
-    if not useCache or not os.path.exists(diffusion_graph_dir+'full_graph.tsv'):
+    if not useCache or not os.path.exists(diffusion_graph_dir+filename):
         #initialize graph
         G=nx.DiGraph()
 
@@ -116,7 +116,7 @@ def create_graph():
         last_pass = False
         while True:
 
-            #Expand graph
+            #expand graph
             if not useCache or not os.path.exists(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv'):
                 graph_epoch_n(frontier, epoch, last_pass)
 
@@ -137,17 +137,23 @@ def create_graph():
                 last_pass = True
             connected_components = nx.number_connected_components(G.to_undirected())
             epoch +=1
-        
-        with open(diffusion_graph_dir+'full_graph.tsv', 'w') as f:
+
+        #add root node
+        df = pd.read_csv(diffusion_graph_dir+'epoch_0.tsv', sep='\t').dropna()
+        df['social'] = project_url+'#twitter'
+        G =  nx.compose(G, nx.from_pandas_edgelist(df, source='social', target='source_url', create_using=nx.DiGraph()))
+
+        with open(diffusion_graph_dir+filename, 'w') as f:
             for edge in G.edges:
                     f.write(edge[0] + '\t' + edge[1] + '\n')
 
+#Read diffusion graph
+def read_graph(filename):
     G = nx.DiGraph()
-    edges = open(diffusion_graph_dir+'full_graph.tsv').read().splitlines()
+    edges = open(diffusion_graph_dir+filename).read().splitlines()
     for e in edges:
         [e0, e1] = e.split('\t')
         G.add_edge(e0, e1)
 
     return G
-
 
