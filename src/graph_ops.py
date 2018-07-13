@@ -30,12 +30,17 @@ def download_papers(papers_file, out_file):
     paper_details.to_csv(out_file, sep='\t', index=None)
 
 #prune the initial diffusion graph by keeping only the paths that contain the selected papers
-def prune_graph(graph_in_file, graph_out_file, papers_file):
+def prune_graph(graph_in_file, graph_out_file, papers_file, papers_with_details):
 
     if not useCache or not os.path.exists(diffusion_graph_dir+graph_out_file):
         G = read_graph(graph_in_file)
 
-        papers = open(papers_file).read().splitlines()
+        if papers_with_details:
+                df = pd.read_csv(papers_file, sep='\t')
+                df = df[~df['full_text'].isnull()]
+                papers = df['url'].tolist()
+        else:
+            papers = open(papers_file).read().splitlines()
 
         newG = nx.DiGraph()
         for path in nx.all_simple_paths(G, source=project_url+'#twitter', target=project_url+'#source'):
