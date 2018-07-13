@@ -10,24 +10,24 @@ from url_helpers import analyze_url
 
 
 #download paper details
-def download_papers(papers_file, out_file):
-    papers = open(papers_file).read().splitlines()
+def download_articles(articles_file, out_file, sleep_time):
+    articles = open(articles_file).read().splitlines()
 
-    paper_details=[]
-    for i, p in enumerate(papers):
-        print('\r %s%%' % ("{0:.2f}").format(100 * (i / float(len(papers)))), end = '\r')
+    article_details=[]
+    for i, a in enumerate(articles):
+        print('\r %s%%' % ("{0:.2f}").format(100 * (i / float(len(articles)))), end = '\r')
         try:
-            article = Article(p)
+            article = Article(a)
             article.download()
             article.parse()
             article.nlp()
-            paper_details.append([p, article.title, article.authors, article.keywords, article.publish_date, article.text])
-            time.sleep(3)
+            article_details.append([a, article.title, article.authors, article.keywords, article.publish_date, article.text])
+            time.sleep(sleep_time)
         except:
             continue
 
-    paper_details = pd.DataFrame(paper_details, columns=['url','title','authors','keywords','publish_date','full_text'])
-    paper_details.to_csv(out_file, sep='\t', index=None)
+    article_details = pd.DataFrame(article_details, columns=['url','title','authors','keywords','publish_date','full_text'])
+    article_details.to_csv(out_file, sep='\t', index=None)
 
 #prune the initial diffusion graph by keeping only the paths that contain the selected papers
 def prune_graph(graph_in_file, graph_out_file, papers_file, papers_with_details):
@@ -62,6 +62,23 @@ def prune_graph(graph_in_file, graph_out_file, papers_file, papers_with_details)
         G.add_edge(e0, e1)
 
     return G
+
+#write articles to file
+def get_effective_articles(graph_file, out_file):
+    G = read_graph(graph_file)
+
+    articles = []
+    for d in G.predecessors(project_url+'#repository'):
+        for p in G.predecessors(d):
+            for a in G.predecessors(p):
+                if 'http://twitter.com' not in a:
+                    articles.append(a)
+    
+    with open(out_file, 'w') as f:
+        for a in articles:
+            f.write(a + '\n')
+    
+ 
 
 #get selected papers
 def get_most_widely_referenced_publications(graph_file, out_file, num_of_domains):
