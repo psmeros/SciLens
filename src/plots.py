@@ -10,6 +10,15 @@ from quoteAnalysis import resolvePerson, resolveOrganization
 from url_helpers import analyze_url
 
 
+#Top keywords in papers
+def top_paper_keywords(papers_file, threshold):
+    df = pd.read_csv(papers_file, sep='\t')
+    df = df[~df['full_text'].isnull()]
+    df['keywords'] = df['keywords'].apply(lambda x: eval(x, {'__builtins__':None}, {}))
+
+    print(pd.Series([k for l in df['keywords'].tolist() for k in l]).value_counts()[lambda x : x>threshold])
+
+
 #Grey vs Scientific Literature
 def plot_papers_info(papers_file):
     df = pd.read_csv(papers_file,header=None)
