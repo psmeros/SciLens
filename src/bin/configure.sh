@@ -13,6 +13,7 @@ rm Miniconda3-latest-Linux-x86_64.sh
 source ~/.bashrc
 
 conda install -y pandas numpy networkx nltk spacy pyspark beautifulsoup4 scikit-learn
+pip install newspaper3k
 conda update -n base conda -y
 conda upgrade --all -y
 python -m nltk.downloader punkt #-d /path/to/nltk_data
