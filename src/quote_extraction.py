@@ -1,6 +1,5 @@
 import os
 import sys
-import shutil
 from time import time
 from datetime import datetime
 
@@ -8,9 +7,10 @@ import spacy
 from nltk.tokenize import sent_tokenize
 
 from pyspark.sql import Row
+import pandas as pd
 
 from settings import *
-from utils import initSpark
+from utils import initSpark, rdd2tsv
 
 nlp = spacy.load('en')
 personKeywords = open(personKeywordsFile).read().splitlines()
@@ -18,45 +18,45 @@ studyKeywords = open(studyKeywordsFile).read().splitlines()
 actionsKeywords = open(actionsKeywordsFile).read().splitlines()
 
 #Exract quotes from articles
-def extractQuotes(webCorpusFile):
+def extract_quotes(articles_in_file, articles_out_file, usePandas=True):
 
-    spark = initSpark()
+    if usePandas:
+        df = pd.read_csv(articles_in_file, sep='\t')
+        df.columns = ['url', 'title', 'authors', 'keywords', 'publish_date', 'full_text']
 
-    cache_doc = 'cache/'+sys._getframe().f_code.co_name+'_doc.pkl'
-    cache_q = 'cache/'+sys._getframe().f_code.co_name+'_q.pkl'
+        df['quotes'] = df['full_text'].apply(lambda x : quote_pattern_search(x))
 
-    if useCache and os.path.exists(cache_doc) and os.path.exists(cache_q):
-        print ('Reading from cache:', cache_doc)
-        documents = spark.sparkContext.pickleFile(cache_doc)
-        print ('Reading from cache:', cache_q)
-        quotes = spark.sparkContext.pickleFile(cache_q)
+        df['quote_indicators'] = df['quotes'].apply(lambda x : quote_indicators(x))
+
+        for d in df['quote_indicators'].iteritems():
+            print (d)
 
     else:
-        t0 = time()
+        spark = initSpark()
+        documents = spark.sparkContext.textFile(articles_in_file) \
+                    .map(lambda r: (lambda r: Row(url=r[0], title=r[1], authors=r[2], keywords=r[3], publish_date=r[4], full_text=r[5]))(r.split('\t'))) \
+                    .map(lambda r: (lambda r, q: Row(url=r.url, title=r.title, authors=r.authors, keywords=r.keywords, publish_date=r.publish_date, full_text=r.full_text, quotes=q)(r, dependencyGraphSearch(r.full_text)))) \
+                    .map(lambda r : '\t'.join(str(a) for a in [r.url, r.title, r.authors, r.keywords, r.publish_date, r.full_text, r.quotes]))
+        rdd2tsv(documents, articles_out_file, ['url', 'title', 'authors', 'keywords', 'publish_date', 'full_text'])
 
-        documents = spark.sparkContext.textFile(webCorpusFile) 
-        documents = documents.map(lambda r: (lambda r: Row(url=r[0], article=r[1], timestamp=datetime.strptime(r[2], '%Y-%m-%d %H:%M:%S')))(r.split('\t')))
-
-        #process articles to extract quotes
-        documents = documents.map(lambda r: Row(article=r.article, quotes=dependencyGraphSearch(r.article)))
-        
-        #drop documents without quotes
-        documents = documents.filter(lambda r: r.quotes is not None)
-
-        quotes = documents.flatMap(lambda r: [Row(quote=q['quote'], quotee=q['quotee'], quoteeType=q['quoteeType'], quoteeAffiliation=q['quoteeAffiliation']) for q in r.quotes])
-        documents = documents.map(lambda r: Row(article=r.article, quotes=[q['quote']for q in r.quotes]))
-
-        #caching
-        shutil.rmtree(cache_doc, ignore_errors=True)
-        shutil.rmtree(cache_q, ignore_errors=True)
-        documents.saveAsPickleFile(cache_doc)
-        quotes.saveAsPickleFile(cache_q)
-        print(sys._getframe().f_code.co_name, 'ran in %0.3fs.' % (time() - t0))
-
-    return documents, quotes
+#Quote indicators
+def quote_indicators(quotes):
+    count_PER_quotes = 0
+    count_ORG_quotes = 0
+    count_unnamed_quotes = 0
+    count_all_quotes = 0
+    for q in quotes:
+        if q['quoteeType'] == 'PERSON':
+            count_PER_quotes += 1
+        if q['quoteeType'] == 'ORG':
+            count_ORG_quotes += 1
+        if 'unnamed' in q['quoteeType']:
+            count_unnamed_quotes += 1
+    count_all_quotes = count_PER_quotes + count_ORG_quotes + count_unnamed_quotes
+    return {'count_all_quotes':count_all_quotes, 'count_PER_quotes':count_PER_quotes, 'count_ORG_quotes':count_ORG_quotes, 'count_unnamed_quotes':count_unnamed_quotes}
 
 #Search for quote patterns
-def dependencyGraphSearch(article):
+def quote_pattern_search(article):
 
     allPerEntities = []
     allOrgEntities = []
@@ -99,24 +99,21 @@ def dependencyGraphSearch(article):
 
         for v in verbs:
             if v is not None and v.lemma_ in actionsKeywords:            
-
-                quoteFound = True
                 
                 for np in v.children:
                     if np.dep_ == 'nsubj':
                         quotee = s[np.left_edge.i : np.right_edge.i+1].text
-                        break
+                        quote = s.text.strip()
+                        quotee, quoteeType, quoteeAffiliation = resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEntities)
+                        if quotee != 'unknown':
+                            quoteFound = True
+                            quotes.append({'quote': quote, 'quotee':quotee, 'quoteeType':quoteeType, 'quoteeAffiliation':quoteeAffiliation})
+                            break
 
             if quoteFound:
-                    quote = s.text.strip()
-                    quotee, quoteeType, quoteeAffiliation = resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEntities)
-                    quotes.append({'quote': quote, 'quotee':quotee, 'quoteeType':quoteeType, 'quoteeAffiliation':quoteeAffiliation})
-                    break
-    
-    if quotes == []:
-        return None
-    else:
-        return quotes
+                break
+                
+    return quotes
 
 #Resolve the quotee of a quote.
 def resolveQuotee(quotee, sPerEntities, sOrgEntities, allPerEntities, allOrgEntities):
