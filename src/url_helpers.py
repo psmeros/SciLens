@@ -1,3 +1,4 @@
+import time
 import re
 from urllib.parse import urlsplit
 from urllib.request import urlopen
@@ -9,8 +10,13 @@ from bs4 import BeautifulSoup
 from settings import *
 
 
-def scrap_twitter_replies(url):
-    soup = BeautifulSoup(urlopen(url), 'html.parser')
+def scrap_twitter_replies(url, sleep_time):
+    try:
+        soup = BeautifulSoup(urlopen(url), 'html.parser')
+    except:
+        return []
+        
+    time.sleep(sleep_time)
 
     replies = []
     for d in soup.find_all('div', attrs={'class' : 'js-tweet-text-container'}):

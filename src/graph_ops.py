@@ -6,9 +6,21 @@ from newspaper import Article
 
 from diffusion_graph import read_graph
 from settings import *
-from url_helpers import analyze_url
+from url_helpers import analyze_url, scrap_twitter_replies
 
 
+#write tweets to file
+def download_tweets(corpus_file, in_file, out_file, sleep_time):
+
+    df = pd.read_csv(twitterCorpusFile, sep='\t', header=None)
+    df[0] = df[0].apply(lambda x: x.replace('https://','http://'))
+    tweets_details = pd.read_csv(in_file, sep='\t', header=None)
+    tweets_details = tweets_details.merge(df, left_on=0, right_on=0)
+    tweets_details.columns = ['url','full_text','publish_date','popularity','RTs','user_country']
+    
+    tweets_details['replies'] = tweets_details['url'].apply(lambda x: scrap_twitter_replies(x, sleep_time))
+    tweets_details['replies_num'] = tweets_details['replies'].apply(lambda x: len(x))
+    tweets_details.to_csv(out_file, sep='\t', index=None)
 
 #write documents to file
 def get_effective_documents(graph_file, out_file, doc_type):
