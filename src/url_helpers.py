@@ -9,36 +9,17 @@ from bs4 import BeautifulSoup
 from settings import *
 
 
-#Download papers
-def download_selected_papers():
-    with open(selected_papers_file) as f:
-        selected_papers = f.readlines()
-    
-    for id, p in enumerate(selected_papers):
-        try:  
-            links = get_html(p).findAll('a')
+def scrap_twitter_replies(url):
+    soup = BeautifulSoup(urlopen(url), 'html.parser')
+
+    replies = []
+    for d in soup.find_all('div', attrs={'class' : 'js-tweet-text-container'}):
+        try:
+            replies.append(d.find('p', attrs={'class':"TweetTextSize js-tweet-text tweet-text", 'data-aria-label-part':'0', 'lang':'en'}).get_text())
         except:
-            print('Manual checking:', p)
             continue
 
-        pdfs = []
-        for l in links:
-            try:
-                if l['href'][-4:]=='.pdf':
-                    pdfs.append(l)
-            except:
-                continue
-
-        if len(pdfs)==0:
-            print('[no pdfs] Manual checking:', p)
-            continue
-
-        if len(pdfs)>1:
-            print('[many pdfs] Manual checking:', p)
-            continue
-                
-        with open('cache/'+str(id)+'.pdf','wb') as output:
-            output.write(urlopen(pdfs[0]).read())
+    return replies
 
 
 #Find the domain and the path of an http url
