@@ -1,15 +1,15 @@
 #Memory in GBs - cores used by Spark and corpus path
 #conf = {'memory':8, 'cores':4, 'partitions':4*20, 'corpusPath':'/Users/smeros/workspace/corpora/'}
-#conf = {'memory':8, 'cores':4, 'partitions':4*20, 'corpusPath':'/home/psmeros/workspace/corpora/'}
-conf = {'memory':64, 'cores':24, 'partitions':24*20, 'corpusPath': '/home/smeros/backup_data/'}
+conf = {'memory':8, 'cores':4, 'partitions':4*20, 'corpusPath':'/home/psmeros/workspace/corpora/'}
+#conf = {'memory':64, 'cores':24, 'partitions':24*20, 'corpusPath': '/home/smeros/backup_data/'}
 #conf = {'memory':252, 'cores':48, 'partitions':48*20, 'corpusPath': '/root/'}
 
 #Use cached files
 useCache = True
 
 #Corpus files
-#webCorpusFile = conf['corpusPath'] + 'webFood.tsv'
 twitterCorpusFile = conf['corpusPath'] + 'scilens_3M.tsv'
+glove_file = conf['corpusPath'] + 'glove.6B.300d.txt'
 
 #Graph files
 diffusion_graph_dir = 'cache/diffusion_graph/'

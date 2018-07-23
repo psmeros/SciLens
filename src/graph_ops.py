@@ -9,6 +9,24 @@ from settings import *
 from url_helpers import analyze_url, scrap_twitter_replies
 
 
+#write scientific - news article pairs
+def get_article_pairs(graph_in_file, graph_out_file):
+    
+    G = read_graph(graph_in_file)
+
+    pairs = []
+    for d in G.predecessors(project_url+'#repository'):
+        for p in G.predecessors(d):
+            for a in G.predecessors(p):
+                if 'http://twitter.com' not in a:
+                    pairs.append([p, a])
+
+    with open(diffusion_graph_dir+graph_out_file, 'w') as f:
+        f.write('paper\tarticle\n')
+        for p in pairs:
+            f.write(p[0] + '\t' +p[1] + '\n')
+
+
 #write tweets to file
 def download_tweets(corpus_file, in_file, out_file, sleep_time):
 
