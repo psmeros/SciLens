@@ -6,7 +6,7 @@ import pandas as pd
 from settings import *
 
 nlp = spacy.load('en')
-vocabulary = set(open(topicsFile).read().splitlines())
+vocabulary = open(topicsFile).read().splitlines()
 
 def text_to_bag_of_entities(text):
     paragraphs = re.split('\n', text)
