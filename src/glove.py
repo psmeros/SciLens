@@ -33,18 +33,11 @@ def word2vec(word):
 #Return the vector of a sentence
 def sent2vec(sentence):    
     vec = word2vec('')
-    for w in nlp(sentence):
-         if not (w.is_stop or w.is_punct):
-            vec += word2vec(w.text)
+    if len(sentence) != 0:
+        for w in nlp(sentence):
+            if not (w.is_stop or w.is_punct):
+                vec += word2vec(w.text)
     return vec   
-
-#Return a dictionary of vectors for the given topics
-def topics2Vec(topics):
-    tEmbeddings = {}
-    for t in topics:
-        tEmbeddings[t] = sent2vec(' '.join(t.split(',')))
-    return tEmbeddings
-
 
 #Compute the cosine similarity between two vectors
 def cos_sim(vec1, vec2):

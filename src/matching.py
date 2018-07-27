@@ -23,7 +23,6 @@ def text_to_bag_of_entities(text):
             if e.text not in entities and e.label_ in ['PERSON', 'ORG', 'DATE', 'TIME', 'PERCENT', 'QUANTITY', 'CARDINAL']:
                 entities.append(e.text)
         
-        #if entities != [] and entities not in text_repr:
         text_repr.append(entities)
     
     return text_repr
@@ -31,6 +30,6 @@ def text_to_bag_of_entities(text):
 def prepare_articles_matching(in_file, out_file):
     df = pd.read_csv(in_file, sep='\t')
     df = df[~df['full_text'].isnull()]
-    df['paragraphs'] = df['full_text'].apply(lambda x: text_to_bag_of_entities(x))
+    df['entities'] = df['full_text'].apply(lambda x: text_to_bag_of_entities(x))
     df.to_csv(out_file, sep='\t', index=None)
 
