@@ -39,10 +39,10 @@ def predict_topic(news_art_in_file, news_art_out_file, sci_art_in_file, sci_art_
 
     print('Discovering news article topics...')
     df = pd.read_csv(news_art_in_file, sep='\t')
-    df['topics'] = df['full_text'].apply(lambda x: lda.transform(tf_vectorizer.transform(re.split('\n', x))))
+    df['topics'] = df['full_text'].apply(lambda x: lda.transform(tf_vectorizer.transform(re.split('\n', x))).tolist())
     df.to_csv(news_art_out_file, sep='\t', index=None)
 
     print('Discovering scientific article topics...')
     df = pd.read_csv(sci_art_in_file, sep='\t')
-    df['topics'] = df['full_text'].apply(lambda x: lda.transform(tf_vectorizer.transform(re.split('\n', x))))
+    df['topics'] = df['full_text'].apply(lambda x: lda.transform(tf_vectorizer.transform(re.split('\n', x))).tolist())
     df.to_csv(sci_art_out_file, sep='\t', index=None)
