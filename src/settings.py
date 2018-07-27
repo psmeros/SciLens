@@ -24,11 +24,8 @@ url_timeout = 1
 components_ratio = 0.10
 
 #Topic Discovery parameters
-numOfTopics = 32
-topicTopfeatures = 1
-max_iter = 20
-samplingFraction = 0.2
-topicSimThreshold = 0.5
+numOfTopics = 16
+max_iter = 100
 
 #Auxiliary Files
 #File with refined topics
