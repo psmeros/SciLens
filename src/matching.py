@@ -1,8 +1,10 @@
 import re
 from math import sqrt
 
+import numpy as np
 import pandas as pd
 import spacy
+from sklearn.neighbors import NearestNeighbors
 
 from glove import cos_sim, sent2vec
 from settings import *
@@ -96,4 +98,18 @@ def create_annotation_subsample(pairs_file, article_details_file, paper_details_
     sample = pairs.sample(subsample_size)
     sample = sample.apply(cartesian_similarity, axis=1)
     df = pd.DataFrame([p for s in sample.tolist() for p in s], columns=['par_x', 'par_y', 'vec_sim', 'jac_sim', 'len_sim', 'top_sim'])
+    df.to_csv(out_file, sep='\t', index=None)
+
+
+def uniformly_random_subsample(pairs_file, n_samples, out_file):
+    
+    pairs = pd.read_csv('cache/par_pairs_v1.tsv', sep='\t')
+    samples = np.random.uniform(size=(n_samples,pairs.shape[1]-2))
+
+    nn = NearestNeighbors(1, n_jobs=-1)
+    nn.fit(pairs[['vec_sim', 'jac_sim', 'len_sim', 'top_sim']])
+
+    index = pd.DataFrame(nn.kneighbors(samples, return_distance=False), columns=['index'])
+    df = pairs.reset_index().merge(index).drop_duplicates()
+
     df.to_csv(out_file, sep='\t', index=None)
