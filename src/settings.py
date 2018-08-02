@@ -1,18 +1,18 @@
-#Memory in GBs - cores used by Spark and corpus path
-conf = {'memory':8, 'cores':4, 'partitions':4*20, 'corpusPath':'/Users/smeros/workspace/corpora/'}
-#conf = {'memory':8, 'cores':4, 'partitions':4*20, 'corpusPath':'/home/psmeros/workspace/corpora/'}
-#conf = {'memory':64, 'cores':24, 'partitions':24*20, 'corpusPath': '/home/smeros/backup_data/'}
-#conf = {'memory':252, 'cores':48, 'partitions':48*20, 'corpusPath': '/root/'}
+#Memory in GBs - cores used by Spark and cache folder
+conf = {'memory':8, 'cores':4, 'partitions':4*20, 'aux_dir':'/home/psmeros/Dropbox/scilens/'} #batfink
+#conf = {'memory':8, 'cores':4, 'partitions':4*20, 'corpusPath':'/Users/smeros/workspace/corpora/'} #mac
+#conf = {'memory':64, 'cores':24, 'partitions':24*20, 'corpusPath': '/home/smeros/backup_data/'}    #lsir-cloud
+#conf = {'memory':252, 'cores':48, 'partitions':48*20, 'corpusPath': '/root/'}  #iccluster
 
 #Use cached files
 useCache = True
+cache_dir = conf['aux_dir'] + 'cache/'
 
 #Corpus files
-twitterCorpusFile = conf['corpusPath'] + 'scilens_3M.tsv'
-glove_file = conf['corpusPath'] + 'glove.6B.300d.txt'
+twitterCorpusFile = conf['aux_dir'] + 'corpus/scilens_3M.tsv'
+glove_file = conf['aux_dir'] + 'big_files/glove.6B.300d.txt'
 
-#Graph files
-diffusion_graph_dir = 'cache/diffusion_graph/'
+#Graph settings
 project_url = 'http://sci-lens.org'
 graph_nodes = {'tweetWithoutURL':project_url+'#tweetWithoutURL', 'HTTPError':project_url+'#HTTPError', 'TimeoutError':project_url+'#TimeoutError', 'institution':project_url+'#institution', 'repository':project_url+'#repository', 'source':project_url+'#source'}
 
@@ -29,22 +29,16 @@ max_iter = 100
 
 #Auxiliary Files
 #File with refined topics
-topicsFile = 'auxiliary_files/topics/topics.txt'
+topicsFile = conf['aux_dir'] + 'small_files/topics/topics.txt'
 #File with institutions metadata
-institutionsFile = 'auxiliary_files/institutions/metadata.tsv'
+institutionsFile = conf['aux_dir'] + 'small_files/institutions/metadata.tsv'
 #File with country codes
-countriesFile = 'auxiliary_files/countries/codes.csv'
+countriesFile = conf['aux_dir'] + 'small_files/countries/codes.csv'
 #File with academic repositories
-repositoriesFile = 'auxiliary_files/repositories/academic_repositories.csv'
+repositoriesFile = conf['aux_dir'] + 'small_files/repositories/academic_repositories.csv'
 #blacklisted URLs
-blacklistURLs = open('auxiliary_files/blacklist/urls.txt').read().splitlines()
+blacklistURLs = open(conf['aux_dir'] + 'small_files/blacklist/urls.txt').read().splitlines()
 #Predefined keyword lists
-personKeywordsFile = 'auxiliary_files/keywords/person.txt'
-studyKeywordsFile = 'auxiliary_files/keywords/study.txt'
-actionsKeywordsFile = 'auxiliary_files/keywords/action.txt'
-
-#Cache directories
-import os
-os.makedirs('cache', exist_ok=True)
-os.makedirs(diffusion_graph_dir, exist_ok=True)
-
+personKeywordsFile = conf['aux_dir'] + 'small_files/keywords/person.txt'
+studyKeywordsFile = conf['aux_dir'] + 'small_files/keywords/study.txt'
+actionsKeywordsFile = conf['aux_dir'] + 'small_files/keywords/action.txt'

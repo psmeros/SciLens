@@ -16,7 +16,7 @@ institutions['URL'] = institutions['URL'].apply(lambda u: re.sub(r'^(www[0-9]?\.
 repositories = pd.read_csv(repositoriesFile)
 repositories['URL'] = repositories['URL'].apply(lambda u: re.sub(r'^http://(www\.)?', r'', u))
 sources = institutions['URL'].tolist() + repositories['URL'].tolist()
-
+diffusion_graph_dir = conf['aux_dir'] + 'cache/diffusion_graph/'
 
 
 #Get outgoing links from article
@@ -150,10 +150,9 @@ def create_graph(filename):
 #Read diffusion graph
 def read_graph(filename):
     G = nx.DiGraph()
-    edges = open(diffusion_graph_dir+filename).read().splitlines()
+    edges = open(filename).read().splitlines()
     for e in edges:
         [e0, e1] = e.split('\t')
         G.add_edge(e0, e1)
 
     return G
-
