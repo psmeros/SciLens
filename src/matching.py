@@ -9,10 +9,7 @@ from sklearn.neighbors import NearestNeighbors
 from glove import cos_sim, sent2vec
 from settings import *
 
-nlp = spacy.load('en')
-vocabulary = open(topicsFile).read().splitlines()
-
-def text_to_bag_of_entities(text):
+def text_to_bag_of_entities(text, nlp, vocabulary):
     paragraphs = re.split('\n', text)
     
     text_repr = []
@@ -32,9 +29,12 @@ def text_to_bag_of_entities(text):
     return text_repr
 
 def prepare_articles_matching(in_file, out_file):
+    nlp = spacy.load('en')
+    vocabulary = open(topicsFile).read().splitlines()
+
     df = pd.read_csv(in_file, sep='\t')
     df = df[~df['full_text'].isnull()]
-    df['entities'] = df['full_text'].apply(lambda x: text_to_bag_of_entities(x))
+    df['entities'] = df['full_text'].apply(lambda x: text_to_bag_of_entities(x, nlp, vocabulary))
     df.to_csv(out_file, sep='\t', index=None)
 
 
