@@ -2,15 +2,25 @@ import time
 
 import networkx as nx
 import pandas as pd
-from newspaper import Article
+from textblob import TextBlob
 
 from diffusion_graph import read_graph
+from newspaper import Article
 from settings import *
 from url_helpers import analyze_url, scrap_twitter_replies
+
 
 def aggregate_tweets(graph_file, article_file, tweet_file, attribute):
     G = read_graph(graph_file)
 
+
+def extent_tweets(tweet_file):
+    tweet_details = pd.read_csv(tweet_file, sep='\t')
+    tweet_details['likes'] = tweet_details['popularity'] - tweet_details['RTs']
+    tweet_details['tweet_polarity'] = tweet_details['full_text'].apply(lambda x: TextBlob(x).sentiment.polarity)
+    tweet_details['tweet_subjectivity'] = tweet_details['full_text'].apply(lambda x: TextBlob(x).sentiment.subjectivity)
+    tweet_details['replies_mean_polarity'] = tweet_details['replies'].apply(lambda x: np.mean([TextBlob(r).sentiment.polarity for r in eval(x)]))
+    tweet_details['replies_mean_subjectivity'] = tweet_details['replies'].apply(lambda x: np.mean([TextBlob(r).sentiment.subjectivity for r in eval(x)]))
 
 #write scientific - news article pairs
 def get_article_pairs(graph_in_file, graph_out_file):
@@ -131,4 +141,3 @@ def get_most_widely_referenced_publications(graph_file, out_file, num_of_domains
     pubs = pubs.sort_values(1, ascending=False)
 
     pubs[pubs[1]>=num_of_domains][0].to_csv(out_file, index=False)
-
