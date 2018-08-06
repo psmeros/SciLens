@@ -11,6 +11,7 @@ cache_dir = conf['aux_dir'] + 'cache/'
 #Corpus files
 twitterCorpusFile = conf['aux_dir'] + 'corpus/scilens_3M.tsv'
 glove_file = conf['aux_dir'] + 'big_files/glove.6B.300d.txt'
+twitter_users_file = conf['aux_dir'] + 'corpus/twitter_users.tsv'
 
 #Graph settings
 project_url = 'http://sci-lens.org'
