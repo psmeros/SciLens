@@ -47,11 +47,13 @@ def jaccard_similarity(set_x, set_y):
 def len_similarity(len_x, len_y):
     return min(len_x, len_y) / (max(len_x, len_y) + 0.1)
 
-def topic_similarity(tvx, tvy):
-    sim = 0
-    for tx, ty in zip(tvx, tvy):
-        sim += (sqrt(tx) - sqrt(ty))**2
-    sim = 1 - 1/sqrt(2) * sqrt(sim)
+def topic_similarity(tvx, tvy): 
+    sim = 0.0
+    #if both are not related to any topic return 0
+    if not (len(set(tvx)) == len(set(tvy)) == 1 and set(tvx).pop() == set(tvy).pop() == 0.0625):    
+        for tx, ty in zip(tvx, tvy):
+            sim += (sqrt(tx) - sqrt(ty))**2
+        sim = 1 - 1/sqrt(2) * sqrt(sim)
     return sim
 
 def cartesian_similarity(pair):
