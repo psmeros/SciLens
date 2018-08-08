@@ -65,7 +65,7 @@ def cartesian_similarity(pair):
     topics_x = eval(pair['topics_x'])
     topics_y = eval(pair['topics_y'])
     
-    similarities = []
+    paragraphs, vs, js, ls, ts = (0, ) * 5
     for ex, ftx, tvx in zip(entities_x, full_text_x, topics_x):
         len_x = len(ftx)
         if (len_x < MIN_PAR_LENGTH):
@@ -79,28 +79,32 @@ def cartesian_similarity(pair):
             ey = set(ey)
             ftvy = sent2vec(fty)
             
-            vs = vector_similarity(ftvx, ftvy)
-            js = jaccard_similarity(ex, ey)
-            ls = len_similarity(len_x, len_y)
-            ts = topic_similarity(tvx, tvy)
-            
-            similarities.append([ftx, fty, vs, js, ls, ts])
-            
-    return similarities
+            vs += vector_similarity(ftvx, ftvy)
+            js += jaccard_similarity(ex, ey)
+            ls += len_similarity(len_x, len_y)
+            ts += topic_similarity(tvx, tvy)
+            paragraphs += 1
 
-def create_annotation_subsample(pairs_file, article_details_file, paper_details_file, subsample_size, out_file):
+    if paragraphs != 0:
+        similarity = [vs/paragraphs, js/paragraphs, ls/paragraphs, ts/paragraphs]
+    else:
+        similarity = [0, 0, 0, 0]
+    return similarity
+
+
+def compute_pairs_similarity(pairs_file, article_details_file, paper_details_file, out_file):
     pairs = pd.read_csv(pairs_file, sep='\t')
     article_details = pd.read_csv(article_details_file, sep='\t')
     paper_details = pd.read_csv(paper_details_file, sep='\t')
 
     pairs = pairs.merge(paper_details[['url','entities', 'full_text', 'topics']], left_on='paper', right_on='url')
     pairs = pairs.merge(article_details[['url','entities', 'full_text', 'topics']], left_on='article', right_on='url')
-    pairs = pairs[['paper', 'entities_x', 'full_text_x', 'topics_x', 'article', 'entities_y', 'full_text_y', 'topics_y']]
+    pairs = pairs[['paper', 'entities_x', 'full_text_x', 'topics_x', 'article', 'entities_y', 'full_text_y', 'topics_y', 'related']]
 
-    sample = pairs.sample(subsample_size)
-    sample = sample.apply(cartesian_similarity, axis=1)
-    df = pd.DataFrame([p for s in sample.tolist() for p in s], columns=['par_x', 'par_y', 'vec_sim', 'jac_sim', 'len_sim', 'top_sim'])
-    df.to_csv(out_file, sep='\t', index=None)
+    df = pd.DataFrame(pairs.apply(cartesian_similarity, axis=1).tolist(), columns=['vec_sim', 'jac_sim', 'len_sim', 'top_sim']).reset_index(drop=True)
+    pairs = pairs[['article', 'paper', 'related']].reset_index(drop=True)
+    pairs = pd.concat([pairs, df], axis=1)    
+    pairs.to_csv(out_file, sep='\t', index=None)
 
 
 def uniformly_random_subsample(pairs_file, n_samples, out_file):

@@ -1,13 +1,14 @@
 import time
+from random import randint
 
 import networkx as nx
-import pandas as pd
 import numpy as np
-from textblob import TextBlob
+import pandas as pd
+from newspaper import Article
 
 from diffusion_graph import read_graph
-from newspaper import Article
 from settings import *
+from textblob import TextBlob
 from url_helpers import analyze_url, scrap_twitter_replies
 
 
@@ -49,22 +50,30 @@ def extent_tweets(in_file, out_file):
     tweet_details = tweet_details.replace('\\N',np.NaN)
     tweet_details.to_csv(out_file, sep='\t', index=None)
 
-#write scientific - news article pairs
-def get_article_pairs(graph_in_file, graph_out_file):
-    
-    G = read_graph(graph_in_file)
 
-    pairs = []
-    for d in G.predecessors(project_url+'#repository'):
-        for p in G.predecessors(d):
-            for a in G.predecessors(p):
-                if 'http://twitter.com' not in a:
-                    pairs.append([p, a])
+#get scientific - news article (true and false) pairs
+def get_article_pairs(graph_file, articles_file, pairs_out_file):
 
-    with open(graph_out_file, 'w') as f:
-        f.write('paper\tarticle\n')
-        for p in pairs:
-            f.write(p[0] + '\t' +p[1] + '\n')
+    G = read_graph(graph_file)
+    articles = open(articles_file).read().splitlines()
+
+    true_pairs = []
+    for a in articles:
+        if G.out_degree(a) == 1:
+            true_pairs.append([a, next(iter(G.successors(a))), True])
+
+    false_pairs = []
+    for a in articles:
+        if G.out_degree(a) == 1:
+            true_successor = next(iter(G.successors(a)))
+            while True:
+                index = randint(0, len(true_pairs)-1)
+                if true_pairs[index][1] != true_successor:
+                    false_pairs.append([a, true_pairs[index][1], False])
+                    break
+
+    df = pd.DataFrame(true_pairs+false_pairs, columns=['article', 'paper', 'related'])
+    df.to_csv(pairs_out_file, sep='\t', index=None)
 
 
 #write tweets to file
