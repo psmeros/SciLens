@@ -103,10 +103,10 @@ def scrap_cwur():
 
 
 #scrap nutritionfacts.org topics
-def scrap_nutritionfacts():
+def scrap_nutritionfacts(vocabulary_file):
     soup = BeautifulSoup(urlopen('https://nutritionfacts.org/topics'), 'html.parser')
     div = soup.find('div', attrs={'class' : 'topics-index'})
 
-    with open(topicsFile, 'w') as f:
+    with open(vocabulary_file, 'w') as f:
     	for t in div.find_all('a', title=True):
     		f.write(t['title'] + '\n')
