@@ -30,7 +30,7 @@ max_iter = 100
 
 #Auxiliary Files
 #File with refined topics
-topicsFile = conf['aux_dir'] + 'small_files/topics/topics.txt'
+hn_vocabulary = open(conf['aux_dir'] + 'small_files/hn_vocabulary/hn_vocabulary.txt').read().splitlines()
 #File with institutions metadata
 institutionsFile = conf['aux_dir'] + 'small_files/institutions/metadata.tsv'
 #File with country codes

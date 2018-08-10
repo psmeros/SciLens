@@ -16,12 +16,9 @@ from utils import initSpark
 def train_model(news_art_file, sci_art_file, model_file):
 
     df = pd.concat([pd.read_csv(news_art_file, sep='\t')[['full_text']], pd.read_csv(sci_art_file, sep='\t')[['full_text']]], ignore_index=True)
-
-    #use topics as vocabulary to reduce dimensions
-    vocabulary = open(topicsFile).read().splitlines()
     
     #define vectorizer (1-2grams)
-    tf_vectorizer = CountVectorizer(stop_words='english', vocabulary=vocabulary)
+    tf_vectorizer = CountVectorizer(stop_words='english', vocabulary=hn_vocabulary)
     tf = tf_vectorizer.transform(df['full_text'])
 
     #fit lda topic model

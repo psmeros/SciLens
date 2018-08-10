@@ -7,7 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from settings import *
 
-nlp = spacy.load('en')
+nlp, glove_embeddings, glove_embeddings_size  = (None,)*3
 
 
 #Load GloVe file
@@ -20,10 +20,13 @@ def load_Glove():
   
     return words, len(next(iter(words.values())))
 
-glove_embeddings, glove_embeddings_size = load_Glove() 
 
 #Return the vector of a word
 def word2vec(word):
+    global glove_embeddings, glove_embeddings_size
+    if glove_embeddings is None:
+        glove_embeddings, glove_embeddings_size = load_Glove()
+
     try:
         return glove_embeddings[word.lower().strip()]
     except:
@@ -31,7 +34,11 @@ def word2vec(word):
 
     
 #Return the vector of a sentence
-def sent2vec(sentence):    
+def sent2vec(sentence):
+    global nlp
+    if nlp is None:
+        nlp = spacy.load('en')
+
     vec = word2vec('')
     if len(sentence) != 0:
         for w in nlp(sentence):
