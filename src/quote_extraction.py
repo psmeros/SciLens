@@ -12,32 +12,32 @@ import pandas as pd
 from settings import *
 from utils import initSpark, rdd2tsv
 
-nlp = spacy.load('en')
-personKeywords = open(personKeywordsFile).read().splitlines()
-studyKeywords = open(studyKeywordsFile).read().splitlines()
-actionsKeywords = open(actionsKeywordsFile).read().splitlines()
+nlp, personKeywords, studyKeywords, actionsKeywords = (None, )*4
 
 #Exract quotes from articles
-def extract_quotes(articles_in_file, articles_out_file, usePandas=True):
+def extract_quotes(article_in_file, article_out_file, usePandas=True):
+
+    global nlp, personKeywords, studyKeywords, actionsKeywords
+    nlp = spacy.load('en')
+    personKeywords = open(personKeywordsFile).read().splitlines()
+    studyKeywords = open(studyKeywordsFile).read().splitlines()
+    actionsKeywords = open(actionsKeywordsFile).read().splitlines()
 
     if usePandas:
-        df = pd.read_csv(articles_in_file, sep='\t')
-        df.columns = ['url', 'title', 'authors', 'keywords', 'publish_date', 'full_text']
-
+        df = pd.read_csv(article_in_file, sep='\t')
         df['quotes'] = df['full_text'].apply(lambda x : quote_pattern_search(x))
-
         df['quote_indicators'] = df['quotes'].apply(lambda x : quote_indicators(x))
+        df.to_csv(article_out_file, sep='\t', index=None)
 
-        for d in df['quote_indicators'].iteritems():
-            print (d)
+        
 
     else:
         spark = initSpark()
-        documents = spark.sparkContext.textFile(articles_in_file) \
+        documents = spark.sparkContext.textFile(article_in_file) \
                     .map(lambda r: (lambda r: Row(url=r[0], title=r[1], authors=r[2], keywords=r[3], publish_date=r[4], full_text=r[5]))(r.split('\t'))) \
                     .map(lambda r: (lambda r, q: Row(url=r.url, title=r.title, authors=r.authors, keywords=r.keywords, publish_date=r.publish_date, full_text=r.full_text, quotes=q)(r, dependencyGraphSearch(r.full_text)))) \
                     .map(lambda r : '\t'.join(str(a) for a in [r.url, r.title, r.authors, r.keywords, r.publish_date, r.full_text, r.quotes]))
-        rdd2tsv(documents, articles_out_file, ['url', 'title', 'authors', 'keywords', 'publish_date', 'full_text'])
+        rdd2tsv(documents, article_out_file, ['url', 'title', 'authors', 'keywords', 'publish_date', 'full_text'])
 
 #Quote indicators
 def quote_indicators(quotes):
