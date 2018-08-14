@@ -4,6 +4,7 @@ from graph_ops import download_articles, get_effective_documents, prune_graph, d
 from settings import twitterCorpusFile, cache_dir
 from matching import prepare_articles_matching, compute_pairs_similarity, uniformly_random_subsample, compute_similarity_model
 from topic_detection import train_model, predict_topic
+from quote_extraction import extract_quotes
 
 t0 = time()
 
@@ -17,5 +18,6 @@ t0 = time()
 #aggregate_tweet_details(cache_dir+'diffusion_graph/pruned_graph_v2.tsv', cache_dir+'tweet_details_v2.tsv', cache_dir+'article_details_v3.tsv', cache_dir+'article_details_v4.tsv')
 #get_article_pairs(cache_dir+'diffusion_graph/pruned_graph_v2.tsv', cache_dir+'articles.txt', cache_dir+'pairs.tsv')
 #compute_pairs_similarity(cache_dir + 'similarity_model_pairs_v1.tsv', cache_dir + 'article_details_v3.tsv', cache_dir + 'paper_details_v3.tsv', cache_dir + 'similarity_model_pairs_v2.tsv')
-compute_similarity_model(cache_dir+'similarity_model_pairs_v2.tsv')
+#compute_similarity_model(cache_dir+'similarity_model_pairs_v2.tsv')
+extract_quotes(cache_dir+'article_details_v3.tsv', cache_dir+'article_details_v4.tsv')
 print("Total time: %0.3fs." % (time() - t0))
