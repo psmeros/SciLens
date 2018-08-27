@@ -4,6 +4,7 @@ from math import sqrt
 import numpy as np
 import pandas as pd
 import spacy
+import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.neighbors import NearestNeighbors
@@ -14,7 +15,7 @@ from settings import *
 nlp = None
 
 #Classifier to compute feature importance of similarities
-def compute_similarity_model(pairs_file):
+def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
     fold = 10
     n_est = 80
     m_dep = 80
@@ -27,17 +28,23 @@ def compute_similarity_model(pairs_file):
     #cross validation
     X = df[['vec_sim', 'jac_sim', 'len_sim', 'top_sim']].values
     y = df[['related']].values.ravel()
-    kf = KFold(n_splits=fold, shuffle=True)
-    score = 0.0
-    for train_index, test_index in kf.split(X):
-        X_train, X_test = X[train_index], X[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep)
-        classifier.fit(X_train, y_train)
-        score += classifier.score(X_test, y_test)
+    
+    if cross_val:
+        kf = KFold(n_splits=fold, shuffle=True)
+        score = 0.0
+        for train_index, test_index in kf.split(X):
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
+            classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep)
+            classifier.fit(X_train, y_train)
+            score += classifier.score(X_test, y_test)
 
-    print('Score:', score/fold)
-    print('Feature Importances:', classifier.feature_importances_)
+        print('Score:', score/fold)
+        print('Feature Importances:', classifier.feature_importances_)
+    else:
+        classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep)
+        classifier.fit(X, y)
+        pickle.dump(classifier, open(model_out_file, 'wb'))
 
 
 #Extract entities from text
@@ -73,7 +80,7 @@ def prepare_articles_matching(in_file, out_file):
 
 
 #Compute the cartesian similarity between the paragraphs of a pair of articles
-def cartesian_similarity(pair):
+def cartesian_similarity(pair, split_paragraphs=True):
     def vector_similarity(vector_x, vector_y):
         return cos_sim(vector_x, vector_y)
 
@@ -92,38 +99,61 @@ def cartesian_similarity(pair):
             sim = 1 - 1/sqrt(2) * sqrt(sim)
         return sim
 
-    MIN_PAR_LENGTH = 256
-    entities_x = eval(pair['entities_x'])
-    entities_y = eval(pair['entities_y'])
-    full_text_x = re.split('\n', pair['full_text_x'])
-    full_text_y = re.split('\n', pair['full_text_y'])
-    topics_x = eval(pair['topics_x'])
-    topics_y = eval(pair['topics_y'])
-    
-    paragraphs, vs, js, ls, ts = (0, ) * 5
-    for ex, ftx, tvx in zip(entities_x, full_text_x, topics_x):
-        len_x = len(ftx)
-        if (len_x < MIN_PAR_LENGTH):
-            continue
-        ex = set(ex)
-        ftvx = sent2vec(ftx)
-        for ey, fty, tvy in zip(entities_y, full_text_y, topics_y):
-            len_y = len(fty)
-            if (len_y < MIN_PAR_LENGTH):
-                continue    
-            ey = set(ey)
-            ftvy = sent2vec(fty)
-            
-            vs += vector_similarity(ftvx, ftvy)
-            js += jaccard_similarity(ex, ey)
-            ls += len_similarity(len_x, len_y)
-            ts += topic_similarity(tvx, tvy)
-            paragraphs += 1
 
-    if paragraphs != 0:
-        similarity = [vs/paragraphs, js/paragraphs, ls/paragraphs, ts/paragraphs]
+    if split_paragraphs:
+        MIN_PAR_LENGTH = 256
+        entities_x = eval(pair['entities_x'])
+        entities_y = eval(pair['entities_y'])
+        full_text_x = re.split('\n', pair['full_text_x'])
+        full_text_y = re.split('\n', pair['full_text_y'])
+        topics_x = eval(pair['topics_x'])
+        topics_y = eval(pair['topics_y'])
+        
+        paragraphs, vs, js, ls, ts = (0, ) * 5
+        for ex, ftx, tvx in zip(entities_x, full_text_x, topics_x):
+            len_x = len(ftx)
+            if (len_x < MIN_PAR_LENGTH):
+                continue
+            ex = set(ex)
+            ftvx = sent2vec(ftx)
+            for ey, fty, tvy in zip(entities_y, full_text_y, topics_y):
+                len_y = len(fty)
+                if (len_y < MIN_PAR_LENGTH):
+                    continue    
+                ey = set(ey)
+                ftvy = sent2vec(fty)
+                
+                vs += vector_similarity(ftvx, ftvy)
+                js += jaccard_similarity(ex, ey)
+                ls += len_similarity(len_x, len_y)
+                ts += topic_similarity(tvx, tvy)
+                paragraphs += 1
+
+        if paragraphs != 0:
+            similarity = [vs/paragraphs, js/paragraphs, ls/paragraphs, ts/paragraphs]
+        else:
+            similarity = [0, 0, 0, 0]
     else:
-        similarity = [0, 0, 0, 0]
+        flatten = lambda l: [item for sublist in l for item in sublist]
+        entities_x = set(flatten(eval(pair['entities_x'])))
+        entities_y = set(flatten(eval(pair['entities_y'])))
+        full_text_x = pair['full_text_x']
+        full_text_y = pair['full_text_y']
+        topics_x = set(flatten(eval(pair['topics_x'])))
+        topics_y = set(flatten(eval(pair['topics_y'])))
+
+        len_x = len(full_text_x)
+        vec_x = sent2vec(full_text_x)
+        len_y = len(full_text_y)
+        vec_y = sent2vec(full_text_y)
+            
+        vs = vector_similarity(vec_x, vec_y)
+        js = jaccard_similarity(entities_x, entities_y)
+        ls = len_similarity(len_x, len_y)
+        ts = topic_similarity(topics_x, topics_y)
+
+        similarity = [vs, js, ls, ts]
+
     return similarity
 
 #Compute the similarity for each pair

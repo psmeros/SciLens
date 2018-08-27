@@ -17,8 +17,6 @@ def aggregate_tweet_details(graph_file, tweet_file, article_in_file, article_out
     tweet_details = pd.read_csv(tweet_file, sep='\t')
     article_details = pd.read_csv(article_in_file, sep='\t')
     
-    article_details = article_details.sample(10)
-
     def func(url, tweet_details):
         dmax, dmin = pd.to_datetime(tweet_details['publish_date']).agg([np.max, np.min])
         delta_in_hours = (dmax-dmin).days *24 + (dmax-dmin).seconds // 3600

@@ -27,9 +27,7 @@ def extract_quotes(article_in_file, article_out_file, usePandas=True):
         df = pd.read_csv(article_in_file, sep='\t')
         df['quotes'] = df['full_text'].apply(lambda x : quote_pattern_search(x))
         df['quote_indicators'] = df['quotes'].apply(lambda x : quote_indicators(x))
-        df.to_csv(article_out_file, sep='\t', index=None)
-
-        
+        df.to_csv(article_out_file, sep='\t', index=None)        
 
     else:
         spark = initSpark()
