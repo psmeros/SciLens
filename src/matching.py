@@ -10,9 +10,11 @@ from sklearn.model_selection import KFold
 from sklearn.neighbors import NearestNeighbors
 
 from glove import cos_sim, sent2vec
+from topic_detection import predict_topic
 from settings import *
 
 nlp = None
+cache = {}
 
 #Classifier to compute feature importance of similarities
 def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
@@ -48,39 +50,27 @@ def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
 
 
 #Extract entities from text
-def prepare_articles_matching(in_file, out_file):
+def entity_extraction(text):
 
-    def f(text):
-        global nlp
-        if nlp is None:
-            nlp = spacy.load('en')
-
-        paragraphs = re.split('\n', text)
-        
-        text_repr = []
-        for p in paragraphs:
-            entities = []
+    global nlp
+    if nlp is None:
+        nlp = spacy.load('en')
+    
+    entities = []
+    
+    for v in hn_vocabulary:
+        if v in text:
+            entities.append(v)
             
-            for v in hn_vocabulary:
-                if v in p:
-                    entities.append(v)
-                    
-            for e in nlp(p).ents:
-                if e.text not in entities and e.label_ in ['PERSON', 'ORG', 'DATE', 'TIME', 'PERCENT', 'QUANTITY', 'CARDINAL']:
-                    entities.append(e.text)
+    for e in nlp(text).ents:
+        if e.text not in entities and e.label_ in ['PERSON', 'ORG', 'DATE', 'TIME', 'PERCENT', 'QUANTITY', 'CARDINAL']:
+            entities.append(e.text)
             
-            text_repr.append(entities)
-        
-        return text_repr
-
-    df = pd.read_csv(in_file, sep='\t')
-    df = df[~df['full_text'].isnull()]
-    df['entities'] = df['full_text'].apply(lambda x: f(x))
-    df.to_csv(out_file, sep='\t', index=None)
+    return set(entities)
 
 
 #Compute the cartesian similarity between the paragraphs of a pair of articles
-def cartesian_similarity(pair, split_paragraphs=True):
+def cartesian_similarity(pair, granularity='full_text'):
     def vector_similarity(vector_x, vector_y):
         return cos_sim(vector_x, vector_y)
 
@@ -99,54 +89,28 @@ def cartesian_similarity(pair, split_paragraphs=True):
             sim = 1 - 1/sqrt(2) * sqrt(sim)
         return sim
 
-
-    if split_paragraphs:
-        MIN_PAR_LENGTH = 256
-        entities_x = eval(pair['entities_x'])
-        entities_y = eval(pair['entities_y'])
-        full_text_x = re.split('\n', pair['full_text_x'])
-        full_text_y = re.split('\n', pair['full_text_y'])
-        topics_x = eval(pair['topics_x'])
-        topics_y = eval(pair['topics_y'])
+    def similarity_features(text, MIN_TEXT_LENGTH=0):
         
-        paragraphs, vs, js, ls, ts = (0, ) * 5
-        for ex, ftx, tvx in zip(entities_x, full_text_x, topics_x):
-            len_x = len(ftx)
-            if (len_x < MIN_PAR_LENGTH):
-                continue
-            ex = set(ex)
-            ftvx = sent2vec(ftx)
-            for ey, fty, tvy in zip(entities_y, full_text_y, topics_y):
-                len_y = len(fty)
-                if (len_y < MIN_PAR_LENGTH):
-                    continue    
-                ey = set(ey)
-                ftvy = sent2vec(fty)
-                
-                vs += vector_similarity(ftvx, ftvy)
-                js += jaccard_similarity(ex, ey)
-                ls += len_similarity(len_x, len_y)
-                ts += topic_similarity(tvx, tvy)
-                paragraphs += 1
+        if text not in cache.keys():
+            len_t = len(text)
+            if (len_t < MIN_TEXT_LENGTH):
+                return None
 
-        if paragraphs != 0:
-            similarity = [vs/paragraphs, js/paragraphs, ls/paragraphs, ts/paragraphs]
-        else:
-            similarity = [0, 0, 0, 0]
-    else:
-        flatten = lambda l: [item for sublist in l for item in sublist]
-        entities_x = set(flatten(eval(pair['entities_x'])))
-        entities_y = set(flatten(eval(pair['entities_y'])))
-        full_text_x = pair['full_text_x']
-        full_text_y = pair['full_text_y']
-        topics_x = set(flatten(eval(pair['topics_x'])))
-        topics_y = set(flatten(eval(pair['topics_y'])))
+            vec_t = sent2vec(text)
+            entities_t = entity_extraction(text)
+            topics_t = predict_topic(text)
 
-        len_x = len(full_text_x)
-        vec_x = sent2vec(full_text_x)
-        len_y = len(full_text_y)
-        vec_y = sent2vec(full_text_y)
-            
+            cache[text] = (len_t, vec_t, entities_t, topics_t)
+        return cache[text]
+
+    full_text_x = pair['full_text_x']
+    full_text_y = pair['full_text_y']
+
+    if granularity == 'full_text':
+
+        len_x, vec_x, entities_x, topics_x = similarity_features(full_text_x)
+        len_y, vec_y, entities_y, topics_y = similarity_features(full_text_y)
+
         vs = vector_similarity(vec_x, vec_y)
         js = jaccard_similarity(entities_x, entities_y)
         ls = len_similarity(len_x, len_y)
@@ -154,19 +118,49 @@ def cartesian_similarity(pair, split_paragraphs=True):
 
         similarity = [vs, js, ls, ts]
 
+    elif granularity == 'paragraph':
+        MIN_PAR_LENGTH = 256
+
+        paragraphs, vs, js, ls, ts = (0, ) * 5
+        for par_x in re.split('\n', full_text_x):
+            feat = similarity_features(par_x, MIN_PAR_LENGTH)
+            if feat == None:
+                continue
+            else:
+                len_x, vec_x, entities_x, topics_x = feat
+
+            for par_y in re.split('\n', full_text_y):
+                feat = similarity_features(par_y, MIN_PAR_LENGTH)
+                if feat == None:
+                    continue
+                else:
+                    len_y, vec_y, entities_y, topics_y = feat
+                
+                vs += vector_similarity(vec_x, vec_y)
+                js += jaccard_similarity(entities_x, entities_y)
+                ls += len_similarity(len_x, len_y)
+                ts += topic_similarity(topics_x, topics_y)
+
+                paragraphs += 1
+
+        if paragraphs != 0:
+            similarity = [vs/paragraphs, js/paragraphs, ls/paragraphs, ts/paragraphs]
+        else:
+            similarity = [0, 0, 0, 0]
+
     return similarity
 
 #Compute the similarity for each pair
-def compute_pairs_similarity(pairs_file, article_details_file, paper_details_file, out_file):
+def compute_pairs_similarity(pairs_file, article_details_file, paper_details_file, granularity, out_file):
     pairs = pd.read_csv(pairs_file, sep='\t')
     article_details = pd.read_csv(article_details_file, sep='\t')
     paper_details = pd.read_csv(paper_details_file, sep='\t')
 
-    pairs = pairs.merge(paper_details[['url','entities', 'full_text', 'topics']], left_on='paper', right_on='url')
-    pairs = pairs.merge(article_details[['url','entities', 'full_text', 'topics']], left_on='article', right_on='url')
-    pairs = pairs[['paper', 'entities_x', 'full_text_x', 'topics_x', 'article', 'entities_y', 'full_text_y', 'topics_y', 'related']]
+    pairs = pairs.merge(paper_details[['url', 'full_text']], left_on='paper', right_on='url')
+    pairs = pairs.merge(article_details[['url', 'full_text']], left_on='article', right_on='url')
+    pairs = pairs[['paper', 'full_text_x', 'article', 'full_text_y', 'related']]
 
-    df = pd.DataFrame(pairs.apply(cartesian_similarity, axis=1).tolist(), columns=['vec_sim', 'jac_sim', 'len_sim', 'top_sim']).reset_index(drop=True)
+    df = pd.DataFrame(pairs.apply(lambda x: cartesian_similarity(x, granularity=granularity), axis=1).tolist(), columns=['vec_sim', 'jac_sim', 'len_sim', 'top_sim']).reset_index(drop=True)
     pairs = pairs[['article', 'paper', 'related']].reset_index(drop=True)
     pairs = pd.concat([pairs, df], axis=1)    
     pairs.to_csv(out_file, sep='\t', index=None)

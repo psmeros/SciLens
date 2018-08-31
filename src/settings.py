@@ -1,7 +1,7 @@
 #Memory in GBs - cores used by Spark and cache folder
-conf = {'memory':8, 'cores':4, 'partitions':4*20, 'aux_dir':'/home/psmeros/Dropbox/scilens/'} #batfink
-#conf = {'memory':8, 'cores':4, 'partitions':4*20, 'aux_dir':'/Users/smeros/Dropbox/scilens/'} #mac
-#conf = {'memory':64, 'cores':24, 'partitions':24*20, 'corpusPath': '/home/smeros/backup_data/'}    #lsir-cloud
+#conf = {'memory':8, 'cores':4, 'partitions':4*20, 'aux_dir':'/home/psmeros/Dropbox/scilens/'} #batfink
+conf = {'memory':8, 'cores':4, 'partitions':4*20, 'aux_dir':'/Users/smeros/Dropbox/scilens/'} #mac
+#conf = {'memory':64, 'cores':24, 'partitions':24*20, 'aux_dir': '/home/smeros/backup_data/scilens/'}    #lsir-cloud
 #conf = {'memory':252, 'cores':48, 'partitions':48*20, 'corpusPath': '/root/'}  #iccluster
 
 #Use cached files

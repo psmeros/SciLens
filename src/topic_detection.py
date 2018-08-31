@@ -11,9 +11,10 @@ from sklearn.feature_extraction.text import CountVectorizer
 from settings import *
 from utils import initSpark
 
+lda, tf_vectorizer = (None,)*2
 
 #Discover topics for both articles and quotes
-def train_model(news_art_file, sci_art_file, model_file):
+def train_topic_model(news_art_file, sci_art_file, model_file):
 
     df = pd.concat([pd.read_csv(news_art_file, sep='\t')[['full_text']], pd.read_csv(sci_art_file, sep='\t')[['full_text']]], ignore_index=True)
     
@@ -30,16 +31,11 @@ def train_model(news_art_file, sci_art_file, model_file):
     pickle.dump(tf_vectorizer, open(model_file + '.vec', 'wb'))
 
 #Predict topics for articles
-def predict_topic(news_art_in_file, news_art_out_file, sci_art_in_file, sci_art_out_file, model_file):
-    lda = pickle.load(open(model_file + '.lda', 'rb'))
-    tf_vectorizer = pickle.load(open(model_file + '.vec', 'rb'))
+def predict_topic(text, model_file=cache_dir + 'topic_model'):
+    global lda, tf_vectorizer
+    if lda is None:
+        lda = pickle.load(open(model_file + '.lda', 'rb'))
+        tf_vectorizer = pickle.load(open(model_file + '.vec', 'rb'))
 
-    print('Discovering news article topics...')
-    df = pd.read_csv(news_art_in_file, sep='\t')
-    df['topics'] = df['full_text'].apply(lambda x: lda.transform(tf_vectorizer.transform(re.split('\n', x))).tolist())
-    df.to_csv(news_art_out_file, sep='\t', index=None)
+    return lda.transform(tf_vectorizer.transform([text])).tolist()[0]
 
-    print('Discovering scientific article topics...')
-    df = pd.read_csv(sci_art_in_file, sep='\t')
-    df['topics'] = df['full_text'].apply(lambda x: lda.transform(tf_vectorizer.transform(re.split('\n', x))).tolist())
-    df.to_csv(sci_art_out_file, sep='\t', index=None)
