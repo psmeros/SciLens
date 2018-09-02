@@ -1,20 +1,20 @@
+import pickle
 import re
 from math import sqrt
 
+import nltk.data
 import numpy as np
 import pandas as pd
 import spacy
-import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.neighbors import NearestNeighbors
 
 from glove import cos_sim, sent2vec
-from topic_detection import predict_topic
 from settings import *
+from topic_detection import predict_topic
 
-nlp = None
-cache = {}
+nlp, tokenizer = (None,)*2
 
 #Classifier to compute feature importance of similarities
 def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
@@ -50,23 +50,35 @@ def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
 
 
 #Extract entities from text
-def entity_extraction(text):
+def entity_extraction(text, granularity):
 
-    global nlp
+    global nlp, tokenizer
     if nlp is None:
         nlp = spacy.load('en')
+        tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
     
-    entities = []
+
+    if granularity == 'full_text':
+        passages = [text] 
+    elif granularity == 'paragraph':
+        passages = [p for p in re.split('\n', text) if len(p) > MIN_PAR_LENGTH]
+    elif granularity == 'sentence':
+        passages = [s for p in re.split('\n', text) if len(p) > MIN_PAR_LENGTH for s in tokenizer.tokenize(p) if len(s) > MIN_SEN_LENGTH]
+
+    p_entities = []
+    for p in passages:
+        entities = []
+        
+        for v in hn_vocabulary:
+            if v in text:
+                entities.append(v)
+                
+        for e in nlp(text).ents:
+            if e.text not in entities and e.label_ in ['PERSON', 'ORG', 'DATE', 'TIME', 'PERCENT', 'QUANTITY', 'CARDINAL']:
+                entities.append(e.text)
+        p_entities.append(set(entities))        
     
-    for v in hn_vocabulary:
-        if v in text:
-            entities.append(v)
-            
-    for e in nlp(text).ents:
-        if e.text not in entities and e.label_ in ['PERSON', 'ORG', 'DATE', 'TIME', 'PERCENT', 'QUANTITY', 'CARDINAL']:
-            entities.append(e.text)
-            
-    return set(entities)
+    return p_entities[0] if granularity == 'full_text' else p_entities
 
 
 #Compute the cartesian similarity between the paragraphs of a pair of articles
@@ -103,13 +115,10 @@ def cartesian_similarity(pair, granularity='full_text'):
             cache[text] = (len_t, vec_t, entities_t, topics_t)
         return cache[text]
 
-    full_text_x = pair['full_text_x']
-    full_text_y = pair['full_text_y']
-
     if granularity == 'full_text':
 
-        len_x, vec_x, entities_x, topics_x = similarity_features(full_text_x)
-        len_y, vec_y, entities_y, topics_y = similarity_features(full_text_y)
+        len_x, vec_x, entities_x, topics_x = similarity_features(pair['full_text_x'])
+        len_y, vec_y, entities_y, topics_y = similarity_features(pair['full_text_y'])
 
         vs = vector_similarity(vec_x, vec_y)
         js = jaccard_similarity(entities_x, entities_y)
@@ -119,17 +128,15 @@ def cartesian_similarity(pair, granularity='full_text'):
         similarity = [vs, js, ls, ts]
 
     elif granularity == 'paragraph':
-        MIN_PAR_LENGTH = 256
-
         paragraphs, vs, js, ls, ts = (0, ) * 5
-        for par_x in re.split('\n', full_text_x):
+        for par_x in re.split('\n', pair['full_text_x']):
             feat = similarity_features(par_x, MIN_PAR_LENGTH)
             if feat == None:
                 continue
             else:
                 len_x, vec_x, entities_x, topics_x = feat
 
-            for par_y in re.split('\n', full_text_y):
+            for par_y in re.split('\n', pair['full_text_y']):
                 feat = similarity_features(par_y, MIN_PAR_LENGTH)
                 if feat == None:
                     continue
@@ -155,15 +162,26 @@ def compute_pairs_similarity(pairs_file, article_details_file, paper_details_fil
     pairs = pd.read_csv(pairs_file, sep='\t')
     article_details = pd.read_csv(article_details_file, sep='\t')
     paper_details = pd.read_csv(paper_details_file, sep='\t')
+    print('entities x')
+    article_details['entities'] = article_details['full_text'].apply(lambda x: entity_extraction(x, granularity))
+    print('topics x')
+    article_details['topics'] = article_details['full_text'].apply(lambda x: predict_topic(x, granularity))
 
-    pairs = pairs.merge(paper_details[['url', 'full_text']], left_on='paper', right_on='url')
-    pairs = pairs.merge(article_details[['url', 'full_text']], left_on='article', right_on='url')
-    pairs = pairs[['paper', 'full_text_x', 'article', 'full_text_y', 'related']]
+    print('entities y')
+    paper_details['entities'] = paper_details['full_text'].apply(lambda x: entity_extraction(x, granularity))
+    print('topics y')
+    paper_details['topics'] = paper_details['full_text'].apply(lambda x: predict_topic(x, granularity))
 
-    df = pd.DataFrame(pairs.apply(lambda x: cartesian_similarity(x, granularity=granularity), axis=1).tolist(), columns=['vec_sim', 'jac_sim', 'len_sim', 'top_sim']).reset_index(drop=True)
-    pairs = pairs[['article', 'paper', 'related']].reset_index(drop=True)
-    pairs = pd.concat([pairs, df], axis=1)    
-    pairs.to_csv(out_file, sep='\t', index=None)
+
+    pairs = pairs.merge(paper_details[['url', 'full_text', 'entities', 'topics']], left_on='paper', right_on='url')
+    pairs = pairs.merge(article_details[['url', 'full_text', 'entities', 'topics']], left_on='article', right_on='url')
+    pairs = pairs[['paper', 'full_text_x', 'entities_x', 'topics_x', 'article', 'full_text_y', 'entities_y', 'topics_y', 'related']]
+    print(pairs['entities_x'])
+
+    #df = pd.DataFrame(pairs.apply(lambda x: cartesian_similarity(x, granularity=granularity), axis=1).tolist(), columns=['vec_sim', 'jac_sim', 'len_sim', 'top_sim']).reset_index(drop=True)
+    #pairs = pairs[['article', 'paper', 'related']].reset_index(drop=True)
+    #pairs = pd.concat([pairs, df], axis=1)    
+    #pairs.to_csv(out_file, sep='\t', index=None)
 
 #Subsumpling
 def uniformly_random_subsample(pairs_file, n_samples, out_file):
