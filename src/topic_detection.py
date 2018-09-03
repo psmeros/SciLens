@@ -10,9 +10,9 @@ from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
 from settings import *
-from utils import initSpark
+from utils import initSpark, split_text_to_passages
 
-lda, tf_vectorizer, tokenizer = (None,)*3
+lda, tf_vectorizer = (None,)*2
 
 #Discover topics for both articles and quotes
 def train_topic_model(news_art_file, sci_art_file, model_file):
@@ -31,19 +31,11 @@ def train_topic_model(news_art_file, sci_art_file, model_file):
     pickle.dump(lda, open(model_file + '.lda', 'wb'))
     pickle.dump(tf_vectorizer, open(model_file + '.vec', 'wb'))
 
-#Predict topics for articles
-def predict_topic(text, granularity, model_file=cache_dir + 'topic_model'):
-    global lda, tf_vectorizer, tokenizer
+#Predict topic for given text
+def predict_topic(text, model_file=cache_dir + 'topic_model'):
+    global lda, tf_vectorizer
     if lda is None:
         lda = pickle.load(open(model_file + '.lda', 'rb'))
         tf_vectorizer = pickle.load(open(model_file + '.vec', 'rb'))
-        tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-    if granularity == 'full_text':
-        return lda.transform(tf_vectorizer.transform([text])).tolist()[0]
-    elif granularity == 'paragraph':
-        paragraphs = [p for p in re.split('\n', text) if len(p) > MIN_PAR_LENGTH]
-        return lda.transform(tf_vectorizer.transform(paragraphs)).tolist()
-    elif granularity == 'sentence':
-        sentences = [s for p in re.split('\n', text) if len(p) > MIN_PAR_LENGTH for s in tokenizer.tokenize(p) if len(s) > MIN_SEN_LENGTH]
-        return lda.transform(tf_vectorizer.transform(sentences)).tolist()
+    return lda.transform(tf_vectorizer.transform(text)).tolist() if text else []
