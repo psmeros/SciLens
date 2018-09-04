@@ -1,7 +1,7 @@
 #Memory in GBs - cores used by Spark and cache folder
 #conf = {'memory':8, 'cores':4, 'partitions':4*20, 'aux_dir':'/home/psmeros/Dropbox/scilens/'} #batfink
 conf = {'memory':8, 'cores':4, 'partitions':4*20, 'aux_dir':'/Users/smeros/Dropbox/scilens/'} #mac
-#conf = {'memory':64, 'cores':24, 'partitions':24*20, 'aux_dir': '/home/smeros/backup_data/scilens/'}    #lsir-cloud
+#conf = {'memory':64, 'cores':24, 'partitions':24*20, 'aux_dir': '/home/smeros/Dropbox/scilens/'}    #lsir-cloud
 #conf = {'memory':252, 'cores':48, 'partitions':48*20, 'corpusPath': '/root/'}  #iccluster
 
 #Use cached files
@@ -31,7 +31,7 @@ max_iter = 100
 #Minimum length for articles/paragraphs/sentences (#chars)
 MIN_ART_LENGTH = 256
 MIN_PAR_LENGTH = 256
-MIN_SEN_LENGTH = 10
+MIN_SEN_LENGTH = 32
 
 #Auxiliary Files
 #File with refined topics
