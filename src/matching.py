@@ -20,16 +20,23 @@ nlp = None
 #Classifier to compute feature importance of similarities
 def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
     fold = 10
-    n_est = 80
-    m_dep = 80
+    n_est = 800
+    m_dep = 200
 
-    df = pd.read_csv(pairs_file, sep='\t')
+    df1 = pd.read_csv(pairs_file+'_full.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_f', 'jac_sim': 'jac_sim_f', 'len_sim': 'len_sim_f', 'top_sim': 'top_sim_f'})
+    df2 = pd.read_csv(pairs_file+'_paragraph.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_p', 'jac_sim': 'jac_sim_p', 'len_sim': 'len_sim_p', 'top_sim': 'top_sim_p'})
+    df3 = pd.read_csv(pairs_file+'_sentence.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_s', 'jac_sim': 'jac_sim_s', 'len_sim': 'len_sim_s', 'top_sim': 'top_sim_s'})
+
+    df = df1.merge(df2, left_on=['article', 'paper', 'related'], right_on=['article', 'paper', 'related']).merge(df3, left_on=['article', 'paper', 'related'], right_on=['article', 'paper', 'related'])
+
+    df.to_csv('~/Desktop/tabl.tsv', sep='\t', index=None)
+
 
     #clean some false positives
-    #df = df[~((df['related']==True) & (df['vec_sim']+df['jac_sim']+df['top_sim']<0.9))]
+    df = df[~((df['related']==True) & ((df['vec_sim_f']==0) | (df['jac_sim_f']==0) | (df['top_sim_f']==0) | (df['vec_sim_p']==0) | (df['jac_sim_p']==0) | (df['top_sim_p']==0) | (df['vec_sim_s']==0) | (df['jac_sim_s']==0) | (df['top_sim_s']==0)))]
 
     #cross validation
-    X = df[['vec_sim', 'jac_sim', 'len_sim', 'top_sim']].values
+    X = df[['vec_sim_f', 'jac_sim_f', 'len_sim_f', 'top_sim_f', 'vec_sim_p', 'jac_sim_p', 'len_sim_p', 'top_sim_p', 'vec_sim_s', 'jac_sim_s', 'len_sim_s', 'top_sim_s']].values
     y = df[['related']].values.ravel()
     
     if cross_val:
@@ -38,7 +45,7 @@ def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
         for train_index, test_index in kf.split(X):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep)
+            classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep, n_jobs=-1, random_state=42)
             classifier.fit(X_train, y_train)
             score += classifier.score(X_test, y_test)
 
