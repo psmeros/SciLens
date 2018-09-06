@@ -50,8 +50,16 @@ def aggregate_tweet_details(graph_file, tweet_file, article_in_file, article_out
     article_details = pd.read_csv(article_in_file, sep='\t')
     
     def func(url, tweet_details):
-        dmax, dmin = pd.to_datetime(tweet_details['publish_date']).agg([np.max, np.min])
-        delta_in_hours = (dmax-dmin).days *24 + (dmax-dmin).seconds // 3600
+        tweet_details = tweet_details.copy()
+        if len(tweet_details['publish_date']) in [0, 1]:
+            delta_in_hours = 0
+        else:
+            tweet_details['publish_date'] = pd.to_datetime(tweet_details['publish_date']).astype('int64')//1e9
+            [dmin, dmax] = np.percentile(tweet_details['publish_date'].tolist(), [5, 95])
+            delta_in_hours = (dmax-dmin) // 3600
+            if len(tweet_details['publish_date'])!=2:
+                tweet_details = tweet_details[(dmin<tweet_details['publish_date']) & (tweet_details['publish_date']<dmax)]
+    
         agg = [url]
         agg.append(delta_in_hours)
         agg.append(len(tweet_details['user_country'].dropna().unique().tolist()))
