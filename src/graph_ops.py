@@ -11,6 +11,38 @@ from settings import *
 from textblob import TextBlob
 from url_helpers import analyze_url, scrap_twitter_replies
 
+#remove articles that have the same text; tweets that point to that articles are redirected to one representative
+def remove_duplicate_text(article_in_file, graph_in_file, article_out_file, graph_out_file):
+    article_details = pd.read_csv(article_in_file, sep='\t')
+    G = read_graph(graph_in_file)
+
+    group = article_details.groupby('full_text')['url'].unique()
+    duplicates = group[group.apply(lambda x: len(x)>1)].reset_index()['url'].tolist()
+
+    remove_edges = []
+    add_edges = []
+    for d in duplicates:
+        for l in d[1:]:
+            for p in G.predecessors(l):
+                remove_edges.append((p, l))
+                add_edges.append((p, d[0]))
+                article_details = article_details[article_details['url'] != l]
+
+    for re in remove_edges:
+        try:
+            G.remove_edge(re[0], re[1])
+        except:
+            pass
+    for ae in add_edges:
+        G.add_edge(ae[0], ae[1])
+
+    with open(graph_out_file, 'w') as f:
+        for edge in G.edges:
+            f.write(edge[0] + '\t' + edge[1] + '\n')
+
+    article_details.to_csv(article_out_file, sep='\t', index=None)
+
+
 
 def aggregate_tweet_details(graph_file, tweet_file, article_in_file, article_out_file):
     G = read_graph(graph_file)
