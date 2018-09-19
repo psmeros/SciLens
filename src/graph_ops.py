@@ -90,28 +90,39 @@ def extent_tweets(in_file, out_file):
 
 
 #get scientific - news article (true and false) pairs
-def get_article_pairs(graph_file, articles_file, pairs_out_file):
+def get_article_pairs(graph_file, articles_file, pairs_out_file, multiple_links=False):
 
     G = read_graph(graph_file)
-    articles = open(articles_file).read().splitlines()
+    articles = pd.read_csv(articles_file, sep='\t')['url'].tolist()
 
-    true_pairs = []
-    for a in articles:
-        if G.out_degree(a) == 1:
-            true_pairs.append([a, next(iter(G.successors(a))), True])
+    if multiple_links == True:
+        pairs = []
+        for a in articles:
+            if G.out_degree(a) > 1:
+                for p in G.successors(a):
+                    pairs.append([a, p])
+        
+        df = pd.DataFrame(pairs, columns=['article', 'paper'])
+        df.to_csv(pairs_out_file, sep='\t', index=None)
 
-    false_pairs = []
-    for a in articles:
-        if G.out_degree(a) == 1:
-            true_successor = next(iter(G.successors(a)))
-            while True:
-                index = randint(0, len(true_pairs)-1)
-                if true_pairs[index][1] != true_successor:
-                    false_pairs.append([a, true_pairs[index][1], False])
-                    break
+    else:
+        true_pairs = []
+        for a in articles:
+            if G.out_degree(a) == 1:
+                true_pairs.append([a, next(iter(G.successors(a))), True])
 
-    df = pd.DataFrame(true_pairs+false_pairs, columns=['article', 'paper', 'related'])
-    df.to_csv(pairs_out_file, sep='\t', index=None)
+        false_pairs = []
+        for a in articles:
+            if G.out_degree(a) == 1:
+                true_successor = next(iter(G.successors(a)))
+                while True:
+                    index = randint(0, len(true_pairs)-1)
+                    if true_pairs[index][1] != true_successor:
+                        false_pairs.append([a, true_pairs[index][1], False])
+                        break
+
+        df = pd.DataFrame(true_pairs+false_pairs, columns=['article', 'paper', 'related'])
+        df.to_csv(pairs_out_file, sep='\t', index=None)
 
 
 #write tweets to file
