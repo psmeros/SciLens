@@ -29,9 +29,6 @@ def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
 
     df = df1.merge(df2, left_on=['article', 'paper', 'related'], right_on=['article', 'paper', 'related']).merge(df3, left_on=['article', 'paper', 'related'], right_on=['article', 'paper', 'related'])
 
-    df.to_csv('~/Desktop/tabl.tsv', sep='\t', index=None)
-
-
     #clean some false positives
     df = df[~((df['related']==True) & ((df['vec_sim_f']==0) | (df['jac_sim_f']==0) | (df['top_sim_f']==0) | (df['vec_sim_p']==0) | (df['jac_sim_p']==0) | (df['top_sim_p']==0) | (df['vec_sim_s']==0) | (df['jac_sim_s']==0) | (df['top_sim_s']==0)))]
 
