@@ -17,6 +17,28 @@ from utils import split_text_to_passages
 
 nlp = None
 
+
+#Classifier to test on multi-link articles
+def test_similarity_model(pairs_in_file, model_file, pairs_out_file):
+    fold = 10
+    n_est = 800
+    m_dep = 200
+
+    df1 = pd.read_csv(pairs_in_file+'_full.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_f', 'jac_sim': 'jac_sim_f', 'len_sim': 'len_sim_f', 'top_sim': 'top_sim_f'})
+    df2 = pd.read_csv(pairs_in_file+'_paragraph.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_p', 'jac_sim': 'jac_sim_p', 'len_sim': 'len_sim_p', 'top_sim': 'top_sim_p'})
+    df3 = pd.read_csv(pairs_in_file+'_sentence.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_s', 'jac_sim': 'jac_sim_s', 'len_sim': 'len_sim_s', 'top_sim': 'top_sim_s'})
+
+    df = df1.merge(df2, left_on=['article', 'paper', 'related'], right_on=['article', 'paper', 'related']).merge(df3, left_on=['article', 'paper', 'related'], right_on=['article', 'paper', 'related'])
+    df = df.drop('related', axis=1)
+
+    X = df[['vec_sim_f', 'jac_sim_f', 'len_sim_f', 'top_sim_f', 'vec_sim_p', 'jac_sim_p', 'len_sim_p', 'top_sim_p', 'vec_sim_s', 'jac_sim_s', 'len_sim_s', 'top_sim_s']].values
+    
+    classifier = pickle.load(open(model_file, 'rb'))
+    df['related'] = classifier.predict(X)
+
+    df = df[['article', 'paper', 'related']]
+    df.to_csv(pairs_out_file, sep='\t', index=None)
+
 #Classifier to compute feature importance of similarities
 def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
     fold = 10
