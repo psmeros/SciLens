@@ -9,6 +9,9 @@ import spacy
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
 from sklearn.neighbors import NearestNeighbors
+import torch
+import torch.nn as nn
+from torch import FloatTensor, LongTensor
 
 from glove import cos_sim, sent2vec
 from settings import *
@@ -40,10 +43,8 @@ def test_similarity_model(pairs_in_file, model_file, pairs_out_file):
     df.to_csv(pairs_out_file, sep='\t', index=None)
 
 #Classifier to compute feature importance of similarities
-def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
-    fold = 10
-    n_est = 800
-    m_dep = 200
+def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, cross_val=True) :
+    fold = 2
 
     df1 = pd.read_csv(pairs_file+'_full.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_f', 'jac_sim': 'jac_sim_f', 'len_sim': 'len_sim_f', 'top_sim': 'top_sim_f'})
     df2 = pd.read_csv(pairs_file+'_paragraph.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_p', 'jac_sim': 'jac_sim_p', 'len_sim': 'len_sim_p', 'top_sim': 'top_sim_p'})
@@ -64,12 +65,62 @@ def compute_similarity_model(pairs_file, model_out_file=None, cross_val=True):
         for train_index, test_index in kf.split(X):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep, n_jobs=-1, random_state=42)
-            classifier.fit(X_train, y_train)
-            score += classifier.score(X_test, y_test)
+            if classifier_type == 'RF':
+                n_est = 800
+                m_dep = 200
+                classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep, n_jobs=-1, random_state=42)
+                classifier.fit(X_train, y_train)
+                score += classifier.score(X_test, y_test)
+            elif classifier_type == 'NN':
+
+                num_epochs = 100000
+                learning_rate = 0.1
+
+                # Logistic regression model
+                model = nn.Sequential(
+                nn.Linear(12, 48),
+                nn.ReLU(),
+                nn.Linear(48, 2)
+                )
+                # Loss and optimizer
+                # nn.CrossEntropyLoss() computes softmax internally
+                criterion = nn.BCEWithLogitsLoss()
+                optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)  
+
+                inputs = FloatTensor(X_train)
+                y_train = np.array([[0,1] if e == True else [1,0] for e in y_train.tolist()])
+                targets = FloatTensor(y_train).view(len(y_train), -1)
+
+                # Train the model
+                for epoch in range(num_epochs):
+                                            
+                    # Forward pass
+                    outputs = model(inputs)
+                    #print(outputs.dtype, targets.dtype, outputs.shape, targets.shape)
+                    loss = criterion(outputs, targets)
+                    
+                    # Backward and optimize
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+                    
+                    if (epoch+1) % 1000 == 0:
+                        print ('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, loss.item()))
+
+                # Test the model
+                # In test phase, we don't need to compute gradients (for memory efficiency)
+                with torch.no_grad():
+
+                    inputs = FloatTensor(X_test)
+                    labels = LongTensor(np.array([1 if e == True else 0 for e in y_test.tolist()]))
+                    outputs = model(inputs)
+                    _, predicted = torch.max(outputs.data, 1)
+                    total = int(labels.size(0))
+                    correct = int((predicted == labels).sum())
+                    score += correct / total
 
         print('Score:', score/fold)
-        print('Feature Importances:', classifier.feature_importances_)
+        #print('Feature Importances:', classifier.feature_importances_)
     else:
         classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep)
         classifier.fit(X, y)
