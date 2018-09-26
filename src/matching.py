@@ -73,14 +73,16 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
                 score += classifier.score(X_test, y_test)
             elif classifier_type == 'NN':
 
-                num_epochs = 100000
-                learning_rate = 0.1
+                num_epochs = 5000
+                learning_rate = 0.01
+                hidden_layers = 192
 
                 # Logistic regression model
                 model = nn.Sequential(
-                nn.Linear(12, 48),
+                nn.Linear(12, hidden_layers),
                 nn.ReLU(),
-                nn.Linear(48, 2)
+                nn.BatchNorm1d(hidden_layers),
+                nn.Linear(hidden_layers, 2)
                 )
                 # Loss and optimizer
                 # nn.CrossEntropyLoss() computes softmax internally
@@ -104,7 +106,7 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
                     loss.backward()
                     optimizer.step()
                     
-                    if (epoch+1) % 1000 == 0:
+                    if (epoch+1) % 500 == 0:
                         print ('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, loss.item()))
 
                 # Test the model
