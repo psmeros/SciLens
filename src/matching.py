@@ -73,21 +73,26 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
                 score += classifier.score(X_test, y_test)
             elif classifier_type == 'NN':
 
-                num_epochs = 5000
-                learning_rate = 0.01
-                hidden_layers = 192
+                num_epochs = 400
+                learning_rate = 1e-5
+                hidden_layers = 800
 
                 # Logistic regression model
                 model = nn.Sequential(
                 nn.Linear(12, hidden_layers),
                 nn.ReLU(),
                 nn.BatchNorm1d(hidden_layers),
+                #nn.Dropout(0.8),
+                nn.Linear(hidden_layers, hidden_layers),
+                nn.ReLU(),
+                nn.BatchNorm1d(hidden_layers),
+                #nn.Dropout(0.8),
                 nn.Linear(hidden_layers, 2)
                 )
                 # Loss and optimizer
                 # nn.CrossEntropyLoss() computes softmax internally
                 criterion = nn.BCEWithLogitsLoss()
-                optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)  
+                optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.001)  
 
                 inputs = FloatTensor(X_train)
                 y_train = np.array([[0,1] if e == True else [1,0] for e in y_train.tolist()])
@@ -105,9 +110,16 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
                     optimizer.zero_grad()
                     loss.backward()
                     optimizer.step()
-                    
-                    if (epoch+1) % 500 == 0:
-                        print ('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, loss.item()))
+
+                    if (epoch+1) % 100 == 0:
+                        inputs_t = FloatTensor(X_test)
+                        labels_t = LongTensor(np.array([1 if e == True else 0 for e in y_test.tolist()]))
+                        outputs_t = model(inputs_t)
+                        _, predicted_t = torch.max(outputs_t.data, 1)
+                        total = int(labels_t.size(0))
+                        correct = int((predicted_t == labels_t).sum())
+                        score = correct / total
+                        print ('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, score))
 
                 # Test the model
                 # In test phase, we don't need to compute gradients (for memory efficiency)
@@ -120,6 +132,7 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
                     total = int(labels.size(0))
                     correct = int((predicted == labels).sum())
                     score += correct / total
+                    print(score)
 
         print('Score:', score/fold)
         #print('Feature Importances:', classifier.feature_importances_)
