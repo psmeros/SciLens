@@ -23,6 +23,6 @@ compute_similarity_model(cache_dir+'similarity_model/train_pairs_v2', 'NN', cach
 #remove_duplicate_text(cache_dir+'article_details_v4.tsv', cache_dir+'diffusion_graph/pruned_graph_v2.tsv', cache_dir+'article_details_v5.tsv', cache_dir+'diffusion_graph/pruned_graph_v3.tsv') 
 #test_similarity_model(cache_dir+'similarity_model/test_pairs_v2', cache_dir+'similarity_model/rf_model.sav', cache_dir+'similarity_model/test_pairs_v3.tsv')
 
-prepare_annotation(cache_dir+'tweet_details_v2.tsv', cache_dir+'tweet_replies.tsv')
+#prepare_annotation(cache_dir+'tweet_details_v2.tsv', cache_dir+'tweet_replies.tsv')
 
 print("Total time: %0.3fs." % (time() - t0))
