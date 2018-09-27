@@ -65,6 +65,8 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
         for train_index, test_index in kf.split(X):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
+            X_train = (X_train - X_train.mean(axis=0)) / X_train.std(axis=0)
+            X_test = (X_test - X_test.mean(axis=0)) / X_test.std(axis=0)
             if classifier_type == 'RF':
                 n_est = 800
                 m_dep = 200
@@ -73,26 +75,26 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
                 score += classifier.score(X_test, y_test)
             elif classifier_type == 'NN':
 
-                num_epochs = 400
+                num_epochs = 550000
                 learning_rate = 1e-5
-                hidden_layers = 800
+                hidden_layers = 120
 
                 # Logistic regression model
                 model = nn.Sequential(
                 nn.Linear(12, hidden_layers),
-                nn.ReLU(),
                 nn.BatchNorm1d(hidden_layers),
-                #nn.Dropout(0.8),
+                nn.ReLU(),
+                nn.Dropout(0.2),
                 nn.Linear(hidden_layers, hidden_layers),
-                nn.ReLU(),
                 nn.BatchNorm1d(hidden_layers),
-                #nn.Dropout(0.8),
+                nn.ReLU(),
+                nn.Dropout(0.2),
                 nn.Linear(hidden_layers, 2)
                 )
                 # Loss and optimizer
                 # nn.CrossEntropyLoss() computes softmax internally
                 criterion = nn.BCEWithLogitsLoss()
-                optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=0.001)  
+                optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)  
 
                 inputs = FloatTensor(X_train)
                 y_train = np.array([[0,1] if e == True else [1,0] for e in y_train.tolist()])
@@ -119,7 +121,7 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
                         total = int(labels_t.size(0))
                         correct = int((predicted_t == labels_t).sum())
                         score = correct / total
-                        print ('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, score))
+                        print ('Epoch [{}/{}], Score: {:.4f}'.format(epoch+1, num_epochs, score))
 
                 # Test the model
                 # In test phase, we don't need to compute gradients (for memory efficiency)
