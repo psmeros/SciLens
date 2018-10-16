@@ -33,8 +33,9 @@ def aggregate_tweet_details(graph_file, tweet_file, article_in_file, article_out
         agg = agg + tweet_details[['RTs', 'replies_num', 'likes']].sum(axis=0).tolist()
         agg = agg + tweet_details[['tweet_polarity', 'tweet_subjectivity', 'replies_mean_polarity', 'replies_mean_subjectivity']].mean(axis=0).tolist()
         agg = agg + tweet_details[['user_followers_count', 'user_tweet_count', 'user_friends_count']].median(axis=0).tolist()
+        agg.append([item for sublist in tweet_details['replies'].unique().tolist() for item in eval(sublist)])
 
-        agg = {'url':agg[0], 'tweets_time_delta':agg[1], 'users_countries':agg[2], 'retweets':agg[3], 'replies':agg[4], 'likes':agg[5], 'tweets_mean_polarity':agg[6], 'tweets_mean_subjectivity':agg[7], 'replies_mean_polarity':agg[8], 'replies_mean_subjectivity':agg[9], 'users_median_followers':agg[10], 'users_median_tweets':agg[11], 'users_median_friends':agg[12]}
+        agg = {'url':agg[0], 'tweets_time_delta':agg[1], 'users_countries':agg[2], 'retweets':agg[3], 'replies_count':agg[4], 'likes':agg[5], 'tweets_mean_polarity':agg[6], 'tweets_mean_subjectivity':agg[7], 'replies_mean_polarity':agg[8], 'replies_mean_subjectivity':agg[9], 'users_median_followers':agg[10], 'users_median_tweets':agg[11], 'users_median_friends':agg[12], 'replies':agg[13]}
         return agg
 
     article_details = article_details.merge(pd.DataFrame(article_details['url'].apply(lambda x: func(x, tweet_details[tweet_details['url'].isin(G.predecessors(x))])).tolist()), on='url')
