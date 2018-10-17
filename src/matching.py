@@ -175,7 +175,7 @@ def topic_extraction(passages):
 
 #Extract len from text
 def len_extraction(passages):
-    return [len(p) for p in passages]
+    return [len(re.findall(r'\w+', p)) for p in passages]
 
 
 def vector_similarity(vector_x, vector_y):
@@ -243,6 +243,8 @@ def compute_pairs_similarity(pairs_file, article_details_file, paper_details_fil
     print('Extracting len y')
     paper_details['len'] = paper_details['full_text'].apply(len_extraction)
 
+    pickle.dump(pairs, open(cache_dir+'pairs.pkl', 'wb'))
+    
     pairs = pairs.merge(paper_details[['url', 'vector', 'entities', 'topic', 'len']], left_on='paper', right_on='url')
     pairs = pairs.merge(article_details[['url', 'vector', 'entities', 'topic', 'len']], left_on='article', right_on='url')
     pairs = pairs[['paper', 'vector_x', 'entities_x', 'topic_x', 'len_x', 'article', 'vector_y', 'entities_y', 'topic_y', 'len_y', 'related']]
