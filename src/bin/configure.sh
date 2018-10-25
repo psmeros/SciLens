@@ -13,7 +13,7 @@ rm Miniconda3-latest-Linux-x86_64.sh
 source ~/.bashrc
 
 conda install -y pandas numpy networkx nltk spacy pyspark beautifulsoup4 scikit-learn
-pip install -U textblob newspaper3k
+pip install -U textblob newspaper3k textstat
 python -m nltk.downloader punkt #-d /path/to/nltk_data
 python -m spacy download en
 python -m textblob.download_corpora
