@@ -1,3 +1,4 @@
 [submodule "lib/clickbait"]
 	path = lib/clickbait
 	url = git@github.com:saurabhmathur96/clickbait-detector.git
+	ignore = dirty
