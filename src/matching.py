@@ -48,7 +48,7 @@ def test_similarity_model(pairs_in_file, model_file, pairs_out_file):
 
 #Classifier to compute feature importance of similarities
 def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, cross_val=True):
-    fold = 5
+    fold = 2
 
     df1 = pd.read_csv(pairs_file+'_full.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_f', 'jac_sim': 'jac_sim_f', 'len_sim': 'len_sim_f', 'top_sim': 'top_sim_f'})
     df2 = pd.read_csv(pairs_file+'_paragraph.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_p', 'jac_sim': 'jac_sim_p', 'len_sim': 'len_sim_p', 'top_sim': 'top_sim_p'})
@@ -65,6 +65,7 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
 
     #cross validation
     X = df[['vec_sim_f', 'jac_sim_f', 'len_sim_f', 'top_sim_f', 'vec_sim_p', 'jac_sim_p', 'len_sim_p', 'top_sim_p', 'vec_sim_s', 'jac_sim_s', 'len_sim_s', 'top_sim_s']].values
+    X = df[['vec_sim_s', 'jac_sim_s', 'len_sim_s', 'top_sim_s']].values
     y = df[['related']].values.ravel()
     
     if cross_val:
@@ -86,10 +87,10 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
                 num_epochs = 550000
                 learning_rate = 1e-5
                 hidden_layers = 120
-
+                input_layers = 4
                 # Logistic regression model
                 model = nn.Sequential(
-                nn.Linear(12, hidden_layers),
+                nn.Linear(input_layers, hidden_layers),
                 nn.BatchNorm1d(hidden_layers),
                 nn.ReLU(),
                 nn.Dropout(0.2),
