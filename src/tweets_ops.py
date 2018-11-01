@@ -13,7 +13,7 @@ from url_helpers import analyze_url, scrap_twitter_replies
 
 def aggregate_tweet_details(graph_file, tweet_file, article_in_file, article_out_file):
     G = read_graph(graph_file)
-    tweet_details = pd.read_csv(tweet_file, sep='\t')
+    tweet_details = pd.read_csv(tweet_file, sep='\t').fillna(0)
     article_details = pd.read_csv(article_in_file, sep='\t')
     
     def func(url, tweet_details):
