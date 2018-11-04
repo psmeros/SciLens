@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import spacy
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 from sklearn.neighbors import NearestNeighbors
 import torch
@@ -48,7 +49,7 @@ def test_similarity_model(pairs_in_file, model_file, pairs_out_file):
 
 #Classifier to compute feature importance of similarities
 def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, cross_val=True):
-    fold = 2
+    fold = 5
 
     df1 = pd.read_csv(pairs_file+'_full.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_f', 'jac_sim': 'jac_sim_f', 'len_sim': 'len_sim_f', 'top_sim': 'top_sim_f'})
     df2 = pd.read_csv(pairs_file+'_paragraph.tsv', sep='\t').rename(columns={'vec_sim': 'vec_sim_p', 'jac_sim': 'jac_sim_p', 'len_sim': 'len_sim_p', 'top_sim': 'top_sim_p'})
@@ -65,7 +66,7 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
 
     #cross validation
     X = df[['vec_sim_f', 'jac_sim_f', 'len_sim_f', 'top_sim_f', 'vec_sim_p', 'jac_sim_p', 'len_sim_p', 'top_sim_p', 'vec_sim_s', 'jac_sim_s', 'len_sim_s', 'top_sim_s']].values
-    X = df[['vec_sim_s', 'jac_sim_s', 'len_sim_s', 'top_sim_s']].values
+    #X = df[['vec_sim_f', 'jac_sim_f', 'len_sim_f', 'top_sim_f']].values
     y = df[['related']].values.ravel()
     
     if cross_val:
@@ -79,6 +80,7 @@ def compute_similarity_model(pairs_file, classifier_type, model_out_file=None, c
             if classifier_type == 'RF':
                 n_est = 800
                 m_dep = 200
+                #classifier = SVC()
                 classifier = RandomForestClassifier(n_estimators=n_est, max_depth=m_dep, n_jobs=-1, random_state=42)
                 classifier.fit(X_train, y_train)
                 score += classifier.score(X_test, y_test)
