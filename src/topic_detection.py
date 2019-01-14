@@ -10,7 +10,7 @@ from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
 from settings import *
-from utils import initSpark, split_text_to_passages
+from utils import split_text_to_passages
 
 lda, tf_vectorizer = (None,)*2
 
