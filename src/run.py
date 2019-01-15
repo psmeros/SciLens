@@ -26,6 +26,13 @@ t0 = time()
 
 
 
-create_diffusion_graph(scilens_dir + 'corpus/sample.tsv', scilens_dir + 'cache/test_diffusion_graph/sample_v1.tsv')
-clean_orphan_nodes(scilens_dir + 'cache/test_diffusion_graph/sample_v1.tsv', scilens_dir + 'cache/test_diffusion_graph/sample_v2.tsv')
+diffusion_graph_dir = scilens_dir + 'cache/test_diffusion_graph/'
+
+#create_diffusion_graph(scilens_dir + 'corpus/sample.tsv', diffusion_graph_dir + 'sample_v1.tsv')
+#clean_orphan_nodes(diffusion_graph_dir + 'sample_v1.tsv', diffusion_graph_dir + 'sample_v2.tsv')
+#download_documents(diffusion_graph_dir + 'sample_v2.tsv', diffusion_graph_dir + 'sample_v3.tsv', diffusion_graph_dir + 'paper_details_v1.tsv', 'paper')
+#clean_orphan_nodes(diffusion_graph_dir + 'sample_v3.tsv', diffusion_graph_dir + 'sample_v4.tsv')
+#download_documents(diffusion_graph_dir + 'sample_v4.tsv', diffusion_graph_dir + 'sample_v5.tsv', diffusion_graph_dir + 'article_details_v1.tsv', 'article')
+#clean_orphan_nodes(diffusion_graph_dir + 'sample_v5.tsv', diffusion_graph_dir + 'sample_v6.tsv')
+#download_tweets(diffusion_graph_dir + 'sample_v6.tsv', scilens_dir + 'corpus/sample.tsv', diffusion_graph_dir + 'tweet_details_v1.tsv')
 print("Total time: %0.3fs." % (time() - t0))
