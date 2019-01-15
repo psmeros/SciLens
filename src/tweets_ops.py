@@ -41,16 +41,6 @@ def aggregate_tweet_details(graph_file, tweet_file, article_in_file, article_out
     article_details = article_details.merge(pd.DataFrame(article_details['url'].apply(lambda x: func(x, tweet_details[tweet_details['url'].isin(G.predecessors(x))])).tolist()), on='url')
     article_details.to_csv(article_out_file, sep='\t', index=None)
 
-def prepare_annotation(tweets_file, out_file):
-    df = pd.read_csv(tweets_file, sep='\t')
-    df = df[['full_text', 'replies']]
-    df['replies'] = df['replies'].apply(lambda x: np.NaN if not eval(x) else eval(x))
-    df = df.dropna()
-
-    df = df.join(df['replies'].apply(pd.Series).unstack().dropna().reset_index().drop('level_0', axis=1).set_index('level_1')).drop('replies', axis=1).rename(columns = {0:'reply'})
-    df = df.sample(500)
-
-    df.to_csv(out_file, sep='\t', index=None)
 
 #extend tweet file
 def extent_tweets(in_file, out_file):
@@ -68,15 +58,3 @@ def extent_tweets(in_file, out_file):
 
 
 
-#write tweets to file
-def download_tweets(corpus_file, in_file, out_file, sleep_time):
-
-    df = pd.read_csv(twitterCorpusFile, sep='\t', header=None)
-    df[0] = df[0].apply(lambda x: x.replace('https://','http://'))
-    tweets_details = pd.read_csv(in_file, sep='\t', header=None)
-    tweets_details = tweets_details.merge(df, left_on=0, right_on=0)
-    tweets_details.columns = ['url','full_text','publish_date','popularity','RTs','user_country']
-    
-    tweets_details['replies'] = tweets_details['url'].apply(lambda x: scrap_twitter_replies(x, sleep_time))
-    tweets_details['replies_num'] = tweets_details['replies'].apply(lambda x: len(x))
-    tweets_details.to_csv(out_file, sep='\t', index=None)

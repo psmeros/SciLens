@@ -1,6 +1,7 @@
 import os
 import random
 import re
+from time import time, sleep
 from datetime import datetime
 from math import ceil, exp, floor
 from urllib.parse import urlsplit
@@ -10,6 +11,7 @@ import networkx as nx
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from newspaper import Article
 from pyspark import SparkConf
 from pyspark.sql import Row, SparkSession
 
@@ -85,6 +87,23 @@ def scrap_nutritionfacts(vocabulary_file):
     	for t in div.find_all('a', title=True):
     		f.write(t['title'] + '\n')
 
+#Scrap replies from twitter (without using the API)
+def scrap_twitter_replies(url, sleep_time):
+    try:
+        soup = BeautifulSoup(urlopen(url), 'html.parser')
+    except:
+        return []
+        
+    sleep(sleep_time)
+    replies = []
+    for d in soup.find_all('div', attrs={'class' : 'js-tweet-text-container'}):
+        try:
+            replies.append(d.find('p', attrs={'class':"TweetTextSize js-tweet-text tweet-text", 'data-aria-label-part':'0', 'lang':'en'}).get_text())
+        except:
+            continue
+
+    return replies
+
 #Find the domain and the path of an http url
 def analyze_url(url):
     try:
@@ -105,30 +124,6 @@ def same_domains(domain_1, domain_2):
     if domain_1 in domain_2 or domain_2 in domain_1:
         return True
     return False
-
-#Resolve short url
-def resolve_short_url(url):
-    if url=='':
-        return graph_nodes['tweetWithoutURL']
-        
-    try:
-        #Follow the redirections of a URL
-        r = requests.head(url, allow_redirects='HEAD', timeout=url_timeout)
-        if r.status_code != 403:            
-            r.raise_for_status()
-
-        #Avoid blacklisted and flat URLs
-        domain, path = analyze_url(r.url)
-        if domain in blacklistURLs or path in ['', '/']:
-            r.url = ''
-
-        return r.url
-
-    #Catch the different errors       
-    except requests.HTTPError as e:
-        return graph_nodes['HTTPError']
-    except:
-        return graph_nodes['TimeoutError']
 
 #scrap html page as a browser
 def get_html(url):
@@ -169,6 +164,29 @@ def write_graph(G, graph_file):
                 f.write(edge[0] + '\t' + edge[1] + '\n')
 ################################ ####### ################################
 
+#Resolve short url
+def resolve_short_url(url):
+    if url=='':
+        return graph_nodes['tweetWithoutURL']
+        
+    try:
+        #Follow the redirections of a URL
+        r = requests.head(url, allow_redirects='HEAD', timeout=url_timeout)
+        if r.status_code != 403:            
+            r.raise_for_status()
+
+        #Avoid blacklisted and flat URLs
+        domain, path = analyze_url(r.url)
+        if domain in blacklistURLs or path in ['', '/']:
+            r.url = ''
+
+        return re.sub('\?.*', '', re.sub('^http://', 'https://', r.url))
+
+    #Catch the different errors       
+    except requests.HTTPError as e:
+        return graph_nodes['HTTPError']
+    except:
+        return graph_nodes['TimeoutError']
 
 #Get outgoing links from article
 def get_out_links(url, epoch_decay, last_pass):
@@ -209,10 +227,12 @@ def get_out_links(url, epoch_decay, last_pass):
         link = link.get('href') or ''
         link_domain, link_path = analyze_url(link)
         if not same_domains(domain, link_domain) and link_domain not in blacklistURLs and link_path not in ['', '/'] and len(links) < max_outgoing_links:
+            link = re.sub('\?.*', '', re.sub('^http://', 'https://', link))
             links.append(link)
             for s in sources:
                 if s in link_domain:
                     source_links.append(link)
+                    break
 
     #if there are links to the predefined sources, return only them
     if source_links:
@@ -235,7 +255,7 @@ def graph_epoch_n(frontier, epoch, last_pass, twitter_corpus_file):
     if epoch == 0:
         urlRegex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
         documents = spark.textFile(twitter_corpus_file, minPartitions=(conf['partitions'])) \
-        .map(lambda r: (lambda r: Row(source_url=r[0], tweet=r[1], timestamp=datetime.strptime(r[2], '%Y-%m-%d %H:%M:%S'), popularity=int(r[3]), RTs=int(r[4]), user_country=r[5]))(r.split('\t'))) \
+        .map(lambda r: (lambda r: Row(source_url=r[0], tweet=r[1], timestamp=r[2], popularity=r[3], RTs=r[4], user_country=r[5]))(r.split('\t'))) \
         .flatMap(lambda r: [Row(source_url=r.source_url, timestamp=r.timestamp, popularity=r.popularity, RTs=r.RTs, user_country=r.user_country, target_url=resolve_short_url(u)) for u in re.findall(urlRegex, r.tweet) or ['']]) \
         .map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.timestamp, r.popularity, r.RTs, r.user_country, r.target_url]))
         rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url','timestamp', 'popularity', 'RTs', 'user_country', 'target_url'])
@@ -308,3 +328,126 @@ def clean_orphan_nodes(graph_in_file, graph_out_file):
         for n in nodes:
             G.remove_node(n)
     write_graph(G, graph_out_file)
+
+
+#Download news/scientific article details
+def download_documents(graph_in_file, graph_out_file, document_out_file, document_type, sleep_time=1):
+
+    G = read_graph(graph_in_file)
+
+    documents = []
+    if document_type == 'paper':
+        for r in G.predecessors(project_url+'#repository'):
+            for p in G.predecessors(r):
+                documents.append(p)
+
+    elif document_type == 'article':
+        for r in G.predecessors(project_url+'#repository'):
+            for p in G.predecessors(r):
+                for a in G.predecessors(p):
+                    if 'https://twitter.com' not in a:
+                        documents.append(a)
+
+    documents = list(set(documents))
+
+    document_details=[]
+    removed_documents = []
+    for i, d in enumerate(documents):
+        print('\r %s%%' % ("{0:.2f}").format(100 * (i / float(len(documents)))), end = '\r')
+        try:
+            article = Article(d)
+            article.download()
+            article.parse()
+            article.nlp()
+            if len(article.text)>0:
+                document_details.append([d, article.title, article.authors, article.keywords, article.publish_date, article.text])
+            else:
+                removed_documents.append(d)    
+            sleep(sleep_time)
+        except:
+            removed_documents.append(d)
+            continue
+
+    document_details = pd.DataFrame(document_details, columns=['url','title','authors','keywords','publish_date','full_text'])
+    document_details.to_csv(document_out_file, sep='\t', index=None)
+
+    for n in removed_documents:
+        G.remove_node(n)
+    write_graph(G, graph_out_file)
+
+
+#Get tweet details
+def download_tweets(graph_file, twitter_corpus_file, twitter_out_file, sleep_time=1):
+
+    G = read_graph(graph_file)
+
+    tweets_details = pd.DataFrame([t for t in G.successors(project_url+'#twitter')]) 
+    tweets_details = tweets_details.merge(pd.read_csv(twitter_corpus_file, sep='\t', header=None), left_on=0, right_on=0)
+    tweets_details.columns = ['url','full_text','publish_date','popularity','RTs','user_country']
+    
+    tweets_details['replies'] = tweets_details['url'].apply(lambda x: scrap_twitter_replies(x, sleep_time))
+    tweets_details['replies_num'] = tweets_details['replies'].apply(lambda x: len(x))
+    tweets_details.to_csv(twitter_out_file, sep='\t', index=None)
+
+
+
+
+
+
+
+#Remove articles that have the same text; tweets that point to that articles are redirected to one representative
+def remove_duplicate_text(article_in_file, graph_in_file, article_out_file, graph_out_file):
+    article_details = pd.read_csv(article_in_file, sep='\t')
+    G = read_graph(graph_in_file)
+
+    group = article_details.groupby('full_text')['url'].unique()
+    duplicates = group[group.apply(lambda x: len(x)>1)].reset_index()['url'].tolist()
+
+    remove_edges = []
+    add_edges = []
+    for d in duplicates:
+        for l in d[1:]:
+            for p in G.predecessors(l):
+                remove_edges.append((p, l))
+                add_edges.append((p, d[0]))
+                article_details = article_details[article_details['url'] != l]
+
+    for re in remove_edges:
+        try:
+            G.remove_edge(re[0], re[1])
+        except:
+            pass
+    for ae in add_edges:
+        G.add_edge(ae[0], ae[1])
+
+    with open(graph_out_file, 'w') as f:
+        for edge in G.edges:
+            f.write(edge[0] + '\t' + edge[1] + '\n')
+
+    article_details.to_csv(article_out_file, sep='\t', index=None)
+
+
+
+
+
+
+
+
+
+
+#get selected papers
+def get_most_widely_referenced_publications(graph_file, out_file, num_of_domains):
+    G = read_graph(graph_file)
+
+    pubs = []
+    for r in G.predecessors(project_url+'#repository'):
+        for n in G.predecessors(r):
+            domains = set()
+            for w in G.predecessors(n):
+                domain, _ = analyze_url(w)
+                domains.add(domain)
+            pubs.append([n, len(domains)])
+    pubs = pd.DataFrame(pubs)
+    pubs = pubs.sort_values(1, ascending=False)
+
+    pubs[pubs[1]>=num_of_domains][0].to_csv(out_file, index=False)

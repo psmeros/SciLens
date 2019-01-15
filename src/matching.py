@@ -1,19 +1,21 @@
 import pickle
 import re
 from math import sqrt
+from random import randint
 
 import nltk.data
 import numpy as np
 import pandas as pd
 import spacy
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-from sklearn.model_selection import KFold
-from sklearn.neighbors import NearestNeighbors
 import torch
 import torch.nn as nn
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import KFold
+from sklearn.neighbors import NearestNeighbors
+from sklearn.svm import SVC
 from torch import FloatTensor, LongTensor
 
+from diffusion_graph import read_graph
 from glove import cos_sim, sent2vec
 from settings import *
 from topic_detection import predict_topic
@@ -278,3 +280,39 @@ def uniformly_random_subsample(pairs_file, n_samples, out_file):
     df = pairs.reset_index().merge(index).drop_duplicates()
 
     df.to_csv(out_file, sep='\t', index=None)
+
+
+#get scientific - news article (true and false) pairs
+def get_article_pairs(graph_file, articles_file, pairs_out_file, set_type):
+
+    G = read_graph(graph_file)
+    articles = pd.read_csv(articles_file, sep='\t')['url'].tolist()
+
+    if set_type == 'test':
+        pairs = []
+        for a in articles:
+            if G.out_degree(a) > 1:
+                for p in G.successors(a):
+                    pairs.append([a, p])
+        
+        df = pd.DataFrame(pairs, columns=['article', 'paper'])
+        df.to_csv(pairs_out_file, sep='\t', index=None)
+
+    elif set_type == 'train':
+        true_pairs = []
+        for a in articles:
+            if G.out_degree(a) == 1:
+                true_pairs.append([a, next(iter(G.successors(a))), True])
+
+        false_pairs = []
+        for a in articles:
+            if G.out_degree(a) == 1:
+                true_successor = next(iter(G.successors(a)))
+                while True:
+                    index = randint(0, len(true_pairs)-1)
+                    if true_pairs[index][1] != true_successor:
+                        false_pairs.append([a, true_pairs[index][1], False])
+                        break
+
+        df = pd.DataFrame(true_pairs+false_pairs, columns=['article', 'paper', 'related'])
+        df.to_csv(pairs_out_file, sep='\t', index=None)
