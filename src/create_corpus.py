@@ -248,7 +248,7 @@ def get_out_links(url, epoch_decay, last_pass):
     return list(set(pruned_links))
 
 #Create the nth level of the diffusion graph
-def graph_epoch_n(frontier, epoch, last_pass, twitter_corpus_file):
+def graph_epoch_n(frontier, epoch, last_pass, twitter_corpus_file, diffusion_graph_dir):
 
     spark = init_spark()
 
@@ -268,6 +268,8 @@ def graph_epoch_n(frontier, epoch, last_pass, twitter_corpus_file):
 
 #Create diffusion graph
 def create_diffusion_graph(twitter_corpus_file, diffusion_graph_file):
+
+    diffusion_graph_dir = '/'.join(diffusion_graph_file.split('/')[:-1])+'/'
 
     #initialize graph
     G=nx.DiGraph()
@@ -289,7 +291,7 @@ def create_diffusion_graph(twitter_corpus_file, diffusion_graph_file):
 
         #expand graph
         if not os.path.exists(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv'):
-            graph_epoch_n(frontier, epoch, last_pass, twitter_corpus_file)
+            graph_epoch_n(frontier, epoch, last_pass, twitter_corpus_file, diffusion_graph_dir)
 
         df = pd.read_csv(diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', sep='\t').dropna()
         G =  nx.compose(G, nx.from_pandas_edgelist(df, source='source_url', target='target_url', create_using=nx.DiGraph()))
@@ -390,11 +392,6 @@ def download_tweets(graph_file, twitter_corpus_file, twitter_out_file, sleep_tim
     tweets_details.to_csv(twitter_out_file, sep='\t', index=None)
 
 
-
-
-
-
-
 #Remove articles that have the same text; tweets that point to that articles are redirected to one representative
 def remove_duplicate_text(article_in_file, graph_in_file, article_out_file, graph_out_file):
     article_details = pd.read_csv(article_in_file, sep='\t')
@@ -408,35 +405,16 @@ def remove_duplicate_text(article_in_file, graph_in_file, article_out_file, grap
     for d in duplicates:
         for l in d[1:]:
             for p in G.predecessors(l):
-                remove_edges.append((p, l))
-                add_edges.append((p, d[0]))
-                article_details = article_details[article_details['url'] != l]
+                G.add_edge(p, d[0])
+            G.remove_node(l)
+            article_details = article_details[article_details['url'] != l]
 
-    for re in remove_edges:
-        try:
-            G.remove_edge(re[0], re[1])
-        except:
-            pass
-    for ae in add_edges:
-        G.add_edge(ae[0], ae[1])
-
-    with open(graph_out_file, 'w') as f:
-        for edge in G.edges:
-            f.write(edge[0] + '\t' + edge[1] + '\n')
-
+    write_graph(G, graph_out_file)
     article_details.to_csv(article_out_file, sep='\t', index=None)
 
 
-
-
-
-
-
-
-
-
-#get selected papers
-def get_most_widely_referenced_publications(graph_file, out_file, num_of_domains):
+#Filter graph based on the number of minimum domains referencing a publication (deprecated)
+def filter_graph(graph_file, out_file, num_of_domains):
     G = read_graph(graph_file)
 
     pubs = []
@@ -451,3 +429,25 @@ def get_most_widely_referenced_publications(graph_file, out_file, num_of_domains
     pubs = pubs.sort_values(1, ascending=False)
 
     pubs[pubs[1]>=num_of_domains][0].to_csv(out_file, index=False)
+
+
+def create_corpus(corpus_file):
+    diffusion_graph_dir = scilens_dir + 'cache/diffusion_graph/'+corpus_file.split('/')[-1].split('.')[-2]+'/'
+    os.makedirs(diffusion_graph_dir, exist_ok=True)
+
+    print('Step 1: Create Diffusion Graph')
+    create_diffusion_graph(corpus_file, diffusion_graph_dir + 'diffusion_graph_v1.tsv')
+    print('Step 2: Clean Orphan Nodes')
+    clean_orphan_nodes(diffusion_graph_dir + 'diffusion_graph_v1.tsv', diffusion_graph_dir + 'diffusion_graph_v2.tsv')
+    print('Step 3: Download Papers')
+    download_documents(diffusion_graph_dir + 'diffusion_graph_v2.tsv', diffusion_graph_dir + 'diffusion_graph_v3.tsv', diffusion_graph_dir + 'paper_details_v1.tsv', 'paper')
+    print('Step 4: Clean Orphan Nodes')
+    clean_orphan_nodes(diffusion_graph_dir + 'diffusion_graph_v3.tsv', diffusion_graph_dir + 'diffusion_graph_v4.tsv')
+    print('Step 5: Download News Articles')
+    download_documents(diffusion_graph_dir + 'diffusion_graph_v4.tsv', diffusion_graph_dir + 'diffusion_graph_v5.tsv', diffusion_graph_dir + 'article_details_v1.tsv', 'article')
+    print('Step 6: Clean Orphan Nodes')
+    clean_orphan_nodes(diffusion_graph_dir + 'diffusion_graph_v5.tsv', diffusion_graph_dir + 'diffusion_graph_v6.tsv')
+    print('Step 7: Download Tweets')
+    download_tweets(diffusion_graph_dir + 'diffusion_graph_v6.tsv', corpus_file, diffusion_graph_dir + 'tweet_details_v1.tsv')
+    print('Step 8: Remove Duplicate Articles')
+    remove_duplicate_text(diffusion_graph_dir + 'article_details_v1.tsv', diffusion_graph_dir + 'diffusion_graph_v6.tsv', diffusion_graph_dir + 'article_details_v2.tsv', diffusion_graph_dir + 'diffusion_graph_v7.tsv')
