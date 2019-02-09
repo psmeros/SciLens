@@ -20,8 +20,8 @@ from settings import scilens_dir
 ############################### CONSTANTS ###############################
 
 #Spark conf
-conf = {'memory':8, 'cores':4, 'partitions':4*20}
-#conf = {'memory':64, 'cores':24, 'partitions':24*20}
+#conf = {'memory':8, 'cores':4, 'partitions':4*20}
+conf = {'memory':64, 'cores':24, 'partitions':24*20}
 #conf = {'memory':252, 'cores':48, 'partitions':48*20}
 
 #File with institutions metadata
@@ -127,9 +127,10 @@ def same_domains(domain_1, domain_2):
 
 #scrap html page as a browser
 def get_html(url):
-	headers = {"User-Agent":"Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"}
-	r = requests.get(url, allow_redirects='HEAD', timeout=url_timeout, headers=headers)
-	return BeautifulSoup(r.content, 'html.parser', from_encoding="iso-8859-1").find('body')
+    headers = {"User-Agent":"Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"}
+    r = requests.get(url, allow_redirects='HEAD', timeout=url_timeout, headers=headers)
+    if r.status_code == 200 and r.content:
+        return BeautifulSoup(r.content, 'html.parser', from_encoding="iso-8859-1").find('body')
 
 
 #Spark setup
