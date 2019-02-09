@@ -154,8 +154,10 @@ def read_graph(graph_file):
     G = nx.DiGraph()
     edges = open(graph_file).read().splitlines()
     for e in edges:
-        [e0, e1] = e.split('\t')
-        G.add_edge(e0, e1)
+        e = e.split('\t')
+        if len(e) == 2:
+            [e0, e1] = e
+            G.add_edge(e0, e1)
     return G
 
 def write_graph(G, graph_file):
@@ -261,7 +263,7 @@ def graph_epoch_n(frontier, epoch, last_pass, twitter_corpus_file, diffusion_gra
         rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url','timestamp', 'popularity', 'RTs', 'user_country', 'target_url'])
     else:
         documents = spark.parallelize(frontier, numSlices=(conf['partitions'])) \
-        .flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch), last_pass=last_pass) or ['']]) \
+        .flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch), last_pass=last_pass) or [''] if l!='']) \
         .map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.target_url]))
         rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url', 'target_url'])
 
