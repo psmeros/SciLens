@@ -127,8 +127,7 @@ def same_domains(domain_1, domain_2):
 
 #scrap html page as a browser
 def get_html(url):
-    headers = {"User-Agent":"Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"}
-    r = requests.get(url, allow_redirects='HEAD', timeout=url_timeout, headers=headers)
+    r = requests.get(url, timeout=url_timeout)
     if r.status_code == 200 and r.content:
         return BeautifulSoup(r.content, 'html.parser', from_encoding="iso-8859-1").find('body')
 
