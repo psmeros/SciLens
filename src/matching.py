@@ -15,13 +15,42 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.svm import SVC
 from torch import FloatTensor, LongTensor
 
-from diffusion_graph import read_graph
+from create_corpus import read_graph
 from glove import cos_sim, sent2vec
 from settings import *
 from topic_detection import predict_topic
-from utils import split_text_to_passages
 
 nlp = None
+tokenizer = None
+
+############################### CONSTANTS ###############################
+
+#Minimum length for articles/paragraphs/sentences (#chars)
+MIN_ART_LENGTH = 256
+MIN_PAR_LENGTH = 256
+MIN_SEN_LENGTH = 32
+
+############################### ######### ###############################
+
+################################ HELPERS ################################
+
+#Split text to passages in multiple granularities
+def split_text_to_passages(text, granularity):
+    global tokenizer
+    if tokenizer == None:
+        tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+
+    if granularity == 'full_text':
+        passages = [text] if len(text) > MIN_ART_LENGTH else []
+    elif granularity == 'paragraph':
+        passages = [p for p in re.split('\n', text) if len(p) > MIN_PAR_LENGTH]
+    elif granularity == 'sentence':
+        passages = [s for p in re.split('\n', text) if len(p) > MIN_PAR_LENGTH for s in tokenizer.tokenize(p) if len(s) > MIN_SEN_LENGTH]
+    
+    return passages
+
+################################ ####### ################################
+
 
 
 #Classifier to test on multi-link articles
