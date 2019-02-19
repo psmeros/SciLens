@@ -7,6 +7,8 @@ from networkx.algorithms import bipartite
 
 from settings import *
 
+#File with country codes
+countriesFile = scilens_dir + 'small_files/countries/codes.csv'
 
 #Top keywords in papers
 def top_paper_keywords(papers_file, threshold):
