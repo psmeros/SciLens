@@ -154,8 +154,9 @@ def read_graph(graph_file):
     G = nx.DiGraph()
     edges = open(graph_file).read().splitlines()
     for e in edges:
-        [e0, e1] = e.split('\t')
-        G.add_edge(e0, e1)
+        if len(e.split('\t')) == 2:
+            [e0, e1] = e.split('\t')
+            G.add_edge(e0, e1)
     return G
 
 def write_graph(G, graph_file):

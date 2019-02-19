@@ -6,8 +6,6 @@ import networkx as nx
 from networkx.algorithms import bipartite
 
 from settings import *
-from quoteAnalysis import resolvePerson, resolveOrganization
-from url_helpers import analyze_url
 
 
 #Top keywords in papers
