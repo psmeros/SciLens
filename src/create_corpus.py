@@ -164,6 +164,7 @@ def write_graph(G, graph_file):
     with open(graph_file, 'w') as f:
         for edge in G.edges:
                 f.write(edge[0] + '\t' + edge[1] + '\n')
+
 ################################ ####### ################################
 
 #Resolve short url

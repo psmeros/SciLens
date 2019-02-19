@@ -5,7 +5,7 @@ from time import time
 #from quote_extraction import *
 #from settings import *
 #from topic_detection import *
-#from tweets_ops import *
+from tweets_ops import *
 from create_corpus import *
 t0 = time()
 
@@ -22,5 +22,8 @@ t0 = time()
 #prepare_annotation(cache_dir+'tweet_details_v2.tsv', cache_dir+'tweet_replies.tsv')
 
 
-create_corpus(scilens_dir + 'corpus/scilens_3M.tsv')
+#create_corpus(scilens_dir + 'corpus/scilens_3M.tsv')
+#train_stance_classifier()
+#extent_tweet_details(scilens_dir+'cache/tweet_details_v1.tsv', scilens_dir+'cache/tweet_details_v2.tsv')
+
 print("Total time: %0.3fs." % (time() - t0))

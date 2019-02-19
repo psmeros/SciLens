@@ -9,7 +9,7 @@ cache_dir = scilens_dir + 'cache/'
 #Corpus files
 twitterCorpusFile = scilens_dir + 'corpus/scilens_3M.tsv'
 glove_file = scilens_dir + 'big_files/glove.6B.300d.txt'
-twitter_users_file = scilens_dir + 'corpus/twitter_users.tsv'
+
 
 
 #Topic Discovery parameters
