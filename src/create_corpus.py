@@ -20,8 +20,8 @@ from settings import scilens_dir
 ############################### CONSTANTS ###############################
 
 #Spark conf
-conf = {'memory':8, 'cores':4, 'partitions':4*20}
-#conf = {'memory':64, 'cores':24, 'partitions':24*20}
+#conf = {'memory':8, 'cores':4, 'partitions':4*20}
+conf = {'memory':64, 'cores':24, 'partitions':24*20}
 #conf = {'memory':252, 'cores':48, 'partitions':48*20}
 
 #File with institutions metadata
@@ -127,9 +127,9 @@ def same_domains(domain_1, domain_2):
 
 #scrap html page as a browser
 def get_html(url):
-	headers = {"User-Agent":"Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"}
-	r = requests.get(url, allow_redirects='HEAD', timeout=url_timeout, headers=headers)
-	return BeautifulSoup(r.content, 'html.parser', from_encoding="iso-8859-1").find('body')
+    r = requests.get(url, timeout=url_timeout)
+    if r.status_code == 200 and r.content:
+        return BeautifulSoup(r.content, 'html.parser', from_encoding="iso-8859-1").find('body')
 
 
 #Spark setup
@@ -154,8 +154,9 @@ def read_graph(graph_file):
     G = nx.DiGraph()
     edges = open(graph_file).read().splitlines()
     for e in edges:
-        if len(e.split('\t')) == 2:
-            [e0, e1] = e.split('\t')
+        e = e.split('\t')
+        if len(e) == 2:
+            [e0, e1] = e
             G.add_edge(e0, e1)
     return G
 
@@ -262,7 +263,7 @@ def graph_epoch_n(frontier, epoch, last_pass, twitter_corpus_file, diffusion_gra
         rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url','timestamp', 'popularity', 'RTs', 'user_country', 'target_url'])
     else:
         documents = spark.parallelize(frontier, numSlices=(conf['partitions'])) \
-        .flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch), last_pass=last_pass) or ['']]) \
+        .flatMap(lambda r: [Row(source_url=r, target_url=l) for l in get_out_links(r, epoch_decay=exp(-epoch), last_pass=last_pass) or [''] if l!='']) \
         .map(lambda r : '\t'.join(str(a) for a in [r.source_url, r.target_url]))
         rdd2tsv(documents, diffusion_graph_dir+'epoch_'+str(epoch)+'.tsv', ['source_url', 'target_url'])
 
