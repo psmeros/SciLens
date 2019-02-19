@@ -22,5 +22,5 @@ t0 = time()
 #prepare_annotation(cache_dir+'tweet_details_v2.tsv', cache_dir+'tweet_replies.tsv')
 
 
-create_corpus(scilens_dir + 'corpus/sample.tsv')
+create_corpus(scilens_dir + 'corpus/scilens_3M.tsv')
 print("Total time: %0.3fs." % (time() - t0))
