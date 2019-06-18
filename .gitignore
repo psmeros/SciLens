@@ -1,11 +1,6 @@
 # MAC
 .DS_Store
 
-#cache files
-cache/
-
-#plots
-plots
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -96,3 +91,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+#vscode
+.vscode
