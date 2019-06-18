@@ -15,7 +15,7 @@ from newspaper import Article
 from pyspark import SparkConf
 from pyspark.sql import Row, SparkSession
 
-from settings import scilens_dir
+from run import scilens_dir
 
 ############################### CONSTANTS ###############################
 

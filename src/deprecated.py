@@ -5,10 +5,24 @@ import pandas as pd
 import networkx as nx
 from networkx.algorithms import bipartite
 
-from settings import *
+from run import scilens_dir
+from create_corpus import analyze_url
 
+diffusion_graph_dir = scilens_dir + 'cache/test_diffusion_graph/'
+topicSimThreshold = 0.2
+ 
 #File with country codes
 countriesFile = scilens_dir + 'small_files/countries/codes.csv'
+
+
+#Pretty print of numbers (by https://stackoverflow.com/a/45846841)
+def human_format(num):
+    num = float('{:.3g}'.format(num))
+    magnitude = 0
+    while abs(num) >= 1000:
+        magnitude += 1
+        num /= 1000.0
+    return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
 
 #Top keywords in papers
 def top_paper_keywords(papers_file, threshold):
@@ -103,26 +117,4 @@ def plotHeatMapDF(topics):
 
     df.to_csv('cache/'+sys._getframe().f_code.co_name+'.tsv', sep='\t')
 
-def plotTopQuoteesDF(quotes, topics):
 
-    topics = topics.toDF().toPandas()
-    quotes = quotes.toDF().toPandas()
-    topics = topics[(topics['articleSim']>topicSimThreshold) & (topics['quoteSim']>topicSimThreshold)]
-    topics = quotes.merge(topics)
-
-    df_p = topics[topics['quoteeType'] == 'PERSON']['quotee'].value_counts().reset_index()
-    df_p.columns = ['quotee', 'count']
-    plist = df_p['quotee'].tolist()
-    df_p['quotee'] = df_p['quotee'].apply(lambda x: resolvePerson(x, plist))
-    df_p = df_p.groupby(['quotee']).sum().reset_index()
-    df_p.columns = ['quotee', 'count']
-
-    df_o = topics[topics['quoteeType'].isin(['ORG', 'PERSON'])]['quoteeAffiliation'].value_counts().reset_index()
-    df_o.columns = ['organization', 'count']
-    olist = df_o['organization'].tolist()
-    df_o['organization'] = df_o['organization'].apply(lambda x: resolveOrganization(x, olist))
-    df_o = df_o.groupby(['organization']).sum().reset_index()
-    df_o.columns = ['organization', 'count']
-
-    df_p.to_csv('cache/'+sys._getframe().f_code.co_name+'_p.tsv', sep='\t')
-    df_o.to_csv('cache/'+sys._getframe().f_code.co_name+'_o.tsv', sep='\t')
