@@ -1,3 +1,4 @@
+from pathlib import Path
 import pickle
 import re
 from math import sqrt
@@ -18,12 +19,13 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.svm import SVC
 
 from create_corpus import read_graph
-from run import scilens_dir
 
 nlp = None
 tokenizer = None
 
 ############################### CONSTANTS ###############################
+
+scilens_dir = str(Path.home()) + '/Dropbox/scilens/'
 
 #Topic Discovery parameters
 numOfTopics = 16

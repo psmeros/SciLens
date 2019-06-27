@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 import random
 import re
@@ -15,9 +16,9 @@ from newspaper import Article
 from pyspark import SparkConf
 from pyspark.sql import Row, SparkSession
 
-from run import scilens_dir
-
 ############################### CONSTANTS ###############################
+
+scilens_dir = str(Path.home()) + '/Dropbox/scilens/'
 
 #Spark conf
 #conf = {'memory':8, 'cores':4, 'partitions':4*20}
