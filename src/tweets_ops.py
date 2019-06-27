@@ -1,3 +1,4 @@
+from pathlib import Path
 import pickle
 import re
 from random import randint
@@ -13,9 +14,10 @@ from sklearn.model_selection import KFold
 from textblob import TextBlob
 
 from create_corpus import read_graph
-from run import scilens_dir
 
 ############################### CONSTANTS ###############################
+
+scilens_dir = str(Path.home()) + '/Dropbox/scilens/'
 
 stance_dir = scilens_dir + 'small_files/stance/'
 semeval_tweets = stance_dir+'semeval_2016_stance.tsv'

@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 import re
 import string
@@ -16,10 +17,11 @@ from textstat.textstat import textstat
 
 from create_corpus import analyze_url, read_graph
 from papers_ops import predict_similarity
-from run import scilens_dir
 from tweets_ops import attach_social_media_details
 
 ############################### CONSTANTS ###############################
+
+scilens_dir = str(Path.home()) + '/Dropbox/scilens/'
 
 #Predefined keyword lists
 personKeywordsFile = scilens_dir + 'small_files/keywords/person.txt'
