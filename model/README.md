@@ -1,0 +1,3 @@
+### Models, models & models...
+
+This directory stores models' binary (json, pickle, h5 or other format) file for local use.
