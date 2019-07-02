@@ -31,6 +31,3 @@ class Fetcher:
         :return: pd Dataframe
         """
         raise NotImplementedError("Please implement _load method")
-
-
-
