@@ -15,8 +15,9 @@ class CSVFetcher(Fetcher):
 
     def _fetch(self, **kwargs):
         """
-        Implement the main logic of the class. It reads csv file and return in to pd Dataframe.
+        Implements the main logic of the class. It reads csv file and return in to pd Dataframe.
 
+        :param kwargs: -separator: str. the delimiter of the file
         :return: pd.Dataframe
         """
         return self._read_csv(kwargs.get('separator', None))
