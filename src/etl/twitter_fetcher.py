@@ -15,7 +15,7 @@ class TwitterFetcher(Fetcher):
 
     def _fetch(self, **kwargs):
         """
-        Implements the main logic of the class. It reads csv file and return in to pd Dataframe.
+        Implements the main logic of the class.
 
         :param kwargs: - url: str
                        - sleep_time: int

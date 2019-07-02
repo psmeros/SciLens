@@ -12,7 +12,7 @@ class CWURFetcher(Fetcher):
 
     def _fetch(self, **kwargs):
         """
-        Implements the main logic of the class. It reads csv file and return in to pd Dataframe.
+        Implements the main logic of the class.
 
         :param kwargs: - year: str
         :return: pd.Dataframe
