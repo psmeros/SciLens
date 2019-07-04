@@ -1,4 +1,5 @@
-from src.feature_extraction.dummy_word_count import WordCount
+from src.feature_extraction.text_features import *
+from src.feature_extraction.twitter_features import *
 
 
 class FeatureFactory:
@@ -10,5 +11,41 @@ class FeatureFactory:
     """
 
     @classmethod
-    def word_count(cls, columns, new_column):
-        return WordCount(columns, new_column)
+    def word_count(cls, column, new_column):
+        return WordCount(column, new_column)
+
+    @classmethod
+    def negation(cls, column, new_column):
+        return Negation(column, new_column)
+
+    @classmethod
+    def word_sentiment(cls, column, new_column, has_positive):
+        return WordSentiment(column, new_column, has_positive)
+
+    @classmethod
+    def sentence_length(cls, column, new_column):
+        return SentenceLength(column, new_column)
+
+    @classmethod
+    def has_url(cls, column, new_column):
+        return HasUrl(column, new_column)
+
+    @classmethod
+    def count_question_marks(cls, column, new_column):
+        return CountQuestionMark(column, new_column)
+
+    @classmethod
+    def count_exclamation_marks(cls, column, new_column):
+        return CountExclamationMark(column, new_column)
+
+    @classmethod
+    def polarity(cls, column, new_column):
+        return Polarity(column, new_column)
+
+    @classmethod
+    def subjectivity(cls, column, new_column):
+        return Subjectivity(column, new_column)
+
+    @classmethod
+    def sentiment(cls, column, new_column):
+        return Sentiment(column, new_column)

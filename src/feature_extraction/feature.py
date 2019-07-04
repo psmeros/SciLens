@@ -6,7 +6,8 @@ class Feature:
         """
         Feature class. All other features inherit.
 
-        :param columns: list[str], the list of the names of features we want to apply our pre-processing upon.
+        :param columns: list[str] or str, the list of the names of features or the name of the feature
+        we want to apply our pre-processing upon.
         :param new_column: str., the name of the new feature
         """
         self.logger = get_logger('SciLens', 'feature_extraction.log')
