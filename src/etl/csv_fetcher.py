@@ -11,7 +11,7 @@ class CSVFetcher(Fetcher):
     """
     def __init__(self):
         Fetcher.__init__(self)
-        self.path = os.path.join(get_project_root(), 'datasets/raw/scilens_3M_replies.tsv')
+        self.path = os.path.join(get_project_root(), 'datasets/raw/sample_data.csv')
 
     def _fetch(self, **kwargs):
         """

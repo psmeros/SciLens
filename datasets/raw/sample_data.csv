@@ -1,0 +1,4 @@
+tweet_id,tweet,reply_id,reply
+1,this is an awesome tweet,1,this is a reply
+2,this is another tweet,1,this is a reply
+2,this is another tweet,2,this is another awesome reply
