@@ -9,9 +9,9 @@ class CSVFetcher(Fetcher):
     """
     CSV fetcher. Loads data from CSV files and returns a pandas dataframe.
     """
-    def __init__(self):
+    def __init__(self, params):
         Fetcher.__init__(self)
-        self.path = os.path.join(get_project_root(), 'datasets/raw/sample_data.csv')
+        self.path = os.path.join(get_project_root(), params['path'])
 
     def _fetch(self, **kwargs):
         """

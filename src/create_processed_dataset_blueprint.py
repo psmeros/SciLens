@@ -20,27 +20,17 @@ from src.feature_extraction.feature_factory import FeatureFactory
 if __name__ == '__main__':
 
     # fetch data
-    data_fetcher = get_fetcher_from_source('CSV')
+    data_fetcher = get_fetcher_from_source('CSV', params={'path': 'datasets/raw/sample_data.csv'})
     data = data_fetcher.get_data(separator=',')
 
     # set features configuration
-    feature_set = [FeatureFactory.word_count('tweet', 'word_count'),
-                   FeatureFactory.negation('tweet', 'negation'),
-                   FeatureFactory.word_sentiment('tweet', 'positive', has_positive=True),
-                   FeatureFactory.word_sentiment('tweet', 'negative', has_positive=False),
-                   FeatureFactory.sentence_length('tweet', 'length'),
-                   FeatureFactory.has_url('tweet', 'has_url'),
-                   FeatureFactory.count_question_marks('tweet', 'quest_mark'),
-                   FeatureFactory.count_exclamation_marks('tweet', 'excl_mark'),
-                   FeatureFactory.polarity('tweet', 'polarity'),
-                   FeatureFactory.subjectivity('tweet', 'subjectivity'),
-                   FeatureFactory.sentiment('tweet', 'sentiment')]
+    feature_set = [FeatureFactory.word_count('tweet', 'word_count')]
 
     # perform feature extraction
     for feature in feature_set:
         data = feature.apply(data)
 
     # store df
-    data.to_csv(os.path.join(get_project_root(), 'datasets/processed/new_data.csv'),
+    data.to_csv(os.path.join(get_project_root(), 'datasets/processed/new_sample_data.csv'),
                 sep=',',
                 encoding='utf-8')
