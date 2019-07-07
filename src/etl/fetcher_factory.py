@@ -1,5 +1,5 @@
-from src.etl.twitter_fetcher import TwitterFetcher
-from src.etl.csv_fetcher import CSVFetcher
+from src.etl.twitter_fetcher import *
+from src.etl.csv_fetcher import *
 
 
 def get_fetcher_from_source(source, params=None):

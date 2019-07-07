@@ -49,3 +49,11 @@ class FeatureFactory:
     @classmethod
     def sentiment(cls, column, new_column):
         return Sentiment(column, new_column)
+
+    @classmethod
+    def mean_polarity(cls, column, new_column):
+        return MeanPolarity(column, new_column)
+
+    @classmethod
+    def mean_subjectivity(cls, column, new_column):
+        return MeanSubjectivity(column, new_column)
