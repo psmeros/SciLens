@@ -14,13 +14,17 @@ class MLModel:
         """
         self.ml_model = ml_model
         self.cross_validation = cross_validation
-        self.model_name = '{}_{}_{}'.format(project_name, str(ml_model), str(cross_validation))
+        self.model_name = '{}_{}_{}.{}'.format(project_name,
+                                               ml_model.__class__.__name__,
+                                               cross_validation.__class__.__name__,
+                                               'pkl')
 
     def train(self, data):
         """
         This method performs a model fit according to the cross validation strategy that is set by the caller.
         In case of no provided validation strategy, the model fitting is performed on all the provided data
         and a single validation score on train data is returned.
+        After model fitting, the trained model is stored in the `model` dir.
 
         :param data: dict. of np.arrays with the features and the targets.
         :return: list of float, the performance scores of each iteration of the training process

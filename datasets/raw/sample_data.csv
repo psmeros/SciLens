@@ -1,4 +1,5 @@
-tweet_id,tweet,reply_id,reply
-1,this is an awesome tweet,1,this is a reply
-2,this is another tweet,1,this is a reply
-2,this is another tweet,2,this is another awesome reply
+tweet_id,tweet,reply_id,reply,target
+0,this is an awesome tweet,0,this is a reply,1
+1,this is another tweet,0,this is a reply,1
+1,this is another tweet,1,this is another awesome reply,0
+2,another one,0,another reply,1

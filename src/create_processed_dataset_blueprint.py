@@ -1,5 +1,5 @@
 """
-This scripts serves as a blueprint for creating a processed dataset given a source
+This script serves as a blueprint for creating a processed dataset given a source
 and a list of features to be created upon raw data.
 
 Steps:
@@ -31,6 +31,7 @@ if __name__ == '__main__':
         data = feature.apply(data)
 
     # store df
-    data.to_csv(os.path.join(get_project_root(), 'datasets/processed/new_sample_data.csv'),
+    data.to_csv(os.path.join(get_project_root(), 'datasets/processed/processed_sample_data.csv'),
                 sep=',',
-                encoding='utf-8')
+                encoding='utf-8',
+                index=False)
