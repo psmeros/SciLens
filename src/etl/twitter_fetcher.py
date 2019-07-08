@@ -10,7 +10,7 @@ class TwitterFetcher(Fetcher):
     """
     Twitter fetcher. Scraps data from twitter and returns a pd.Dataframe.
     """
-    def __init__(self):
+    def __init__(self, **kwargs):
         Fetcher.__init__(self)
 
     def _fetch(self, **kwargs):

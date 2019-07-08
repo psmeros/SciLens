@@ -4,7 +4,7 @@ import os
 from utils import get_project_root
 
 
-class MLModel:
+class MLModelTrainer:
     def __init__(self, ml_model, cross_validation=None, project_name=None):
         """
         This class is responsible for training, validate and predict a given sklearn ml model.

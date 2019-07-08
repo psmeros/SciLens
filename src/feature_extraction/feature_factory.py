@@ -19,7 +19,7 @@ class FeatureFactory:
         return Negation(column, new_column)
 
     @classmethod
-    def word_sentiment(cls, column, new_column, has_positive):
+    def word_sentiment(cls, column, new_column, has_positive=True):
         return WordSentiment(column, new_column, has_positive)
 
     @classmethod

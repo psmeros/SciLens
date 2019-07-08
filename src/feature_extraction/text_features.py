@@ -34,7 +34,7 @@ class Negation(Feature):
 
 
 class WordSentiment(Feature):
-    def __init__(self, column, new_column, has_positive):
+    def __init__(self, column, new_column, has_positive=True):
         """
         Word sentiment feature.
 

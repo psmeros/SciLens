@@ -9,6 +9,8 @@ class CWURFetcher(Fetcher):
     """
     CWUR fetcher. Scraps data from World University Rankings and returns a pd.Dataframe.
     """
+    def __init__(self, **kwargs):
+        Fetcher.__init__(self)
 
     def _fetch(self, **kwargs):
         """

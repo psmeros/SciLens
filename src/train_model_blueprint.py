@@ -12,7 +12,7 @@ from sklearn.model_selection import KFold
 
 from src.etl.fetcher_factory import get_fetcher_from_source
 from src.modeling.utils import split_train_test
-from src.modeling.ml_model import MLModel
+from src.modeling.ml_model_trainer import MLModelTrainer
 
 
 if __name__ == '__main__':
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     kf = KFold(n_splits=2, shuffle=True)
 
     # instantiate trainer
-    trainer = MLModel(ml_model=classifier, cross_validation=kf, project_name='example_model')
+    trainer = MLModelTrainer(ml_model=classifier, cross_validation=kf, project_name='example_model')
 
     # train the model
     history = trainer.train(data['train'])
