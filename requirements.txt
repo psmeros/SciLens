@@ -14,7 +14,7 @@ lxml==4.3.4
 matplotlib==3.1.0
 networkx==2.3
 newspaper3k==0.2.8
-nltk==3.4.3
+nltk==3.4.5
 numpy==1.16.4
 pandas==0.24.2
 Pillow==6.0.0
