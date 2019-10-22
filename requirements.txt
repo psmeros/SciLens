@@ -17,7 +17,7 @@ newspaper3k==0.2.8
 nltk==3.4.3
 numpy==1.16.4
 pandas==0.24.2
-Pillow==6.0.0
+Pillow==6.2.0
 py4j==0.10.7
 pyparsing==2.4.0
 Pyphen==0.9.5
