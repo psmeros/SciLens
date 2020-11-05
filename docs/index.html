@@ -36,6 +36,8 @@
               <h1 style="color:rgb(126, 6, 6)"><i class="fas fa-flask"></i>&nbsp;&nbsp;SciLens</h1>
               <span class="subheading">Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators</span>
               <span class="subheading" style="color: black"><b><a href="http://panayiotis.smeros.info">Panayiotis Smeros</a>, <a href="http://chato.cl">Carlos Castillo</a>, <a href="http://people.epfl.ch/karl.aberer/?lang=en">Karl Aberer</a></b></span>
+              <span class="subheading" style="font-size: large; color: black"><br></span><br/>
+              <a href="https://newsteller.io" class="btn btn-primary">Live Platform</a>
             </div>
           </div>
         </div>
@@ -49,32 +51,27 @@
           <div class="post-preview">
             <h2 class="post-title">In a nutshell</h2>
             <p class="post-meta" style="color: black">
-              SciLens is a framework that evaluates the quality of scientific news articles using several content and context indicators.
-              According to our experiments, these indicators help non-experts evaluate more accurately the quality of a scientific news article, compared to non-experts that do not have access to these indicators. 
-              Furthermore, SciLens can also be used to produce a completely automated quality score for an article, which agrees more with expert evaluators than manual evaluations done by non-experts. 
+              <b>SciLens</b> is a framework for evaluating the quality of scientific news articles based on heterogeneous indicators. 
+              These indicators derive from: i) the content of articles, where we consider metrics such as <b>clickbaitness</b>, <b>sentiment</b>, and <b>readability</b>, and distinguish between attributed and unattributed <b>quotes</b>,
+              ii) the scientific context of articles, where we measure the <b>semantic textual similarity</b> and the <b>web-graph proximity</b> to the related scientific literature, and
+              iii) the social media context of articles, where we measure the audience's <b>reach</b> and <b>stance</b>.
+              SciLens combines these indicators with <b>expert reviews</b> in a unified environment, bridging the gap between traditional and computational journalism. 
+              This augmented view of the articles has provably helped non-expert users to acquire better consensus about the quality of scientific news articles. <br/>
+              The <a href="https://github.com/psmeros/SciLens">code of SciLens</a>, the anonymized data (i.e., the social media postings, news articles, and scientific papers) in <a href="files/diffusion_graph_raw.tsv.bz2">raw</a> and <a href="files/diffusion_graph_clean.tsv.bz2">clean</a> format, as well as the anonymized <a href="files/expert_evaluations.csv">expert</a> and <a href="files/non_expert_evaluations.csv">non-expert</a> user evaluations, are made publickly available.
             </p>
-            <h2 class="post-title">Content and Context Indicators</h2>
-            <p class="post-meta" style="color: black">
-              Regarding the content of an article, we consider the click-baitness of its title, the sentiment, the readability and the length of its body and whether it is bylined by its author. 
-              We also analyze its quotes, distinguishing between attributed and unattributed or “weasel” quotes.<br/>
-              Regarding the scientific context, we measure the semantic textual similarity between the article and the related scientific literature.
-              We also expect high-quality articles to be connected through many short paths to scientific portals and academic websites in the Web graph.<br/>
-              Finally, regarding the social media context, we measure two aspects: reach i.e., the impact that the article has in social media and stance i.e., the positioning of posting authors with respect to the article.<br/>
+            <p class="post-meta">
+              <img src="files/components.png" alt="SciLens Components" style="height:6cm;"/>&emsp;&emsp;&emsp;
+              <img src="files/indicator1.png" alt="SciLens Indicator 1" style="height:6cm;"/>
+              <img src="files/indicator2.png" alt="SciLens Indicator 2" style="height:6cm;"/>
             </p>
-            <p class="post-meta" style="color: black;text-align:center"><i class="fas fa-file-alt"></i>&nbsp;&nbsp;For more details, have a look on our WWW'19 paper [<a href="files/smeros_castillo_aberer_2019_scilens_quality_scientific_news.pdf"><b>pdf</b></a>, <a href="files/smeros_castillo_aberer_2019_scilens_quality_scientific_news.bib"><b>bib</b></a>, <a href="files/smeros_castillo_aberer_2019_scilens_quality_scientific_news_poster.pdf"><b>poster</b></a>]<br/><br/> <a href="files/smeros_castillo_aberer_2019_scilens_quality_scientific_news.pdf"><img src="files/scilens_paper_preview.png" class="centered-image" alt="scilens_paper_preview" style="height:7cm;border-style:solid;border-width:1px;"/></a> <a href="files/smeros_castillo_aberer_2019_scilens_quality_scientific_news_poster.pdf"><img src="files/scilens_poster_preview.png" class="centered-image" alt="scilens_poster_preview" style="height:7cm;border-style:solid;border-width:1px;"/></a><br/></p>
           </div>
-          <hr>
           <div class="post-preview">
-            <h2 class="post-title">Resources</h2>
-            <ul class="fa-ul">
-              <li><span class="fa-li" ><i class="fas fa-bezier-curve"></i></span><a href="files/diffusion_graph_raw.tsv.bz2">Directed Diffusion Graph (raw) after the crawling phase containing <b>2.4M</b> nodes and <b>3.7M</b> edges</a></li>
-              <li><span class="fa-li" ><i class="fas fa-bezier-curve"></i></span><a href="files/diffusion_graph_clean.tsv.bz2">Directed Diffusion Graph (clean) after the pruning and merging phase containing <b>49K</b> social media postings, <b>12K</b> news articles, and <b>24K</b> scientific papers</a></li>
-              <li><span class="fa-li" ><i class="fas fa-user-graduate"></i></span><a href="files/expert_evaluations.csv">Anonymized expert evaluations of news articles</a></li>
-              <li><span class="fa-li" ><i class="fas fa-users"></i></span><a href="files/non_expert_evaluations.csv">Anonymized non-expert evaluations of news articles</a></li>
-              <li><span class="fa-li" ><i class="far fa-map"></i></span><a href="files/evaluation_instructions.html">Evaluation instructions for experts/non-experts</a></li>
-            </ul>
+            <h2 class="post-title">Publications</h2>
+            <p class="post-meta" style="color: black">
+              [<b>WWW '19</b>] P. Smeros, C. Castillo, K. Aberer. <em>SciLens: Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators.</em> [<a href="files/Smeros0A19.pdf">pdf</a>, <a href="files/Smeros0A19.bib">bib</a>, <a href="files/Smeros0A19.pptx">slides</a>] <br/>
+              [<b>VLDB '20</b>] A. Romanou, P. Smeros, C. Castillo, K. Aberer. <em>SciLens News Platform: A System for Real-Time Evaluation of News Articles.</em> [<a href="files/RomanouS0A20.pdf">pdf</a>, <a href="files/RomanouS0A20.bib">bib</a>, <a href="files/RomanouS0A20.mp4">demo</a>]
+            </p>
           </div>
-          <hr>
         </div>
       </div>
     </div>
@@ -84,7 +81,8 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-md-10 mx-auto">
-            <p class="copyright text-muted">For more information and further discussion on this project, please <a href="mailto:panayiotis.smeros@epfl.ch">contact us</a>!</p>
+            <p class="copyright text-muted"><b>This project is supported by <a href="https://www.epfl.ch/research/open-science/champions/" target="_blank">Open Science Fund</a> & <a href="https://www.satw.ch/" target="_blank">SATW</a></b> <br/>
+            For more information and further discussion on this project, please <a href="mailto:panayiotis.smeros@epfl.ch">contact us</a>!</p>
           </div>
         </div>
       </div>
