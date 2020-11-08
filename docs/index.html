@@ -1,100 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <title>SciLens: Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators</title>
+        <meta name="keywords" content="Content Quality, Online News, Scientific News, Social Media, Science Communication" lang="en"> 
+        <meta name="description" content="Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators">
+        <meta name="author" content="Panayiotis Smeros">
+        <link rel="shortcut icon" type="image/png" href="assets/img/scilens.png"/> 
     
-    <title>SciLens: Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators</title>
-    <meta name="keywords" content="Content Quality, Online News, Scientific News, Social Media, Science Communication" lang="en"> 
-    <meta name="description" content="Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators">
-    <meta name="author" content="Panayiotis Smeros">
-    <link rel="shortcut icon" type="image/png" href="vendor/scilens.png"/> 
-
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom fonts for this template -->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
-
-    <!-- Custom styles for this template -->
-    <link href="clean-blog.min.css" rel="stylesheet">
-
-  </head>
-
-  <body>
-
-    <!-- Page Header -->
-    <header class="masthead" style="background-image: url('img/home-bg.jpg')">
-      <div class="overlay"></div>
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-8 col-md-10 mx-auto">
-            <div class="site-heading">
-              <h1 style="color:rgb(126, 6, 6)"><i class="fas fa-flask"></i>&nbsp;&nbsp;SciLens</h1>
-              <span class="subheading">Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators</span>
-              <span class="subheading" style="color: black"><b><a href="http://panayiotis.smeros.info">Panayiotis Smeros</a>, <a href="http://chato.cl">Carlos Castillo</a>, <a href="http://people.epfl.ch/karl.aberer/?lang=en">Karl Aberer</a></b></span>
-              <span class="subheading" style="font-size: large; color: black"><br></span><br/>
-              <a href="https://newsteller.io" class="btn btn-primary">Live Platform</a>
+        <!-- Font Awesome icons (free version)-->
+        <script src="https://use.fontawesome.com/releases/v5.15.1/js/all.js" crossorigin="anonymous"></script>
+        <!-- Google fonts-->
+        <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet" type="text/css" />
+        <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+    </head>
+    <body id="page-top">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+            <a class="navbar-brand js-scroll-trigger" href="#page-top">
+                <span class="d-block d-lg-none">SciLens</span>
+                <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="assets/img/scilens.png" alt="" /></span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">In a Nutshell</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#details">Details</a></li>
+                </ul>
             </div>
-          </div>
+        </nav>
+        <!-- Page Content-->
+        <div class="container-fluid p-0">
+            <!-- About-->
+            <section class="resume-section" id="about">
+                <div class="resume-section-content">
+                    <h1 class="mb-0"><span class="text-primary">SciLens <a href="https://newsteller.io" class="btn btn-primary">Live Demo</a></span></h1>
+                    <div class="subheading mb-0">Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators</div>
+                    <div class="subheading mb-5"><a href="http://panayiotis.smeros.info">Panayiotis Smeros</a>, <a href="http://chato.cl">Carlos Castillo</a>, <a href="http://people.epfl.ch/karl.aberer/?lang=en">Karl Aberer</a></div>
+                    <p class="lead mb-3">
+                        <b>SciLens</b> is a framework for evaluating the quality of scientific news based on heterogeneous indicators. 
+                        These indicators derive from: i) the content of articles, where we consider metrics such as <b>clickbaitness</b>, <b>sentiment</b>, and <b>readability</b>, and distinguish between attributed and unattributed <b>quotes</b>,
+                        ii) the scientific context of articles, where we measure the <b>semantic textual similarity</b> and the <b>web-graph proximity</b> to the related scientific literature, and
+                        iii) the social media context of articles, where we measure the audience's <b>reach</b> and <b>stance</b>.
+                        SciLens combines these indicators with <b>expert reviews</b> in a unified environment, bridging the gap between traditional and computational journalism. 
+                        This <b>augmented view</b> of the articles has provably helped <b>non-expert users</b> to acquire better consensus about the quality of scientific news articles. <br/>
+                    </p>
+                    <p class="lead mb-1">
+                        <img src="files/components.png" alt="SciLens Components" style="height:8cm;"/>&emsp;&emsp;
+                        <img src="files/indicator1.png" alt="SciLens Indicator 1" style="height:8cm;"/>
+                        <img src="files/indicator2.png" alt="SciLens Indicator 2" style="height:8cm;"/>
+                    </p>
+                    <div class="mb-3"  style="text-align: center;"><em>Quality Indicators for Scientific News (left); Replies Stance being more informative than Title Clickbaitness (right)</em></div>
+                    <div class="social-icons" style="text-align: center;">
+                        <a class="social-icon" href="mailto:panayiotis.smeros@epfl.ch" target="_blank"><i class="fa fa-envelope"></i></a>
+                        <a class="social-icon" href="http://github.com/psmeros/SciLens" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </section>
+            <hr class="m-0" />
+            <!-- Details-->
+            <section class="resume-section" id="details">
+                <div class="resume-section-content">
+                    <h2 class="mb-5">Details</h2>
+                    <div class="subheading mb-0">Publications</div>
+                    <ul class="fa-ul mb-3">
+                        <li>[<b>WWW '19</b>] P. Smeros, C. Castillo, K. Aberer. <em>SciLens: Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators.</em> [<a href="files/Smeros0A19.pdf">pdf</a>, <a href="files/Smeros0A19.bib">bib</a>, <a href="files/Smeros0A19.pptx">slides</a>]</li>
+                        <li>[<b>VLDB '20</b>] A. Romanou, P. Smeros, C. Castillo, K. Aberer. <em>SciLens News Platform: A System for Real-Time Evaluation of News Articles.</em> [<a href="files/RomanouS0A20.pdf">pdf</a>, <a href="files/RomanouS0A20.bib">bib</a>, <a href="files/RomanouS0A20.mp4">demo</a>]</li>
+                    </ul>
+                    <div class="subheading mb-0">Data</div>
+                    <ul class="fa-ul mb-3">
+                        <li>Anonymized social media postings, news articles, and scientific papers in <a href="files/diffusion_graph_raw.tsv.bz2">raw</a> and <a href="files/diffusion_graph_clean.tsv.bz2">clean</a> graph format</li>
+                        <li>Anonymized <a href="files/expert_evaluations.csv">expert</a> and <a href="files/non_expert_evaluations.csv">non-expert</a> evaluations of news articles</li>
+                    </ul>
+                    <div class="subheading mb-0">Support</div>
+                    <ul class="fa-ul mb-3">
+                        <li><a href="https://www.epfl.ch/research/open-science/champions" target="_blank">Open Science Fund</a></li>
+                        <li><a href="https://www.satw.ch/en" target="_blank">Swiss Academy of Engineering Sciences</a></li>
+                    </ul>
+                </div>
+            </section>
+            <hr class="m-0" />
         </div>
-      </div>
-    </header>
 
-    <!-- Main Content -->
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <div class="post-preview">
-            <h2 class="post-title">In a nutshell</h2>
-            <p class="post-meta" style="color: black">
-              <b>SciLens</b> is a framework for evaluating the quality of scientific news articles based on heterogeneous indicators. 
-              These indicators derive from: i) the content of articles, where we consider metrics such as <b>clickbaitness</b>, <b>sentiment</b>, and <b>readability</b>, and distinguish between attributed and unattributed <b>quotes</b>,
-              ii) the scientific context of articles, where we measure the <b>semantic textual similarity</b> and the <b>web-graph proximity</b> to the related scientific literature, and
-              iii) the social media context of articles, where we measure the audience's <b>reach</b> and <b>stance</b>.
-              SciLens combines these indicators with <b>expert reviews</b> in a unified environment, bridging the gap between traditional and computational journalism. 
-              This augmented view of the articles has provably helped non-expert users to acquire better consensus about the quality of scientific news articles. <br/>
-              The <a href="https://github.com/psmeros/SciLens">code of SciLens</a>, the anonymized data (i.e., the social media postings, news articles, and scientific papers) in <a href="files/diffusion_graph_raw.tsv.bz2">raw</a> and <a href="files/diffusion_graph_clean.tsv.bz2">clean</a> format, as well as the anonymized <a href="files/expert_evaluations.csv">expert</a> and <a href="files/non_expert_evaluations.csv">non-expert</a> user evaluations, are made publickly available.
-            </p>
-            <p class="post-meta">
-              <img src="files/components.png" alt="SciLens Components" style="height:6cm;"/>&emsp;&emsp;&emsp;
-              <img src="files/indicator1.png" alt="SciLens Indicator 1" style="height:6cm;"/>
-              <img src="files/indicator2.png" alt="SciLens Indicator 2" style="height:6cm;"/>
-            </p>
-          </div>
-          <div class="post-preview">
-            <h2 class="post-title">Publications</h2>
-            <p class="post-meta" style="color: black">
-              [<b>WWW '19</b>] P. Smeros, C. Castillo, K. Aberer. <em>SciLens: Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators.</em> [<a href="files/Smeros0A19.pdf">pdf</a>, <a href="files/Smeros0A19.bib">bib</a>, <a href="files/Smeros0A19.pptx">slides</a>] <br/>
-              [<b>VLDB '20</b>] A. Romanou, P. Smeros, C. Castillo, K. Aberer. <em>SciLens News Platform: A System for Real-Time Evaluation of News Articles.</em> [<a href="files/RomanouS0A20.pdf">pdf</a>, <a href="files/RomanouS0A20.bib">bib</a>, <a href="files/RomanouS0A20.mp4">demo</a>]
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-8 col-md-10 mx-auto">
-            <p class="copyright text-muted"><b>This project is supported by <a href="https://www.epfl.ch/research/open-science/champions/" target="_blank">Open Science Fund</a> & <a href="https://www.satw.ch/" target="_blank">SATW</a></b> <br/>
-            For more information and further discussion on this project, please <a href="mailto:panayiotis.smeros@epfl.ch">contact us</a>!</p>
-          </div>
-        </div>
-      </div>
-    </footer>
-
-    <!-- Bootstrap core JavaScript -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom scripts for this template -->
-    <script src="js/clean-blog.min.js"></script>
-
-  </body>
-
+        <footer class="footer">
+            <div class="text-center"><small class="copyright">Last update 11/2020. Template designed by <a href="https://startbootstrap.com/theme/resume" target="_blank">Start Bootstrap</a>.</small></div>
+        </footer>    
+        <!-- Bootstrap core JS-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Third party plugin JS-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+    </body>
 </html>
