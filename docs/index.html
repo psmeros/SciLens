@@ -21,14 +21,16 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
             <a class="navbar-brand js-scroll-trigger" href="#page-top">
-                <span class="d-block d-lg-none">SciLens</span>
+                <span class="d-block d-lg-none">SciLens &amp; SciClops</span>
                 <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="assets/img/scilens.png" alt="" /></span>
             </a>
             
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">In a Nutshell</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#SciClops">SciClops</a></li>
+                    <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#SciLens">SciLens</a></li>
                     <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#details">Details</a></li>
                 </ul>
             </div>
@@ -38,10 +40,47 @@
             <!-- About-->
             <section class="resume-section" id="about">
                 <div class="resume-section-content">
-                    <h1 class="mb-0"><span class="text-primary">SciLens <a href="https://newsteller.io" class="btn btn-primary">Live Demo</a></span></h1>
-                    <div class="subheading mb-0">Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators</div>
+                    <h1 class="mb-0"><span class="text-primary">SciLens &amp; SciClops</span></h1>
+                    <div class="subheading mb-0">Methods to combat online scientific misinformation</div>
                     <div class="subheading mb-5"><a href="http://panayiotis.smeros.info">Panayiotis Smeros</a>, <a href="http://chato.cl">Carlos Castillo</a>, <a href="http://people.epfl.ch/karl.aberer/?lang=en">Karl Aberer</a></div>
                     <p class="lead mb-3">
+                        <b>Misinformation</b> in news and social media is a multifaceted problem that can be tackled at different levels of granularity: at the level of claims, articles, or sources.
+                        <b>Claims</b> are short passages containing check-worthy information, such as messages exchanged on social media or fragments of news articles.
+                        <b>Articles</b> in news outlets and personal blogs are longer passages that contain one or more claims and typically provide more contextual information to support, dispute, or satirize these claims.
+                        At the top level of this taxonomy, we find news <b>sources</b>, e.g., broadcasting syndications or independent journalists, that produce news-worthy content.
+                    </p>
+                    <div class="social-icons text-center">
+                        
+                    </div>
+                </div>
+            </section>
+            <hr class="m-0" />
+            <section class="resume-section" id="SciClops">
+                <div class="resume-section-content">
+                    <p class="lead mb-3">                        
+                        <b>SciClops</b> involves three main steps to process scientific claims found in online news articles and social media postings: <b>extraction, clustering, and contextualization</b>.
+                        First, the extraction of scientific claims takes place using a <b>domain-specific, fine-tuned transformer model</b>.
+                        Second, similar claims extracted from heterogeneous sources are clustered together with <b>related scientific literature</b> using a method that exploits their content and the connections among them.
+                        Third, check-worthy claims, broadcasted by popular yet unreliable sources, are highlighted together with an <b>enhanced fact-checking context</b> that includes related verified claims, news articles, and scientific papers.
+                        Extensive experiments show that SciClops assists effectively non-expert fact-checkers in the verification of complex scientific claims, <b>outperforming commercial fact-checking systems</b>.
+                        <br/>
+                    </p>
+                    <p class="lead mb-1 text-center">
+                        <img src="files/SciClops.png" alt="SciClops Fact-Checking Context" style="width:23%;"/>
+                        <img src="files/SciClops_RMSE.png" alt="SciClops RMSE" style="width:23%;"/>
+                        <img src="files/SciClops_KDEs.png" alt="SciClops KDEs" style="width:46%;"/>
+                    </p>
+                    <div class="mb-3 text-center"><em>SciClops Fact-Checking Context; Non-Experts + Context > Commercial Systems; Context => confidence↑ effort↑</em></div>
+                    <div class="social-icons text-center">
+                        <a class="social-icon" href="mailto:panayiotis.smeros@epfl.ch" target="_blank"><i class="fa fa-envelope"></i></a>
+                        <a class="social-icon" href="http://github.com/psmeros/SciClops" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </section>            
+            <hr class="m-0" />
+            <section class="resume-section" id="SciLens">
+                <div class="resume-section-content">
+                    <p class="lead mb-3">                        
                         <b>SciLens</b> is a framework for evaluating the quality of scientific news based on heterogeneous indicators. 
                         These indicators derive from: i) the content of articles, where we consider metrics such as <b>clickbaitness</b>, <b>sentiment</b>, and <b>readability</b>, and distinguish between attributed and unattributed <b>quotes</b>,
                         ii) the scientific context of articles, where we measure the <b>semantic textual similarity</b> and the <b>web-graph proximity</b> to the related scientific literature, and
@@ -50,17 +89,18 @@
                         This <b>augmented view</b> of the articles has provably helped <b>non-expert users</b> to acquire better consensus about the quality of scientific news articles. <br/>
                     </p>
                     <p class="lead mb-1 text-center">
-                        <img src="files/components.png" alt="SciLens Components" style="height:8cm;"/>&emsp;&emsp;
-                        <img src="files/indicator_1.png" alt="SciLens Indicator 1" style="height:8cm;"/>
-                        <img src="files/indicator_2.png" alt="SciLens Indicator 2" style="height:8cm;"/>
+                        <img src="files/SciLens.png" alt="SciLens Components" style="width:23%;"/>
+                        <img src="files/SciLens_RMSE.png" alt="SciLens RMSE" style="width:23%;"/>
+                        <img src="files/SciLens_indicator_1.png" alt="SciLens Indicator 1" style="width:23%;"/>
+                        <img src="files/SciLens_indicator_2.png" alt="SciLens Indicator 2" style="width:23%;"/>
                     </p>
-                    <div class="mb-3 text-center"><em>Quality Indicators for Scientific News (left); Replies Stance being more informative than Title Clickbaitness (right)</em></div>
+                    <div class="mb-3 text-center"><em>SciLens Indicators Overview; Non-Experts + Indicators > Non-Experts; Replies Stance > Title Clickbaitness</em></div>
                     <div class="social-icons text-center">
                         <a class="social-icon" href="mailto:panayiotis.smeros@epfl.ch" target="_blank"><i class="fa fa-envelope"></i></a>
                         <a class="social-icon" href="http://github.com/psmeros/SciLens" target="_blank"><i class="fab fa-github"></i></a>
                     </div>
                 </div>
-            </section>
+            </section>            
             <hr class="m-0" />
             <!-- Details-->
             <section class="resume-section" id="details">
@@ -70,6 +110,10 @@
                     <ul class="fa-ul mb-3">
                         <li>[<b>WWW '19</b>] P. Smeros, C. Castillo, K. Aberer. <em>SciLens: Evaluating the Quality of Scientific News Articles Using Social Media and Scientific Literature Indicators.</em> [<a href="files/Smeros0A19.pdf">pdf</a>, <a href="files/Smeros0A19.bib">bib</a>, <a href="files/Smeros0A19.pptx">slides</a>]</li>
                         <li>[<b>VLDB '20</b>] A. Romanou, P. Smeros, C. Castillo, K. Aberer. <em>SciLens News Platform: A System for Real-Time Evaluation of News Articles.</em> [<a href="files/RomanouS0A20.pdf">pdf</a>, <a href="files/RomanouS0A20.bib">bib</a>, <a href="files/RomanouS0A20.mp4">demo</a>]</li>
+                    </ul>
+                    <div class="subheading mb-0">System</div>
+                    <ul class="fa-ul mb-3">
+                        <li><a href="https://newsteller.io" class="btn btn-primary">NewsTeller</a></li>
                     </ul>
                     <div class="subheading mb-0">Data</div>
                     <ul class="fa-ul mb-3">
@@ -87,7 +131,7 @@
         </div>
 
         <footer class="footer">
-            <div class="text-center"><small class="copyright">Last update 11/2020. Template designed by <a href="https://startbootstrap.com/theme/resume" target="_blank">Start Bootstrap</a>.</small></div>
+            <div class="text-center"><small class="copyright">Last update 11/2021. Template designed by <a href="https://startbootstrap.com/theme/resume" target="_blank">Start Bootstrap</a>.</small></div>
         </footer>    
         <!-- Bootstrap core JS-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
