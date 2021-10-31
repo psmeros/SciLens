@@ -1,3 +1,0 @@
-#!/bin/bash
-
-rsync -aP --delete ../docs/* smeros@scilens.epfl.ch:/icsil1/scilens/
